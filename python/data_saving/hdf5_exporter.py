@@ -52,6 +52,7 @@ class PytablesEncoder(json.JSONEncoder):
         elif isinstance(obj, np.signedinteger):
             return int(obj)
         else:
+            # TODO(Another type)
             return "Not impletented"
 
 
@@ -88,6 +89,7 @@ def main():
                         default="from_hdf5.json",
                         help='name of output json file')
     parser.add_argument("--debug", default=False, action="store_true", help="enable debug mode")
+    # TODO(Compression)
     #parser.add_argument("--zip", default=False, action="stroe_true", help="enable zip compression")
 
     args = parser.parse_args()
