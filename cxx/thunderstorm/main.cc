@@ -33,6 +33,15 @@ int main(int argc, char **argv) {
             fin.close();
         }
     }
+    else{
+        G4DFClient *dfClient = G4DFClient::instance();
+        dfClient->read(std::cin);
+        dfClient->setup(new PhysicsList(settings->physics), new ActionInitialization(settings));
+        dfClient->initialize();
+        dfClient->massWorld->setDetectorFactory(new SensitiveDetectorFactory);
+        dfClient->read(std::cin);
+        dfClient->stop();
+    }
     return 0;
 }
 
