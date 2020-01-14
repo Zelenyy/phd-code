@@ -11,17 +11,19 @@ from functools import partial
 
 from dataforge.meta import Meta
 
-GEANT4_OUTFILE = ['gdml/default.gdml', 'gps/gps.mac', 'mac/init.mac']
 
-
-def create_one_file(finput, foutput, dict_value):
-    with open(finput, 'r') as fin:
+def create_from_file_template(fin, fout, values: dict):
+    with open(fin) as fin:
         text = fin.read()
+    return create_one_file(text, fout, values)
+
+
+def create_one_file(text, foutput, values: dict):
     template = Template(text)
     os.makedirs(os.path.split(foutput)[0], exist_ok=True)
     with open(foutput, 'w') as fout:
-        fout.write(template.safe_substitute(dict_value))
-    return True
+        fout.write(template.safe_substitute(values))
+    return foutput
 
 
 def dir_name_generator(path, prefix):
@@ -47,16 +49,20 @@ def dir_name_generator(path, prefix):
             yield prefix + str(max_).rjust(4, '0')
 
 
-def run_command(parametres):
-    inputData, command = parametres
-    run_path = inputData.path
+def run_command(parameters):
+    input_data, command = parameters
+    run_path = input_data.path
+    os.makedirs(run_path, exist_ok=True)
     os.chdir(run_path)
-    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-    p.stdin.write(inputData.text)
-    # p.stdin.flush()
-    logging.debug(p.stdout.read().decode('utf-8'))
+    p = subprocess.Popen(command, shell=True,
+                         stdout=subprocess.PIPE,
+                         stdin=subprocess.PIPE,
+                         encoding='utf-8'
+                         )
+    out, err = p.communicate(input_data.text)
+    logging.debug(out)
     p.wait()
-    return run_path
+    return input_data
 
 
 @dataclass
@@ -64,14 +70,14 @@ class InputData:
     path : str
     text : str
 
-def multirun_command(inputDataGenerator, command, n_cpu_cores = None, post_processor = None):
+def multirun_command(input_data_generator, command, n_cpu_cores = None, post_processor = None):
     if n_cpu_cores is None: n_cpu_cores= os.cpu_count()
     with Pool(n_cpu_cores)as p:
         logging.debug("Start multirun")
-        for path in p.imap_unordered(run_command, [(inputData, command) for inputData in inputDataGenerator]):
-            logging.debug("End run in path: " + path)
+        for data in p.imap_unordered(run_command, [(inputData, command) for inputData in input_data_generator]):
+            logging.debug("End run in path: " + data.path)
             if post_processor is not None:
-                post_processor(path)
+                post_processor(data)
         logging.debug("End multirun")
     return True
 

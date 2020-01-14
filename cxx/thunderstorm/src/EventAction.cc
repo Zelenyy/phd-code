@@ -8,8 +8,8 @@
 
 
 void EventAction::BeginOfEventAction(const G4Event *anEvent) {
-    cout<< "\033[A\033[2K\r"; // Magic sequence for clear last line
-    cout<< "Start event: " << anEvent->GetEventID()<<endl;
+    cout<< "\033[A\033[K\r"; // Magic sequence for clear last line
+    cout<< "Start event: " << anEvent->GetEventID();
     G4UserEventAction::BeginOfEventAction(anEvent);
 }
 

@@ -6,8 +6,17 @@ from typing import List, Union
 import abc
 import numpy as np
 from numpy import dtype
+from phd.utils.run_tools import InputData
 from tables import open_file, File, Group, Filters
 
+
+def get_convertor(readers, path_h5file):
+    convertor = ConverterFromBinToHDF5(readers)
+
+    def post_run_processor(input_data: InputData):
+        path = input_data.path
+        convertor.convert(path, path_h5file)
+    return post_run_processor
 
 class Reader(abc.ABC):
     def __init__(self, filename: str):
@@ -28,15 +37,17 @@ class ConverterFromBinToHDF5:
     def __init__(self, readerList: List[Reader]):
         self.readerList = readerList
 
-    def convert(self, pathsBin: Union[List, str], pathHDF5: str, mode: str = "a") -> str:
+    def convert(self, paths_data: Union[List, str], path_h5file: str, mode: str = "a",
+                meta: Union[List, str] = None) -> str:
 
-        if isinstance(pathsBin, str):
-            pathsBin = [pathsBin]
-        os.makedirs(os.path.split(pathHDF5)[0], exist_ok=True)
-        with open_file(pathHDF5, mode=mode, title='Auto convert from binary files', ) as h5file:
-            for path in pathsBin:
-                with open(os.path.join(path, 'meta.json')) as fin:
-                    meta = json.load(fin)
+        if isinstance(paths_data, str):
+            paths_data = [paths_data]
+        if meta is not None:
+            if isinstance(meta, str):
+                meta = [meta]
+        os.makedirs(os.path.split(path_h5file)[0], exist_ok=True)
+        with open_file(path_h5file, mode=mode, title='Auto convert from binary files', ) as h5file:
+            for indx, path in enumerate(paths_data):
                 nameGroup = os.path.normpath(path).split(os.sep)[-1]
 
                 if mode == 'a' or mode == 'r+':
@@ -44,7 +55,7 @@ class ConverterFromBinToHDF5:
 
                 group = h5file.create_group('/', nameGroup, title='Auto group from path {}'.format(path))
                 for reader in self.readerList:
-                    pathToFile = os.path.join(path, 'data', reader.filename)
+                    pathToFile = os.path.join(path, reader.filename)
                     reader(pathToFile, h5file, group)
                 for table in h5file.iter_nodes(group):
                     logging.debug(str(table))
@@ -55,7 +66,7 @@ class ConverterFromBinToHDF5:
                     table.flush()
                     logging.debug(repr(table.attrs))
             h5file.close()
-        return pathHDF5
+        return path_h5file
 
     _check_name_counter = 0
 
