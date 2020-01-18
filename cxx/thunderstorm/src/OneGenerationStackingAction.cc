@@ -11,9 +11,9 @@
 
 OneGenerationStackingAction::OneGenerationStackingAction(Settings *settings) {
     foutNumber = DataFileManager::instance()->getTextFile("number");
-    foutGamma = DataFileManager::instance()->getDataFile<CylinderData>("Gamma");
-    foutElectron = DataFileManager::instance()->getDataFile<CylinderData>("Electron");
-    foutPositron = DataFileManager::instance()->getDataFile<CylinderData>("Positron");
+    foutGamma = DataFileManager::instance()->getDataFile<CylinderData>("gamma");
+    foutElectron = DataFileManager::instance()->getDataFile<CylinderData>("electron");
+    foutPositron = DataFileManager::instance()->getDataFile<CylinderData>("positron");
     cut = settings->born_cut;
 }
 
