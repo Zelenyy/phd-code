@@ -11,21 +11,16 @@ ENDIF(NOT Geant4_FOUND)
 
 INCLUDE(${Geant4_USE_FILE})
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../../../g4npm/include)
-
-find_library(geant4-dfclient NAMES geant4-dfclient         PATHS ${PROJECT_SOURCE_DIR}/../../../g4npm/lib)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../general/include)
+FILE(GLOB general ${PROJECT_SOURCE_DIR}/../general/src/*.cc)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include)
 FILE(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 
-
-
 ADD_EXECUTABLE(geant4-thunderstorm.exe main.cc
-        ${sources}
-
+        ${sources} ${general}
 )
 
 TARGET_LINK_LIBRARIES(geant4-thunderstorm.exe
         ${Geant4_LIBRARIES}
-        ${geant4-dfclient}
 )

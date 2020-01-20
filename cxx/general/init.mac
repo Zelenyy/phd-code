@@ -1,0 +1,4 @@
+/df/project test
+/df/gdml test.gdml
+
+/run/beamOn 1
