@@ -57,6 +57,7 @@ void DetectorConstruction::ConstructSDandField() {
             } else if ((*vit).type == "ElectricField") {
                 //Construct field
                 //
+                logger->print("Construct field: " + (*vit).value + " in " + (iter.first)->GetName());
                 G4ElectricField *fEMfield = fieldFactory->getElectricFieldFromGDMLAux(vit);
                 G4EqMagElectricField *fEquation = new G4EqMagElectricField(fEMfield);
                 G4int nvar = 8;

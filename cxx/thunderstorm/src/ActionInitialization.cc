@@ -7,8 +7,8 @@
 using namespace std;
 
 void ActionInitialization::Build() const {
-    GeneralParticleSource *generalParticleSource = new GeneralParticleSource();
-    SetUserAction(generalParticleSource);
+//    GeneralParticleSource *generalParticleSource = new GeneralParticleSource();
+//    SetUserAction(generalParticleSource);
 
     auto logger = Logger::instance();
 

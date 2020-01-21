@@ -5,18 +5,13 @@ import sys
 from typing import List, Union
 import abc
 import numpy as np
+from dataforge.io import JsonMetaFormat
 from numpy import dtype
-from phd.utils.run_tools import InputData
+from .run_tools import InputData
 from tables import open_file, File, Group, Filters
 
 
-def get_convertor(readers, path_h5file):
-    convertor = ConverterFromBinToHDF5(readers)
 
-    def post_run_processor(input_data: InputData):
-        path = input_data.path
-        convertor.convert(path, path_h5file)
-    return post_run_processor
 
 class Reader(abc.ABC):
     def __init__(self, filename: str):
@@ -34,16 +29,20 @@ class Reader(abc.ABC):
 
 class ConverterFromBinToHDF5:
 
-    def __init__(self, readerList: List[Reader]):
-        self.readerList = readerList
+    def __init__(self, readers: List[Reader]):
+        self.readers = readers
+        self.logger : logging.Logger = logging.getLogger(__name__)
+        self.logger.addHandler(
+            logging.FileHandler("convertor.log")
+        )
 
     def convert(self, paths_data: Union[List, str], path_h5file: str, mode: str = "a",
-                meta: Union[List, str] = None) -> str:
+                meta: Union[List, dict] = None) -> str:
 
         if isinstance(paths_data, str):
             paths_data = [paths_data]
         if meta is not None:
-            if isinstance(meta, str):
+            if isinstance(meta, dict):
                 meta = [meta]
         os.makedirs(os.path.split(path_h5file)[0], exist_ok=True)
         with open_file(path_h5file, mode=mode, title='Auto convert from binary files', ) as h5file:
@@ -54,17 +53,23 @@ class ConverterFromBinToHDF5:
                     nameGroup = self._check_name(h5file.root, nameGroup)
 
                 group = h5file.create_group('/', nameGroup, title='Auto group from path {}'.format(path))
-                for reader in self.readerList:
+
+                if meta is not None:
+                    meta_item = JsonMetaFormat().dump_meta(meta[indx]).encode("utf-8")
+                    h5file.create_array(group, "meta", obj=meta_item).flush()
+
+                for reader in self.readers:
                     pathToFile = os.path.join(path, reader.filename)
-                    reader(pathToFile, h5file, group)
+                    if os.path.exists(pathToFile) and (os.path.getsize(path) !=0):
+                        reader(pathToFile, h5file, group)
                 for table in h5file.iter_nodes(group):
                     logging.debug(str(table))
-                    for key, value in meta.items():
-                        if sys.getsizeof(value) > 64 * 1024:
-                            continue
-                        table.attrs[key] = value
+                    # for key, value in meta.items():
+                    #     if sys.getsizeof(value) > 64 * 1024:
+                    #         continue
+                    #     table.attrs[key] = value
                     table.flush()
-                    logging.debug(repr(table.attrs))
+                    self.logger.debug(repr(table.attrs))
             h5file.close()
         return path_h5file
 
@@ -101,3 +106,14 @@ class txtDataReader(Reader):
         self.tableName = self.filename[:self.filename.rfind('.')]
         my_table = h5file.create_table(group, self.tableName, obj=data, **self.settings)
         my_table.flush()
+
+def get_convertor(readers: list, path_h5file):
+
+    filters = Filters(complevel=3, fletcher32=True)
+    convertor = ConverterFromBinToHDF5(readers)
+    for reader in readers:
+        reader.set_filters(filters)
+    def post_run_processor(input_data: InputData):
+        path = input_data.path
+        convertor.convert(path, path_h5file, meta=input_data.to_meta())
+    return post_run_processor

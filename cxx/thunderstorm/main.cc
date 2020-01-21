@@ -26,8 +26,9 @@ int main(int argc, char **argv) {
             G4DFClient *dfClient = G4DFClient::instance();
             dfClient->read(fin);
             dfClient->setup(new PhysicsList(settings->physics), new ActionInitialization(settings));
-            dfClient->initialize();
             dfClient->massWorld->setDetectorFactory(new SensitiveDetectorFactory);
+            dfClient->massWorld->setFieldFactory(new FieldFactory);
+            dfClient->initialize();
             dfClient->read(fin);
             dfClient->stop();
             fin.close();
@@ -37,8 +38,9 @@ int main(int argc, char **argv) {
         G4DFClient *dfClient = G4DFClient::instance();
         dfClient->read(std::cin);
         dfClient->setup(new PhysicsList(settings->physics), new ActionInitialization(settings));
-        dfClient->initialize();
         dfClient->massWorld->setDetectorFactory(new SensitiveDetectorFactory);
+        dfClient->massWorld->setFieldFactory(new FieldFactory);
+        dfClient->initialize();
         dfClient->read(std::cin);
         dfClient->stop();
     }

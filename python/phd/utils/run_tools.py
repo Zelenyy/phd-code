@@ -1,21 +1,34 @@
 from dataclasses import dataclass
 from string import Template
 import sys, os
-import shutil
 import subprocess
 import logging
-import json, time
+import json
 from multiprocessing import Pool
 from itertools import product
-from functools import partial
+from typing import Optional
 
-from dataforge.meta import Meta
+import numpy as np
+from dataforge import Meta, MetaRepr
 
 
-def create_from_file_template(fin, fout, values: dict):
-    with open(fin) as fin:
-        text = fin.read()
-    return create_one_file(text, fout, values)
+def create_gdml(template_file, values: dict):
+    values = values_from_dict(values)
+    os.makedirs("./gdml", exist_ok=True)
+    paths = []
+    with open(template_file) as fin:
+        gdml_template = fin.read()
+        # gdml_template = Template(gdml_template)
+    for indx, value in enumerate(values):
+        path = os.path.join("./gdml", "{}.gdml".format(indx))
+        paths.append(path)
+        create_one_file(gdml_template, path, value)
+    return paths
+
+# def create_from_file_template(fin, fout, values: dict):
+#     with open(fin) as fin:
+#         text = fin.read()
+#     return create_one_file(text, fout, values)
 
 
 def create_one_file(text, foutput, values: dict):
@@ -24,6 +37,57 @@ def create_one_file(text, foutput, values: dict):
     with open(foutput, 'w') as fout:
         fout.write(template.safe_substitute(values))
     return foutput
+
+
+def values_from_dict(values : dict):
+    keys, product_ = meta_analysis(values)
+    for values in product_:
+        yield {
+            key : value for key, value in zip(keys, values)
+        }
+
+
+def meta_analysis(values: dict):
+    keys = values.keys()
+
+    for key, item in values.items():
+        if not isinstance(item, list) and not isinstance(item, np.ndarray):
+            values[key] = [item]
+
+    if 'sync' in keys:
+        listForProduct = []
+        listForSyncProduct = []
+        keysFP = []
+        keysFSP = []
+        for key in keys:
+            if key!='sync':
+                if key in values['sync']:
+                    listForSyncProduct.append(values[key])
+                    keysFSP.append(key)
+                else:
+                    listForProduct.append(values[key])
+                    keysFP.append(key)
+        productFP = list(product(*listForProduct))
+        product_ = []
+        logging.debug('Product for no sync: {}'.format(productFP))
+        logging.debug('List for product sync: {}'.format(listForSyncProduct))
+        for arg in zip(*listForSyncProduct):
+            temp = list(arg)
+            for pFP in productFP:
+                product_.append(list(pFP) + temp)
+        keys = keysFP + keysFSP
+    else:
+        listForProduct = [values[key] for key in keys]
+        product_ = product(*listForProduct)
+
+    keys  = list(keys)
+    product_ = list(product_)
+
+    logging.debug("".format(keys))
+    for p in product_.copy():
+        logging.debug("Values: {}".format(' '.join(map(str,p))))
+
+    return keys, product_
 
 
 def dir_name_generator(path, prefix):
@@ -53,22 +117,42 @@ def run_command(parameters):
     input_data, command = parameters
     run_path = input_data.path
     os.makedirs(run_path, exist_ok=True)
+    pwd = os.getcwd()
     os.chdir(run_path)
+
+    logname = os.path.split(run_path)[-1]
+    logger: logging.Logger = logging.getLogger(logname)
+    logger.addHandler(
+        logging.FileHandler("run_tools.log")
+    )
+
     p = subprocess.Popen(command, shell=True,
                          stdout=subprocess.PIPE,
                          stdin=subprocess.PIPE,
+                         stderr=subprocess.PIPE,
                          encoding='utf-8'
                          )
     out, err = p.communicate(input_data.text)
-    logging.debug(out)
+    logger.debug(out)
+    logger.debug(err)
     p.wait()
+    os.chdir(pwd)
     return input_data
 
 
 @dataclass
-class InputData:
+class InputData(MetaRepr):
     path : str
     text : str
+    values : Optional[Meta] = None
+
+    def to_meta(self) -> 'Meta':
+        return Meta({
+            "path" : self.path,
+            "text" : self.text,
+            "values" : self.values
+        })
+
 
 def multirun_command(input_data_generator, command, n_cpu_cores = None, post_processor = None):
     if n_cpu_cores is None: n_cpu_cores= os.cpu_count()

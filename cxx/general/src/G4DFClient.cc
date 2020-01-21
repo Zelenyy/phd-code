@@ -11,7 +11,6 @@
 
 
 G4DFClient::G4DFClient() {
-
     messenger = new G4DFClientMessenger(this);
 }
 

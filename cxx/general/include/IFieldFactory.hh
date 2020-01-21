@@ -18,16 +18,18 @@ using  namespace CLHEP;
 class IFieldFactory {
 public:
     virtual G4ElectricField *getElectricFieldFromGDMLAux(G4GDMLAuxListType::const_iterator vit) {
+        auto logger = Logger::instance();
+        logger->print("Start Ifield factory");
         if (vit->value == "Uniform") {
             auto fieldList = (*vit).auxList;
             map<string, double> E;
-            for (auto fieldIt = fieldList->begin(); fieldIt != fieldList->end(); ++fieldIt) {
-                E[(*fieldIt).type] = stod((*fieldIt).value);
-                string ESi = to_string(E[(*fieldIt).type] / (kilovolt/meter));
-                Logger::instance()->print((*fieldIt).type + " = " + ESi + " kilovolt/meter");
+            for (auto & fieldIt : *fieldList) {
+                E[fieldIt.type] = stod(fieldIt.value);
+                string ESi = to_string(E[fieldIt.type] / (kilovolt/meter));
+                Logger::instance()->print(fieldIt.type + " = " + ESi + " kilovolt/meter");
             }
             G4ElectricField *fEMfield = new G4UniformElectricField(G4ThreeVector(E["Ex"], E["Ey"], E["Ez"]));
-
+            logger->print("IFieldFactory: \"I produce field: Uniform\"");
             return fEMfield;
 
         }
