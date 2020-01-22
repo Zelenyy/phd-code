@@ -41,7 +41,7 @@ setuptools.setup(
         # 'pandas>={0}'.format(PANDAS_MIN_VERSION),
         'matplotlib>={0}'.format(MATPLOTLIB_MIN_VERSION),
         'tables>={0}'.format(PYTABLES_MIN_VERSION),
-        'dataforge>=0.0.4'
+        'dataforge'
 
     ],
     test_suite='tests'
