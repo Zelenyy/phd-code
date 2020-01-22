@@ -1,11 +1,12 @@
-from dataclasses import dataclass
-from string import Template
-import sys, os
-import subprocess
-import logging
 import json
-from multiprocessing import Pool
+import logging
+import os
+import subprocess
+from dataclasses import dataclass
 from itertools import product
+from multiprocessing import Pool
+from string import Template
+from timeit import default_timer as timer
 from typing import Optional
 
 import numpy as np
@@ -25,6 +26,7 @@ def create_gdml(template_file, values: dict):
         create_one_file(gdml_template, path, value)
     return paths
 
+
 # def create_from_file_template(fin, fout, values: dict):
 #     with open(fin) as fin:
 #         text = fin.read()
@@ -39,11 +41,11 @@ def create_one_file(text, foutput, values: dict):
     return foutput
 
 
-def values_from_dict(values : dict):
+def values_from_dict(values: dict):
     keys, product_ = meta_analysis(values)
     for values in product_:
         yield {
-            key : value for key, value in zip(keys, values)
+            key: value for key, value in zip(keys, values)
         }
 
 
@@ -60,7 +62,7 @@ def meta_analysis(values: dict):
         keysFP = []
         keysFSP = []
         for key in keys:
-            if key!='sync':
+            if key != 'sync':
                 if key in values['sync']:
                     listForSyncProduct.append(values[key])
                     keysFSP.append(key)
@@ -80,37 +82,37 @@ def meta_analysis(values: dict):
         listForProduct = [values[key] for key in keys]
         product_ = product(*listForProduct)
 
-    keys  = list(keys)
+    keys = list(keys)
     product_ = list(product_)
 
     logging.debug("".format(keys))
     for p in product_.copy():
-        logging.debug("Values: {}".format(' '.join(map(str,p))))
+        logging.debug("Values: {}".format(' '.join(map(str, p))))
 
     return keys, product_
 
 
 def dir_name_generator(path, prefix):
-        dirs = os.listdir(path)
-        n = len(prefix)
-        prefixDirs = []
-        numbers = []
-        for dir_ in dirs:
-            if dir_[:n] ==prefix:
-                postfix = dir_[n:]
-                try:
-                    number = int(postfix)
-                    prefixDirs.append(dir_)
-                    numbers.append(number)
-                except Exception:
-                    pass
-        try:
-            max_ = max(numbers)
-        except Exception:
-            max_ = 0
-        while True:
-            max_ += 1
-            yield prefix + str(max_).rjust(4, '0')
+    dirs = os.listdir(path)
+    n = len(prefix)
+    prefixDirs = []
+    numbers = []
+    for dir_ in dirs:
+        if dir_[:n] == prefix:
+            postfix = dir_[n:]
+            try:
+                number = int(postfix)
+                prefixDirs.append(dir_)
+                numbers.append(number)
+            except Exception:
+                pass
+    try:
+        max_ = max(numbers)
+    except Exception:
+        max_ = 0
+    while True:
+        max_ += 1
+        yield prefix + str(max_).rjust(4, '0')
 
 
 def run_command(parameters):
@@ -126,6 +128,7 @@ def run_command(parameters):
         logging.FileHandler("run_tools.log")
     )
 
+    start = timer()
     p = subprocess.Popen(command, shell=True,
                          stdout=subprocess.PIPE,
                          stdin=subprocess.PIPE,
@@ -136,26 +139,29 @@ def run_command(parameters):
     logger.debug(out)
     logger.debug(err)
     p.wait()
+    end = timer()
     os.chdir(pwd)
+    input_data.values["time"] = end - start
+
     return input_data
 
 
 @dataclass
 class InputData(MetaRepr):
-    path : str
-    text : str
-    values : Optional[Meta] = None
+    path: str
+    text: str
+    values: Optional[Meta] = None
 
     def to_meta(self) -> 'Meta':
         return Meta({
-            "path" : self.path,
-            "text" : self.text,
-            "values" : self.values
+            "path": self.path,
+            "text": self.text,
+            "values": self.values
         })
 
 
-def multirun_command(input_data_generator, command, n_cpu_cores = None, post_processor = None):
-    if n_cpu_cores is None: n_cpu_cores= os.cpu_count()
+def multirun_command(input_data_generator, command, n_cpu_cores=None, post_processor=None):
+    if n_cpu_cores is None: n_cpu_cores = os.cpu_count()
     with Pool(n_cpu_cores)as p:
         logging.debug("Start multirun")
         for data in p.imap_unordered(run_command, [(inputData, command) for inputData in input_data_generator]):
@@ -182,4 +188,3 @@ def create_path(keys, dict_values):
     for values in product_:
         name_dir = '_'.join(map(str, values))
     return paths
-

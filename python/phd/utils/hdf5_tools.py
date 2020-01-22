@@ -2,9 +2,10 @@ import json
 import logging
 import os
 import sys
-from typing import List, Union
+from typing import List, Union, Optional
 import abc
 import numpy as np
+from dataforge import Meta
 from dataforge.io import JsonMetaFormat
 from numpy import dtype
 from .run_tools import InputData
@@ -37,7 +38,7 @@ class ConverterFromBinToHDF5:
         )
 
     def convert(self, paths_data: Union[List, str], path_h5file: str, mode: str = "a",
-                meta: Union[List, dict] = None) -> str:
+                meta: Optional[Union[List[Meta], Meta]] = None) -> str:
 
         if isinstance(paths_data, str):
             paths_data = [paths_data]
@@ -64,10 +65,13 @@ class ConverterFromBinToHDF5:
                         reader(pathToFile, h5file, group)
                 for table in h5file.iter_nodes(group):
                     logging.debug(str(table))
-                    # for key, value in meta.items():
-                    #     if sys.getsizeof(value) > 64 * 1024:
-                    #         continue
-                    #     table.attrs[key] = value
+                    if meta is not None:
+                        for key, value in meta[indx].to_flat().items():
+                            if sys.getsizeof(value) > 64 * 1024:
+                                continue
+                            if "@" in key: continue
+                            key = key.replace(".", "_")
+                            table.attrs[key] = value
                     table.flush()
                     self.logger.debug(repr(table.attrs))
             h5file.close()

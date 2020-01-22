@@ -7,12 +7,21 @@
 
 
 #include <G4UserEventAction.hh>
+#include "Data.hh"
+#include "DataManager.hh"
 
 class EventAction : public G4UserEventAction {
 public:
+    EventAction(){
+        dataManager = DataManager::instance();
+    };
+
     void BeginOfEventAction(const G4Event *anEvent) override;
 
     void EndOfEventAction(const G4Event *anEvent) override;
+
+private:
+    DataManager * dataManager;
 };
 
 

@@ -27,9 +27,8 @@ public:
 private:
     double cut = 0.05*MeV;
     G4ParticleDefinition* primaryParticle;
-    Numbers number;
+    Numbers* number;
     CylinderData data;
-    ofstream* foutNumber;
     DataFile<CylinderData> *foutGamma;
     DataFile<CylinderData> *foutElectron;
     DataFile<CylinderData> *foutPositron;

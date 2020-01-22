@@ -8,9 +8,10 @@
 #include <G4Electron.hh>
 #include <DataFileManager.hh>
 #include "G4Positron.hh"
+#include "DataManager.hh"
 
 OneGenerationStackingAction::OneGenerationStackingAction(Settings *settings) {
-    foutNumber = DataFileManager::instance()->getTextFile("number");
+    number = DataManager::instance()->createNumber("number");
     foutGamma = DataFileManager::instance()->getDataFile<CylinderData>("gamma");
     foutElectron = DataFileManager::instance()->getDataFile<CylinderData>("electron");
     foutPositron = DataFileManager::instance()->getDataFile<CylinderData>("positron");
@@ -22,22 +23,21 @@ G4ClassificationOfNewTrack OneGenerationStackingAction::ClassifyNewTrack(const G
     if (aTrack->GetParentID() == 0) {
         primaryParticle = aTrack->GetDefinition();
         return fUrgent;
-    }
-    else{
+    } else {
         data.fillFromTrack(aTrack);
-        if (aTrack->GetDefinition() == G4Electron::Definition()){
+        if (aTrack->GetDefinition() == G4Electron::Definition()) {
             foutElectron->addData(data);
-            number.electron++;
+            number->electron++;
             return fKill;
         }
         if (aTrack->GetDefinition() == G4Gamma::Definition()) {
             foutGamma->addData(data);
-            number.gamma++;
+            number->gamma++;
             return fKill;
         }
         if (aTrack->GetDefinition() == G4Positron::Definition()) {
             foutPositron->addData(data);
-            number.positron++;
+            number->positron++;
             return fKill;
         }
     }
@@ -47,14 +47,15 @@ G4ClassificationOfNewTrack OneGenerationStackingAction::ClassifyNewTrack(const G
 }
 
 void OneGenerationStackingAction::PrepareNewEvent() {
-    if (flag){
-        number.write(foutNumber);
-    }
-    number.clear();
-    flag = true;
+//    if (flag) {
+//        number.write(foutNumber);
+//    }
+//    number.clear();
+//    flag = true;
     G4UserStackingAction::PrepareNewEvent();
 }
 
 OneGenerationStackingAction::~OneGenerationStackingAction() {
-    number.write(foutNumber);
+//    number.write(foutNumber);
+//    foutNumber->flush();
 }

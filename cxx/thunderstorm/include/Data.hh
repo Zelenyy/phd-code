@@ -9,6 +9,8 @@
 #include "G4SystemOfUnits.hh"
 #include "G4Track.hh"
 
+using namespace std;
+
 struct Numbers {
     int primary = 0;
     int gamma = 0;
