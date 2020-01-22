@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="file:///home/zelenyy/npm/phd/phd-code/cxx/schema/gdml.xsd"
+      xsi:noNamespaceSchemaLocation="schema/gdml.xsd">
+    <define>
+        <constant value="1.2e-3" name="density"/>
+        <quantity value="300" name="worldWidth" unit="m"/>
+        <quantity value="600" name="worldHeight" unit="m"/>
+        <position name="centerPos"/>
+    </define>
+    <materials>
+        <material name="airHeigth">
+            <D value="density"/>
+            <fraction n="1.0" ref="G4_AIR"/>
+        </material>
+    </materials>
+    <solids>
+        <tube name="world" rmax="worldWidth" z="worldHeight" deltaphi="360" aunit="degree"/>
+    </solids>
+    <structure>
+        <volume name="World">
+            <materialref ref="airHeigth"/>
+            <solidref ref="world"/>
+        </volume>
+    </structure>
+    <setup name="test" version="1.0">
+        <world ref="World"/>
+    </setup>
+</gdml>

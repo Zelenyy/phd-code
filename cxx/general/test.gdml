@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="../schema/gdml.xsd">
+    <define>
+        <quantity value="0.25" name="worldRadius" unit="m"/>
+        <quantity value="1" name="worldHeight" unit="m"/>
+        <quantity value="100" name="cellThickness" unit="mm"/>
+        <quantity value="5" name="cellRadius" unit="cm"/>
+        <position name="centerPos"/>
+        <variable value="0" name="x"/>
+        <constant value="100" name="numberCell"/>
+    </define>
+    <solids>
+        <tube name="world" rmax="worldRadius" z="worldHeight" deltaphi="360" aunit="degree"/>
+        <box name="box" x="10" y="10" z="10"/>
+        <tube name="cell" rmax="cellRadius" z="cellThickness" deltaphi="360" aunit="degree"/>
+    </solids>
+    <structure>
+        <volume name="Box">
+            <materialref ref="G4_AIR"/>
+            <solidref ref="box"/>
+        </volume>
+        <volume name="Cell">
+            <materialref ref="G4_ANTHRACENE"/>
+            <solidref ref="cell"/>
+            <physvol>
+                <volumeref ref="Box"/>
+                <positionref ref="centerPos"/>
+            </physvol>
+        </volume>
+        <volume name="World">
+            <materialref ref="G4_Galactic"/>
+            <solidref ref="world"/>
+                <physvol>
+                    <volumeref ref="Cell"/>
+                    <positionref ref="centerPos"/>
+                </physvol>
+
+
+        </volume>
+    </structure>
+    <setup name="test" version="1.0">
+        <world ref="World"/>
+    </setup>
+</gdml>

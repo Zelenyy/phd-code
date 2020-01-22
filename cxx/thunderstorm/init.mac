@@ -1,0 +1,9 @@
+/df/project test
+/df/gdml gdml/empty.gdml
+/thunderstorm/physics standard
+/thunderstorm/stacking one_generation
+
+/gps/particle e-
+/gps/direction 0 0 -1
+/gps/ene/mono 100 MeV
+/run/beamOn 10
