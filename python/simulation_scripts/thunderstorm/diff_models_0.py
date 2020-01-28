@@ -61,7 +61,7 @@ def main():
 
     command = "../build/thunderstorm/geant4-thunderstorm.exe"
     readers = READERS_CYLINDER_DATA + READERS_TXT
-    multirun_command(input_generator(), command, post_processor=get_convertor(readers, "./result.hdf5"))
+    multirun_command(input_generator(), command, post_processor=get_convertor(readers, "./result.hdf5", True))
     return 0
 
 if __name__ == '__main__':

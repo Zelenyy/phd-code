@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import shutil
 import sys
 from typing import List, Union, Optional
 import abc
@@ -111,7 +112,7 @@ class txtDataReader(Reader):
         my_table = h5file.create_table(group, self.tableName, obj=data, **self.settings)
         my_table.flush()
 
-def get_convertor(readers: list, path_h5file):
+def get_convertor(readers: list, path_h5file, clear = False):
 
     filters = Filters(complevel=3, fletcher32=True)
     convertor = ConverterFromBinToHDF5(readers)
@@ -120,4 +121,6 @@ def get_convertor(readers: list, path_h5file):
     def post_run_processor(input_data: InputData):
         path = input_data.path
         convertor.convert(path, path_h5file, meta=input_data.to_meta())
+        if clear:
+            shutil.rmtree(path)
     return post_run_processor
