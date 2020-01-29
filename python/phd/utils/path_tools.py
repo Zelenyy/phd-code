@@ -9,7 +9,7 @@ from tables import File, open_file
 
 
 
-def find_by_meta(filename: str, node = None, meta: Optional[Meta] = None, **kwargs):
+def find_by_meta(filename: str, target_node = None, meta: Optional[Meta] = None, **kwargs):
 
     def check(node, meta):
         for key, value in meta.items():
@@ -20,15 +20,15 @@ def find_by_meta(filename: str, node = None, meta: Optional[Meta] = None, **kwar
     results = []
     with open_file(filename) as h5file:
         for group in h5file.root:
-            if node is None:
+            if target_node is None:
                 for node in h5file.list_nodes(group):
                     if check(node, kwargs):
                          results.append(node._v_pathname)
-            elif isinstance(node, str):
-                node_item = h5file.get_node(group, node)
+            elif isinstance(target_node, str):
+                node_item = h5file.get_node(group, target_node)
                 if check(node_item, kwargs):
                     results.append(node_item._v_pathname)
-            elif isinstance(node, list):
+            elif isinstance(target_node, list):
                 for node_item in node:
                     node_item = h5file.get_node(group, node_item)
                     if check(node_item, kwargs):

@@ -37,7 +37,7 @@ def main():
     "physics" : ["standard","standard_opt_1","standard_opt_2","standard_opt_3",  "standard_opt_4", "penelopa", "livermore", "emlowepphysics"],
     'number' : [int(100)],
     'energy' : [10],
-    'posZ' : [399.9],
+    'posZ' : [299.9],
     'direction' : ['0 0 -1'],
     'particle' : 'e-'
                   }

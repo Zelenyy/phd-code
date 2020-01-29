@@ -24,6 +24,11 @@ G4ClassificationOfNewTrack OneGenerationStackingAction::ClassifyNewTrack(const G
         primaryParticle = aTrack->GetDefinition();
         return fUrgent;
     } else {
+
+        if (aTrack->GetKineticEnergy() <= cut){
+            return fKill;
+        }
+
         data.fillFromTrack(aTrack);
         if (aTrack->GetDefinition() == G4Electron::Definition()) {
             foutElectron->addData(data);

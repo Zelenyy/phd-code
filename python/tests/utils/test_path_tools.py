@@ -17,9 +17,11 @@ class PathToolsTest(unittest.TestCase):
             print(np.histogram(data["z"]))
 
     def test_find_by_meta(self):
-        path = "/mnt/storage2/phd/data/thunderstorm/diffModels/result_1_1e4.hdf5"
-        find_by_meta(path, fieldValueZ=0.0)
-
+        path = "/home/zelenyy/temp/phd-run/result.hdf5"
+        paths = find_by_meta(path, values_gdml_fieldValueZ=0.0)
+        print(paths)
+        paths = find_by_meta(path,target_node="electron", values_gdml_fieldValueZ=0.0)
+        print(paths)
 
 if __name__ == '__main__':
     unittest.main()
