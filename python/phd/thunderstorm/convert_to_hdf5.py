@@ -11,7 +11,7 @@ names_cylinder = ['energy',
                   'radius',
                   'z']
 
-dtype_cylinder = np.dtype([(name, 'i') for name in names_cylinder])
+dtype_cylinder = np.dtype([(name, 'd') for name in names_cylinder])
 
 READERS_CYLINDER_DATA = [dtypeDataReader(file, dtype_cylinder) for file in
                          ['gamma.bin', 'electron.bin', 'positron.bin']]

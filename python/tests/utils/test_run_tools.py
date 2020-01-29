@@ -10,7 +10,7 @@ ROOT_PATH = os.path.dirname(__file__)
 
 INPUT_TEMPLATE = """/df/project test
 /df/gdml ${path}
-/thunderstorm/physics ${physics}
+/thunderstorm/physics standard
 /thunderstorm/stacking one_generation
 
 /gps/particle ${particle}
@@ -21,26 +21,24 @@ INPUT_TEMPLATE = """/df/project test
 /run/beamOn ${number}
 """
 
-def main():
-    logging.basicConfig(filename = "run.log")
+
+def test_run():
+    logging.basicConfig(filename="run.log")
     logging.root.setLevel(logging.DEBUG)
-
-    gdml_template = os.path.join(ROOT_PATH, "template", "diff_models_0.gdml")
-
+    gdml_template = os.path.join(ROOT_PATH,"..", "..","simulation_scripts","thunderstorm", "template", "dwyer2003.gdml")
+    print(gdml_template)
     values_gdml = {
-    'height' : [0],
-    'cellHeight' : [600],
-    'fieldValueZ' : [0, 3e-4, 10e-4],
+        'height': [5000, 6000],
+        'fieldValueZ': [2e-4, 1e-4],
+    }
+    values_macros = {
+        'number': [int(1e2)],
+        'energy': [i for i in range(1, 3)],
+        'posZ': [49.5],
+        'direction': ['0 0 -1', '0.5 0 -0.5'],
+        'particle': 'e-'
     }
 
-    values_macros = {
-    "physics" : ["standard","standard_opt_1","standard_opt_2","standard_opt_3",  "standard_opt_4", "penelopa", "livermore", "emlowepphysics"],
-    'number' : [int(100)],
-    'energy' : [10],
-    'posZ' : [399.9],
-    'direction' : ['0 0 -1'],
-    'particle' : 'e-'
-                  }
     meta = Meta(
         {
             "macros": values_macros,
@@ -51,8 +49,8 @@ def main():
     input_data = general_input_generator(meta, gdml_template, INPUT_TEMPLATE)
     command = "../build/thunderstorm/geant4-thunderstorm.exe"
     readers = READERS_CYLINDER_DATA + READERS_TXT
-    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=True))
+    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5"))
     return 0
 
 if __name__ == '__main__':
-    main()
+    test_run()

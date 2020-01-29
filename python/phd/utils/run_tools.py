@@ -13,10 +13,37 @@ import numpy as np
 from dataforge import Meta, MetaRepr
 
 
+def general_input_generator(meta: Meta, gdml_template_file: str, macros_template: str):
+    macros_template = Template(macros_template)
+
+    paths, values_gdml = create_gdml(gdml_template_file, meta["gdml"])
+    paths = list(map(lambda x: os.path.join("..", x), paths))
+    meta["macros"]["path"] = paths
+    for path, values in zip(
+            dir_name_generator(".", "sim"),
+            values_from_dict(meta["macros"])
+    ):
+
+        text = macros_template.substitute(values)
+        path_gdml = values["path"]
+        indx = paths.index(path_gdml)
+        input_data_meta = {
+            "macros" : values,
+            "gdml" : values_gdml[indx]
+        }
+        data = InputData(
+            text=text,
+            path=path,
+            values=Meta(input_data_meta)
+        )
+        yield data
+
+
 def create_gdml(template_file, values: dict):
     values = values_from_dict(values)
     os.makedirs("./gdml", exist_ok=True)
     paths = []
+    values = list(values)
     with open(template_file) as fin:
         gdml_template = fin.read()
         # gdml_template = Template(gdml_template)
@@ -24,13 +51,7 @@ def create_gdml(template_file, values: dict):
         path = os.path.join("./gdml", "{}.gdml".format(indx))
         paths.append(path)
         create_one_file(gdml_template, path, value)
-    return paths
-
-
-# def create_from_file_template(fin, fout, values: dict):
-#     with open(fin) as fin:
-#         text = fin.read()
-#     return create_one_file(text, fout, values)
+    return paths, list(values)
 
 
 def create_one_file(text, foutput, values: dict):
@@ -56,31 +77,31 @@ def meta_analysis(values: dict):
         if not isinstance(item, list) and not isinstance(item, np.ndarray):
             values[key] = [item]
 
-    if 'sync' in keys:
-        listForProduct = []
-        listForSyncProduct = []
-        keysFP = []
-        keysFSP = []
-        for key in keys:
-            if key != 'sync':
-                if key in values['sync']:
-                    listForSyncProduct.append(values[key])
-                    keysFSP.append(key)
-                else:
-                    listForProduct.append(values[key])
-                    keysFP.append(key)
-        productFP = list(product(*listForProduct))
-        product_ = []
-        logging.debug('Product for no sync: {}'.format(productFP))
-        logging.debug('List for product sync: {}'.format(listForSyncProduct))
-        for arg in zip(*listForSyncProduct):
-            temp = list(arg)
-            for pFP in productFP:
-                product_.append(list(pFP) + temp)
-        keys = keysFP + keysFSP
-    else:
-        listForProduct = [values[key] for key in keys]
-        product_ = product(*listForProduct)
+    # if 'sync' in keys:
+    #     listForProduct = []
+    #     listForSyncProduct = []
+    #     keysFP = []
+    #     keysFSP = []
+    #     for key in keys:
+    #         if key != 'sync':
+    #             if key in values['sync']:
+    #                 listForSyncProduct.append(values[key])
+    #                 keysFSP.append(key)
+    #             else:
+    #                 listForProduct.append(values[key])
+    #                 keysFP.append(key)
+    #     productFP = list(product(*listForProduct))
+    #     product_ = []
+    #     logging.debug('Product for no sync: {}'.format(productFP))
+    #     logging.debug('List for product sync: {}'.format(listForSyncProduct))
+    #     for arg in zip(*listForSyncProduct):
+    #         temp = list(arg)
+    #         for pFP in productFP:
+    #             product_.append(list(pFP) + temp)
+    #     keys = keysFP + keysFSP
+    # else:
+    listForProduct = [values[key] for key in keys]
+    product_ = product(*listForProduct)
 
     keys = list(keys)
     product_ = list(product_)
