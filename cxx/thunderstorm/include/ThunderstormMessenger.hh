@@ -6,6 +6,7 @@
 #define PHD_CODE_THUNDERSTORMMESSENGER_HH
 
 #include <G4UIcmdWithAString.hh>
+#include <G4UIcmdWithADoubleAndUnit.hh>
 #include "G4UImessenger.hh"
 #include "PhysicsList.hh"
 #include "Settings.hh"
@@ -27,10 +28,13 @@ private:
     G4UIdirectory * directory;
     G4UIcmdWithAString * physics;
     G4UIcmdWithAString * stacking;
+    G4UIcmdWithADoubleAndUnit * energyCut;
 private:
     string thunderstorm_directory = "/thunderstorm/";
     string physics_path = thunderstorm_directory + "physics";
     string stacking_path = thunderstorm_directory + "stacking";
+    string cut_path = thunderstorm_directory +"cut/";
+    string energy_cut_path = cut_path +"energy";
 };
 
 

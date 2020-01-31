@@ -2,6 +2,7 @@
 /df/gdml gdml/empty.gdml
 /thunderstorm/physics standard
 /thunderstorm/stacking one_generation
+/thunderstorm/energy/cut 0.01
 
 /gps/particle e-
 /gps/direction 0 0 -1

@@ -16,6 +16,7 @@ OneGenerationStackingAction::OneGenerationStackingAction(Settings *settings) {
     foutElectron = DataFileManager::instance()->getDataFile<CylinderData>("electron");
     foutPositron = DataFileManager::instance()->getDataFile<CylinderData>("positron");
     cut = settings->born_cut;
+    Logger::instance()->print("One generation set cut: " + to_string(cut) + " MeV");
 }
 
 G4ClassificationOfNewTrack OneGenerationStackingAction::ClassifyNewTrack(const G4Track *aTrack) {

@@ -11,6 +11,9 @@ G4String ThunderstormMessenger::GetCurrentValue(G4UIcommand *command) {
     else if( command == stacking){
         return settings->stacking;
     }
+    else if (command == energyCut){
+        return to_string(settings->born_cut);
+    }
     return G4UImessenger::GetCurrentValue(command);
 }
 
@@ -20,6 +23,8 @@ void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue)
     }
     else if (command==stacking){
         settings->stacking = newValue;
+    } else if (command == energyCut){
+        settings->born_cut = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
     }
     else{
         G4UImessenger::SetNewValue(command, newValue);
@@ -36,4 +41,11 @@ ThunderstormMessenger::ThunderstormMessenger(Settings* pSettings) : settings(pSe
     stacking = new G4UIcmdWithAString(stacking_path.c_str(), this);
     stacking ->SetGuidance("Set using stacking action.");
     stacking ->SetParameterName("stacking", true);
+
+    auto cutDirectory = new G4UIdirectory(cut_path.c_str());
+    energyCut = new G4UIcmdWithADoubleAndUnit(energy_cut_path.c_str(), this);
+    energyCut->SetGuidance("Set minimal energy for particle");
+    energyCut->SetParameterName("energy", true, false);
+    energyCut->SetDefaultUnit("MeV");
+
 }
