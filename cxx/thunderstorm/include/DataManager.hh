@@ -21,8 +21,8 @@ public:
         static DataManager dataManager;
         return &dataManager;
     }
-    Numbers* createNumber(string name){
-        Numbers * data = new Numbers;
+    Numbers* createNumber(const string& name){
+        auto * data = new Numbers;
         ofstream* foutNumber = DataFileManager::instance()->getTextFile(name);
         NumberFile temp = {data, foutNumber};
         if (numbers.find(name)==numbers.end()) {
@@ -46,7 +46,7 @@ public:
 private:
     map<string, NumberFile> numbers;
     DataManager()= default;
-    DataManager(DataManager const&);
+    DataManager(DataManager const&) = delete;
     DataManager& operator=(DataManager const&) = delete;
 };
 

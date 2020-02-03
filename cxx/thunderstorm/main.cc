@@ -12,6 +12,19 @@
 #include "SensitiveDetectorFactory.hh"
 #include "FieldFactory.hh"
 
+void startFromFile(const string& filename, Settings* settings){
+    fstream fin;
+    fin.open(filename);
+    G4DFClient *dfClient = G4DFClient::instance();
+    dfClient->read(fin);
+    dfClient->setup(new PhysicsList(settings->physics), new ActionInitialization(settings));
+    dfClient->massWorld->setDetectorFactory(new SensitiveDetectorFactory);
+    dfClient->massWorld->setFieldFactory(new FieldFactory);
+    dfClient->initialize();
+    dfClient->read(fin);
+    dfClient->stop();
+    fin.close();
+}
 
 int main(int argc, char **argv) {
     auto logger = Logger::instance();
@@ -25,19 +38,9 @@ int main(int argc, char **argv) {
 
     if (argc > 1) {
         if (strcmp(argv[1], "test") == 0) {
-            fstream fin;
-            fin.open("init.mac");
-            G4DFClient *dfClient = G4DFClient::instance();
-            dfClient->read(fin);
-            dfClient->setup(new PhysicsList(settings->physics), new ActionInitialization(settings));
-            dfClient->massWorld->setDetectorFactory(new SensitiveDetectorFactory);
-            dfClient->massWorld->setFieldFactory(new FieldFactory);
-            dfClient->initialize();
-            dfClient->read(fin);
-            dfClient->stop();
-            fin.close();
+            startFromFile("init.mac", settings);
         }
-        if (strcmp(argv[1], "vis") == 0){
+        else if (strcmp(argv[1], "vis") == 0){
             fstream fin;
             fin.open(argv[2]);
             G4DFClient *dfClient = G4DFClient::instance();
@@ -56,6 +59,9 @@ int main(int argc, char **argv) {
             delete ui;
             dfClient->stop();
             fin.close();
+        }
+        else{
+            startFromFile(argv[1],settings);
         }
     }
     else{
