@@ -39,6 +39,29 @@ def general_input_generator(meta: Meta, gdml_template_file: str, macros_template
         yield data
 
 
+def input_generator_custom_gdml(meta: Meta, gdml_template_file: str, macros_template: str, gdml_generator):
+    paths, values_gdml = gdml_generator(gdml_template_file)
+    paths = list(map(lambda x: os.path.join("..", x), paths))
+    meta["macros"]["path"] = paths
+    macros_template = Template(macros_template)
+    for path, values in zip(
+            dir_name_generator(".", "sim"),
+            values_from_dict(meta["macros"])
+    ):
+        text = macros_template.substitute(values)
+        path_gdml = values["path"]
+        indx = paths.index(path_gdml)
+        input_data_meta = {
+            "macros": values,
+            "gdml": values_gdml[indx]
+        }
+        data = InputData(
+            text=text,
+            path=path,
+            values=Meta(input_data_meta)
+        )
+        yield data
+
 def create_gdml(template_file, values: dict):
     values = values_from_dict(values)
     os.makedirs("./gdml", exist_ok=True)
