@@ -1,18 +1,18 @@
-import json
+import logging
+import abc
 import logging
 import os
 import shutil
 import sys
 from typing import List, Union, Optional
-import abc
+
 import numpy as np
 from dataforge import Meta
 from dataforge.io import JsonMetaFormat
 from numpy import dtype
-from .run_tools import InputData
 from tables import open_file, File, Group, Filters
 
-
+from .run_tools import InputData
 
 
 class Reader(abc.ABC):
@@ -33,7 +33,7 @@ class ConverterFromBinToHDF5:
 
     def __init__(self, readers: List[Reader]):
         self.readers = readers
-        self.logger : logging.Logger = logging.getLogger(__name__)
+        self.logger: logging.Logger = logging.getLogger(__name__)
         self.logger.addHandler(
             logging.FileHandler("convertor.log")
         )
@@ -62,7 +62,7 @@ class ConverterFromBinToHDF5:
 
                 for reader in self.readers:
                     pathToFile = os.path.join(path, reader.filename)
-                    if os.path.exists(pathToFile) and (os.path.getsize(path) !=0):
+                    if os.path.exists(pathToFile) and (os.path.getsize(path) != 0):
                         reader(pathToFile, h5file, group)
                 for table in h5file.iter_nodes(group):
                     logging.debug(str(table))
@@ -83,7 +83,7 @@ class ConverterFromBinToHDF5:
     def _check_name(self, root, name, postfix=''):
         if name + postfix in root:
             self._check_name_counter += 1
-            return self._check_name(root, name, postfix='(' + str(self._check_name_counter) + ')')
+            return self._check_name(root, name, postfix='_re_' + str(self._check_name_counter))
         else:
             self._check_name_counter = 0
             return name + postfix
@@ -97,6 +97,11 @@ class dtypeDataReader(Reader):
     def __call__(self, path: str, h5file: File, group: Group):
         data = np.fromfile(path, dtype=self.dtype)
         self.tableName = self.filename[:self.filename.rfind('.')]
+        if ("e-" in self.tableName):
+            self.tableName = self.tableName.replace("e-", "electron")
+        if ("e+" in self.tableName):
+            self.tableName = self.tableName.replace("e+", "positron")
+
         my_table = h5file.create_table(group, self.tableName, obj=data, **self.settings)
         my_table.flush()
 
@@ -112,15 +117,17 @@ class txtDataReader(Reader):
         my_table = h5file.create_table(group, self.tableName, obj=data, **self.settings)
         my_table.flush()
 
-def get_convertor(readers: list, path_h5file, clear = False):
 
+def get_convertor(readers: list, path_h5file, clear=False):
     filters = Filters(complevel=3, fletcher32=True)
     convertor = ConverterFromBinToHDF5(readers)
     for reader in readers:
         reader.set_filters(filters)
+
     def post_run_processor(input_data: InputData):
         path = input_data.path
         convertor.convert(path, path_h5file, meta=input_data.to_meta())
         if clear:
             shutil.rmtree(path)
+
     return post_run_processor

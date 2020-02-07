@@ -1,3 +1,4 @@
+#include <ParticleDetector.hh>
 #include "SensitiveDetectorFactory.hh"
 #include "G4SDManager.hh"
 #include "Logger.hh"
@@ -9,8 +10,19 @@ G4VSensitiveDetector *SensitiveDetectorFactory::getSensitiveDetector(G4GDMLAuxLi
         return fSDM->FindSensitiveDetector(name);
     }
     G4VSensitiveDetector *tempDetector;
-    tempDetector = IDetectorFactory::getSensitiveDetector(vit);
+    if (name == "particle"){
+        tempDetector = new ParticleDetector(name, settings);
+    }
+    else{
+        tempDetector = IDetectorFactory::getSensitiveDetector(vit);
+    }
+
+
     fSDM->AddNewDetector(tempDetector);
     Logger::instance()->print("Create new detector: " + name);
     return tempDetector;
+}
+
+SensitiveDetectorFactory::SensitiveDetectorFactory(Settings *settings): settings(settings) {
+
 }

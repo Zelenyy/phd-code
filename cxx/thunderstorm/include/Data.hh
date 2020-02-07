@@ -31,6 +31,29 @@ struct Numbers {
     }
 };
 
+struct NamedNumbers{
+    map<string, int> number;
+    void clear(){
+        for (auto it = number.begin(); it != number.end(); ++it){
+            it->second = 0;
+        }
+    }
+
+    void write_header(ofstream* fout){
+        for (auto it : number){
+            *fout<<it.first<<" ";
+        }
+        *fout<<endl;
+    }
+
+    void write(ofstream *fout){
+        for (auto it : number){
+            *fout<<it.second<<" ";
+        }
+        *fout<<endl;
+    }
+};
+
 struct CylinderData {
     double energy;
     double theta;

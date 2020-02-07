@@ -25,6 +25,10 @@ void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue)
         settings->stacking = newValue;
     } else if (command == energyCut){
         settings->born_cut = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    } else if (command == stackingParticle){
+        settings->particle_cylinder_stacking.push_back(newValue);
+    } else if (command == detectorParticle){
+        settings->particle_detector.push_back(newValue);
     }
     else{
         G4UImessenger::SetNewValue(command, newValue);
@@ -41,6 +45,14 @@ ThunderstormMessenger::ThunderstormMessenger(Settings* pSettings) : settings(pSe
     stacking = new G4UIcmdWithAString(stacking_path.c_str(), this);
     stacking ->SetGuidance("Set using stacking action.");
     stacking ->SetParameterName("stacking", true);
+
+    stackingParticle = new G4UIcmdWithAString(add_particle_stacking_path.c_str(), this);
+    stackingParticle ->SetGuidance("Add particle in ParticleCylinderStacking.");
+    stackingParticle ->SetParameterName("particle", false);
+
+    detectorParticle = new G4UIcmdWithAString(add_particle_detector_path.c_str(), this);
+    detectorParticle ->SetGuidance("Add particle in ParticleDetector.");
+    detectorParticle ->SetParameterName("particle", false);
 
     auto cutDirectory = new G4UIdirectory(cut_path.c_str());
     energyCut = new G4UIcmdWithADoubleAndUnit(energy_cut_path.c_str(), this);
