@@ -3,8 +3,7 @@ import os
 
 import numpy as np
 from dataforge import Meta
-from phd.thunderstorm.convert_to_hdf5 import READERS_TXT, READERS_CYLINDER_DATA, get_named_number_readers, \
-    get_named_cylinder_readers, get_named_number_readers_1
+from phd.thunderstorm.convert_to_hdf5 import get_named_cylinder_readers, get_named_number_readers_1
 from phd.utils.convertor_tools import theta_to_direction
 from phd.utils.hdf5_tools import get_convertor
 from phd.utils.run_tools import multirun_command, general_input_generator
@@ -45,20 +44,17 @@ def main():
 
     values_gdml = {
     'height' : [0],
-    'fieldValueZ' : [8e-4],
+    'fieldValueZ' : 1e-4 * np.arange(5.0, 10.1, 0.5),
     }
-
 
     energy = np.arange(0.1, 1.01, 0.05)
     theta = np.arange(0, 91, 10)
 
     values_macros = {
     "cut" : [0.05],
-    'number' : [int(100)],
+    'number' : [int(1)],
     'energy' : energy,
-    'posZ' : [200],
     'direction' : list(map(theta_to_direction, np.deg2rad(theta))),
-    'particle' : 'e-'
                   }
     meta = Meta(
         {

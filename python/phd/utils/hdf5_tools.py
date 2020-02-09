@@ -101,7 +101,9 @@ class dtypeDataReader(Reader):
             self.tableName = self.tableName.replace("e-", "electron")
         if ("e+" in self.tableName):
             self.tableName = self.tableName.replace("e+", "positron")
-
+        # if data.size == 0:
+        #     my_table = h5file.create_table(group, self.tableName, desc **self.settings)
+        # else:
         my_table = h5file.create_table(group, self.tableName, obj=data, **self.settings)
         my_table.flush()
 
@@ -113,8 +115,14 @@ class txtDataReader(Reader):
 
     def __call__(self, path: str, h5file: File, group: Group):
         data = np.loadtxt(path, **self.kwargs)
+        if data.size == 1:
+            data = data.reshape((1,))
         self.tableName = self.filename[:self.filename.rfind('.')]
-        my_table = h5file.create_table(group, self.tableName, obj=data, **self.settings)
+        try:
+            my_table = h5file.create_table(group, self.tableName, obj=data, **self.settings)
+        except IndexError:
+            print(group, self.tableName, data, data.size, type(data), data.shape)
+            raise
         my_table.flush()
 
 
