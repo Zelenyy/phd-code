@@ -19,7 +19,7 @@ FILE(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 
 ADD_EXECUTABLE(geant4-thunderstorm.exe main.cc
         ${sources} ${general}
-)
+        src/SteppingAction.cc include/SteppingAction.hh)
 
 TARGET_LINK_LIBRARIES(geant4-thunderstorm.exe
         ${Geant4_LIBRARIES}

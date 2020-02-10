@@ -1,0 +1,11 @@
+/df/project test
+/df/gdml ../gdml/dwyer2003.gdml
+/thunderstorm/physics standard_opt_4
+/thunderstorm/stacking dwyer2003
+/thunderstorm/tracking tree_socket
+
+/gps/particle e-
+/gps/direction 0 0 -1
+/gps/position 0. 0. 99.9 m
+/gps/ene/mono 1 MeV
+/run/beamOn 1

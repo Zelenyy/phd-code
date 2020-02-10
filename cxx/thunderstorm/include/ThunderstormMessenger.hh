@@ -28,6 +28,8 @@ private:
     G4UIdirectory * directory;
     G4UIcmdWithAString * physics;
     G4UIcmdWithAString * stacking;
+    G4UIcmdWithAString * stepping;
+    G4UIcmdWithAString * tracking;
     G4UIcmdWithAString * stackingParticle;
     G4UIcmdWithAString * detectorParticle;
     G4UIcmdWithADoubleAndUnit * energyCut;
@@ -35,6 +37,8 @@ private:
     string thunderstorm_directory = "/thunderstorm/";
     string physics_path = thunderstorm_directory + "physics";
     string stacking_path = thunderstorm_directory + "stacking";
+    string stepping_path = thunderstorm_directory + "stepping";
+    string tracking_path = thunderstorm_directory + "tracking";
     string cut_path = thunderstorm_directory +"cut/";
     string energy_cut_path = cut_path +"energy";
     string add_particle_stacking_path = thunderstorm_directory + "addParticleInPCS";

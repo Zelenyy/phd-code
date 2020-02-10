@@ -10,8 +10,8 @@
 
 Dwyer2003StackingAction::Dwyer2003StackingAction(Settings *settings) {
     number = DataManager::instance()->createNumber("number");
-    foutGamma = DataFileManager::instance()->getDataFile<CylinderData>("gamma");
-    foutPositron = DataFileManager::instance()->getDataFile<CylinderData>("positron");
+    foutGamma = DataFileManager::instance()->getDataFile<CylinderIdData>("gamma");
+    foutPositron = DataFileManager::instance()->getDataFile<CylinderIdData>("positron");
     cut = settings->born_cut;
     Logger::instance()->print("One generation set cut: " + to_string(cut) + " MeV");
     parent.reserve(100000);

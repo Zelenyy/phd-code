@@ -70,4 +70,49 @@ struct CylinderData {
     }
 };
 
+struct CylinderIdData {
+    int id;
+    int parent_id;
+    double energy;
+    double theta;
+    double radius;
+    double z;
+
+    void fillFromTrack(const G4Track *aTrack) {
+        id = aTrack->GetTrackID();
+        parent_id = aTrack->GetParentID();
+        energy = aTrack->GetKineticEnergy() / MeV;
+        const G4ThreeVector &momentumDir = aTrack->GetMomentumDirection();
+        const G4ThreeVector &position = aTrack->GetPosition();
+        theta = momentumDir.getTheta() / radian;
+        radius = position.perp() / meter;
+        z = position.getZ() / meter;
+    }
+};
+
+
+struct TreeSocket{
+    int id;
+    int parent_id;
+    int particle;
+    double energy;
+    double theta;
+    double radius;
+    double z;
+    void fillFromStep(const G4Step *aStep){
+        fillFromTrack(aStep->GetTrack());
+    }
+
+    void fillFromTrack(const G4Track *aTrack){
+        id = aTrack->GetTrackID();
+        parent_id = aTrack->GetParentID();
+        particle = aTrack->GetDefinition()->GetPDGEncoding();
+        energy = aTrack->GetKineticEnergy() / MeV;
+        const G4ThreeVector &momentumDir = aTrack->GetMomentumDirection();
+        const G4ThreeVector &position = aTrack->GetPosition();
+        theta = momentumDir.getTheta() / radian;
+        radius = position.perp() / meter;
+        z = position.getZ() / meter;
+    }
+};
 #endif //PHD_CODE_DATA_HH

@@ -25,9 +25,9 @@ private:
     double cut = 0.05*MeV;
     vector<int> parent;
     Numbers* number;
-    CylinderData data;
-    DataFile<CylinderData> *foutGamma;
-    DataFile<CylinderData> *foutPositron;
+    CylinderIdData data;
+    DataFile<CylinderIdData> *foutGamma;
+    DataFile<CylinderIdData> *foutPositron;
 };
 
 
