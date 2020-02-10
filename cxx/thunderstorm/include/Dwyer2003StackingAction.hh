@@ -13,6 +13,7 @@
 #include "G4Track.hh"
 #include "DataFile.hh"
 #include <DataManager.hh>
+#include "G4StackManager.hh"
 
 class Dwyer2003StackingAction : public G4UserStackingAction {
 public:
@@ -28,6 +29,8 @@ private:
     CylinderIdData data;
     DataFile<CylinderIdData> *foutGamma;
     DataFile<CylinderIdData> *foutPositron;
+
+    G4ClassificationOfNewTrack ClassifyGamma(const G4Track *);
 };
 
 

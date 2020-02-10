@@ -1,18 +1,21 @@
 import logging
 import os
+from string import Template
 
 from dataforge import Meta
-from phd.thunderstorm.convert_to_hdf5 import READERS_TXT, READERS_CYLINDER_DATA
+from phd.thunderstorm.convert_to_hdf5 import READERS_TXT, READERS_CYLINDER_DATA, READERS_CYLINDER_ID_DATA, \
+    READER_TREE_SOCKET_DATA
 from phd.utils.hdf5_tools import get_convertor
 from phd.utils.run_tools import multirun_command, \
-    create_one_file, input_generator_custom_gdml
+    create_one_file, dir_name_generator, values_from_dict, InputData
 
 ROOT_PATH = os.path.dirname(__file__)
 
 INPUT_TEMPLATE = """/df/project test
 /df/gdml ${path}
-/thunderstorm/physics ${physics}
-/thunderstorm/stacking ${stacking}
+/thunderstorm/physics standard_opt_4
+/thunderstorm/stacking dwyer2003
+/thunderstorm/tracking tree_socket
 /thunderstorm/cut/energy ${cut}
 
 /gps/particle ${particle}
@@ -26,8 +29,8 @@ INPUT_TEMPLATE = """/df/project test
 
 def gdml_generator(template_file):
     os.makedirs("./gdml", exist_ok=True)
-    fields = [8e-4, 6e-4, 5.5e-4, 5.2e-4]
-    heights = [100, 200, 300, 400]
+    fields = [10e-4, 7e-4, 6.0e-4, 5.5e-4, 5.0e-4, 4.5e-4, 4.0e-4]
+    heights = [100, 200, 300, 400, 500, 700, 1000]
     paths = []
     values_gdml = []
 
@@ -47,6 +50,31 @@ def gdml_generator(template_file):
     return paths, values_gdml
 
 
+def input_generator_custom_gdml_dwyer2003(meta: Meta, gdml_template_file: str, macros_template: str, gdml_generator):
+    paths, values_gdml = gdml_generator(gdml_template_file)
+    paths = list(map(lambda x: os.path.join("..", x), paths))
+    meta["macros"]["path"] = paths
+    macros_template = Template(macros_template)
+    for path, values in zip(
+            dir_name_generator(".", "sim"),
+            values_from_dict(meta["macros"])
+    ):
+        path_gdml = values["path"]
+        indx = paths.index(path_gdml)
+        gdml = values_gdml[indx]
+        values["posZ"] = gdml["cellHeight"]/2 - 0.1
+        text = macros_template.substitute(values)
+        input_data_meta = {
+            "macros": values,
+            "gdml": gdml
+        }
+        data = InputData(
+            text=text,
+            path=path,
+            values=Meta(input_data_meta)
+        )
+        yield data
+
 def main():
     logging.basicConfig(filename="run.log")
     logging.root.setLevel(logging.DEBUG)
@@ -54,12 +82,9 @@ def main():
     gdml_template = os.path.join(ROOT_PATH, "template", "diff_models_0.gdml")
 
     values_macros = {
-        "physics": ["standard_opt_4"],
-        "stacking": "dwyer2003",
         "cut": [0.05],
-        'number': [int(10)],
+        'number': [1],
         'energy': [1.0],
-        'posZ': [200],
         'direction': ['0 0 -1'],
         'particle': 'e-'
     }
@@ -69,10 +94,10 @@ def main():
         }
     )
 
-    input_data = input_generator_custom_gdml(meta, gdml_template, INPUT_TEMPLATE, gdml_generator)
-    command = "../build/thunderstorm/geant4-thunderstorm.exe"
-    readers = READERS_CYLINDER_DATA + READERS_TXT
-    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=True))
+    input_data = input_generator_custom_gdml_dwyer2003(meta, gdml_template, INPUT_TEMPLATE, gdml_generator)
+    command = "../../build/thunderstorm/geant4-thunderstorm.exe"
+    readers = READERS_CYLINDER_ID_DATA + READERS_TXT + READER_TREE_SOCKET_DATA
+    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=False))
     return 0
 
 

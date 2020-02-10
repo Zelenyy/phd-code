@@ -16,12 +16,14 @@ public:
     void PreUserTrackingAction(const G4Track *track) override;
 
     TreeSocketTrackingAction(){
-        socketOutput = DataFileManager::instance()->GetSocketOutput<TreeSocket>("TreeTracking");
+//        socketOutput = DataFileManager::instance()->GetSocketOutput<TreeSocket>("TreeTracking");
+        dataFile =  DataFileManager::instance()->getDataFile<TreeSocket>("TreeTracking");
     }
 
 private:
     TreeSocket data;
-    SocketOutput<TreeSocket> * socketOutput;
+    DataFile<TreeSocket> * dataFile;
+//    SocketOutput<TreeSocket> * socketOutput;
 };
 
 

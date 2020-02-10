@@ -32,13 +32,13 @@ def main():
     values_gdml = {
     'height' : [0],
     'cellHeight' : [400],
-    'fieldValueZ' : [8e-4],
+    'fieldValueZ' : [5.5e-4],
     }
 
     values_macros = {
     "physics" : ["standard_opt_4"],
         "cut" : [0.05],
-    'number' : [100,100,100,100,100,100,100,100],
+    'number' : [1,1,1,1,1,1],
     'energy' : [1.0],
     'posZ' : [199.9],
     'direction' : ['0 0 -1'],
@@ -52,9 +52,9 @@ def main():
     )
 
     input_data = general_input_generator(meta, gdml_template, INPUT_TEMPLATE)
-    command = "../build/thunderstorm/geant4-thunderstorm.exe"
+    command = "../../build/thunderstorm/geant4-thunderstorm.exe"
     readers = READERS_CYLINDER_DATA + READERS_TXT
-    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=True))
+    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=False))
     return 0
 
 if __name__ == '__main__':

@@ -4,10 +4,20 @@ from typing import Optional
 
 import numpy as np
 from dataforge import Meta
-from tables import File, open_file
+from tables import File, open_file, Group
 
 
-
+def get_attrs_values(filename: str, attrs_name: str):
+    result  = set()
+    with open_file(filename) as h5file:
+        for node in h5file.walk_nodes():
+            if isinstance(node, Group):
+                continue
+            try:
+                result.add(node.attrs[attrs_name])
+            except (AttributeError, KeyError):
+                continue
+    return result
 
 def find_by_meta(filename: str, target_node = None, meta: Optional[Meta] = None, **kwargs):
 

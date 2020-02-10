@@ -47,8 +47,8 @@ def main():
     'fieldValueZ' : 1e-4 * np.arange(5.0, 10.1, 0.5),
     }
 
-    energy = np.arange(0.1, 1.01, 0.05)
-    theta = np.arange(0, 91, 10)
+    energy = [1] #np.arange(0.1, 1.01, 0.05)
+    theta = [0] #np.arange(0, 91, 10)
 
     values_macros = {
     "cut" : [0.05],
@@ -66,7 +66,7 @@ def main():
     input_data = general_input_generator(meta, gdml_template, INPUT_TEMPLATE)
     command = "../build/thunderstorm/geant4-thunderstorm.exe"
     readers = get_readers()
-    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=True))
+    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=False))
     return 0
 
 

@@ -7,5 +7,6 @@
 void TreeSocketTrackingAction::PreUserTrackingAction(const G4Track *track) {
     G4UserTrackingAction::PreUserTrackingAction(track);
     data.fillFromTrack(track);
-    socketOutput->addData(data);
+    dataFile->addData(data);
+//    socketOutput->addData(data);
 }

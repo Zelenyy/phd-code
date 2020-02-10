@@ -36,6 +36,7 @@ void G4DFClient::setup(G4VUserPhysicsList *physList, G4VUserActionInitialization
 }
 
 void G4DFClient::initialize() {
+    runManager->SetNumberOfAdditionalWaitingStacks(4);
     runManager->Initialize();
 }
 

@@ -19,6 +19,31 @@ dtype_cylinder = np.dtype([(name, 'd') for name in names_cylinder])
 READERS_CYLINDER_DATA = [dtypeDataReader(file, dtype_cylinder) for file in
                          ['gamma.bin', 'electron.bin', 'positron.bin']]
 
+CYLINDER_ID_DTYPE = np.dtype([
+    ("id", "i"),
+    ("parent_id", "i"),
+    ("energy", "d"),
+    ("theta", "d"),
+    ("radius", "d"),
+    ("z", "d"),
+])
+
+READERS_CYLINDER_ID_DATA = [dtypeDataReader(file, CYLINDER_ID_DTYPE) for file in
+                         ['gamma.bin', 'electron.bin', 'positron.bin']]
+
+TREE_SOCKET_DTYPE = np.dtype([
+    ("id", "i"),
+    ("parent_id", "i"),
+    ("particle", "i"),
+    ("zero", "i"),
+    ("energy", "d"),
+    ("theta", "d"),
+    ("radius", "d"),
+    ("z", "d"),
+])
+
+READER_TREE_SOCKET_DATA = [dtypeDataReader("TreeTracking.bin", TREE_SOCKET_DTYPE)]
+
 def convert_name(name):
     if name == "e-":
         return "electron"
