@@ -5,25 +5,37 @@
 #include <G4Electron.hh>
 #include <G4Positron.hh>
 #include <G4Gamma.hh>
-
+#include "G4VProcess.hh"
 #include "Dwyer2003StackingAction.hh"
 
+
+
+/*
+ *
+Undefined -1
+compt 29
+conv 33
+eBrem 18
+eIoni 15
+phot 25
+ */
 Dwyer2003StackingAction::Dwyer2003StackingAction(Settings *settings) {
     number = DataManager::instance()->createNumber("number");
     foutGamma = DataFileManager::instance()->getDataFile<CylinderIdData>("gamma");
     foutPositron = DataFileManager::instance()->getDataFile<CylinderIdData>("positron");
     cut = settings->born_cut;
     Logger::instance()->print("One generation set cut: " + to_string(cut) + " MeV");
-    parent.reserve(100000);
+//    temp = &DataFileManager::instance()->models;
 }
 
 G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Track * aTrack) {
-    auto indx = aTrack->GetTrackID();
-    if (indx >= parent.size()){
-        parent.resize(parent.size() + 100000);
-    }
-    parent[indx] = aTrack->GetDefinition()->GetParticleDefinitionID();
+//    auto process = aTrack->GetCreatorProcess();
+//    auto model = aTrack->GetCreatorModelID();
 
+//    (*temp)[aTrack->GetCreatorModelName()] = aTrack->GetCreatorModelID();
+
+//    cout<<process->GetProcessName()<<endl;
+//    cout<<process->GetProcessType()<<endl;
     if (aTrack->GetParentID() == 0){
         return fUrgent;
     }
@@ -34,30 +46,34 @@ G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Tra
 
     const auto& position = aTrack->GetPosition();
     if (aTrack->GetDefinition() == G4Electron::Definition()){
-        if (position.getZ() > 0){
-            indx = aTrack->GetParentID();
-            if (parent[indx] == G4Positron::Definition()->GetParticleDefinitionID()){
-//                cout<< "Postron seed"<<endl;
-                data.fillFromTrack(aTrack);
-                foutPositron->addData(data);
-                number->positron++;
-                return fKill;
-            }
-            else if (parent[indx] == G4Gamma::Definition()->GetParticleDefinitionID()){
+        if (position.getZ() > 0) {
+            auto modelId = aTrack->GetCreatorModelID();
+            if (modelId == 25 or modelId == 29 or modelId == 33) {
 //                cout<< "Gamma seed"<<endl;
                 data.fillFromTrack(aTrack);
                 foutGamma->addData(data);
                 number->gamma++;
                 return fKill;
+            } else {
+                int indx = aTrack->GetParentID();
+//                cout<<"Electron "<<indx<<endl;
+                if (positronIndx.find(indx) != positronIndx.end()) {
+//                cout<< "Postron seed"<<endl;
+                    data.fillFromTrack(aTrack);
+                    foutPositron->addData(data);
+                    number->positron++;
+                    return fKill;
+                }
             }
-
+            if (aTrack->GetKineticEnergy() < 0.08 * MeV) {
+                return fWaiting;
+            }
+            return fWaiting_3;
         }
-        if (aTrack->GetKineticEnergy() < 0.08*MeV){
-            return fWaiting;
-        }
-        return fWaiting_3;
     }
     else if (aTrack->GetDefinition() == G4Positron::Definition()){
+//        cout<<"Positron "<<aTrack->GetTrackID()<<endl;
+        positronIndx.insert(aTrack->GetTrackID());
         return fWaiting_4;
     }
     else if (aTrack->GetDefinition() == G4Gamma::Definition()){
@@ -68,7 +84,7 @@ G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Tra
 
 void Dwyer2003StackingAction::PrepareNewEvent() {
     G4UserStackingAction::PrepareNewEvent();
-
+        positronIndx.clear();
 }
 
 G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyGamma(const G4Track *aTrack) {

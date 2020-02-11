@@ -13,7 +13,9 @@
 #include "G4Track.hh"
 #include "DataFile.hh"
 #include <DataManager.hh>
+#include <set>
 #include "G4StackManager.hh"
+#include "map"
 
 class Dwyer2003StackingAction : public G4UserStackingAction {
 public:
@@ -24,9 +26,9 @@ public:
 
 private:
     double cut = 0.05*MeV;
-    vector<int> parent;
     Numbers* number;
-    CylinderIdData data;
+    set<int> positronIndx;
+    CylinderIdData data{};
     DataFile<CylinderIdData> *foutGamma;
     DataFile<CylinderIdData> *foutPositron;
 

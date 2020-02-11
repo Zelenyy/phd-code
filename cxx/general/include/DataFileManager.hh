@@ -62,6 +62,9 @@ public:
         for (auto it : socketMap){
             delete it.second;
         }
+        for (auto it : models){
+            cout<<it.first<<" "<<it.second<<endl;
+        }
     };
 private:
     map<string, IDataFile *> dataFileMap;
@@ -74,6 +77,8 @@ private:
 
     DataFileManager &operator=(DataFileManager const &);
 
+public:
+    map<string, int> models;
 };
 
 
