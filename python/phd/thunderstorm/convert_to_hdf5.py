@@ -65,9 +65,8 @@ def get_named_number_readers(path, prefix):
 
 
 def get_named_cylinder_readers(particles, prefix):
-    names = map(convert_name, particles)
     readers_cylinder_data = [dtypeDataReader(prefix + "_" + name + ".bin", dtype_cylinder)
-                             for name in names]
+                             for name in particles]
     return readers_cylinder_data
 
 def get_named_number_readers_1(particles, prefix):
