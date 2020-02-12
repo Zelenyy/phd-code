@@ -19,6 +19,22 @@ def get_attrs_values(filename: str, attrs_name: str):
                 continue
     return result
 
+def find_group_by_meta(filename, **kwargs):
+    result = []
+    with open_file(filename) as h5file:
+        for group in h5file.root:
+            meta = h5file.get_node(group, "meta")
+            meta = Meta(meta)
+            flag = True
+            for key, value in kwargs:
+                if meta[key] != value:
+                    flag = False
+                    break
+            if flag:
+                result.append(group._v_pathname)
+    return result
+
+
 def find_by_meta(filename: str, target_node = None, meta: Optional[Meta] = None, **kwargs):
 
     def check(node, meta):
