@@ -6,7 +6,7 @@
 #define PHD_CODE_SETTINGS_HH
 
 #include "G4SystemOfUnits.hh"
-
+#include "ParticlePredictor.hh"
 using namespace std;
 
 struct Settings{
@@ -20,6 +20,7 @@ struct Settings{
 
     //SteppingAction
     bool stepping_energy_cut = true;
+    ParticlePredictor* particlePredictor;
 };
 
 #endif //PHD_CODE_SETTINGS_HH

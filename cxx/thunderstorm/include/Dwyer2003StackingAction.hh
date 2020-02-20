@@ -16,6 +16,7 @@
 #include <set>
 #include "G4StackManager.hh"
 #include "map"
+#include "ParticlePredictor.hh"
 
 class Dwyer2003StackingAction : public G4UserStackingAction {
 public:
@@ -33,6 +34,7 @@ private:
     DataFile<CylinderIdData> *foutPositron;
 
     G4ClassificationOfNewTrack ClassifyGamma(const G4Track *);
+    ParticlePredictor* fParticlePredictor;
 };
 
 

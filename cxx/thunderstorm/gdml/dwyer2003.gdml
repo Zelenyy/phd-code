@@ -15,7 +15,7 @@
         <constant value="pressure*M/(R*temperature)*1e-3" name="density"/>
         <quantity value="10000" name="worldWidth" unit="m"/>
         <quantity value="600" name="worldHeight" unit="m"/>
-        <quantity value="150" name="cellHeight" unit="m"/>
+        <quantity value="300" name="cellHeight" unit="m"/>
         <quantity value="9000" name="cellWidth" unit="m"/>
         <quantity value="100" name="detectorThinckness" unit="mm"/>
         <position name="centerPos"/>

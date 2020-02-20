@@ -19,6 +19,28 @@ void EventAction::EndOfEventAction(const G4Event *anEvent) {
         Logger::instance()->print("End event number: " + to_string(anEvent->GetEventID()));
     }
     dataManager->EndEvent();
+
+    cout<<"Height bins" << endl;
+    cout<< fSettings->particlePredictor->fHist2DLow->fYbins->toString()<<endl;
+    cout<< "ELectron"<<endl;
+    cout<<"Energy bins"<<endl;
+    cout<<fSettings->particlePredictor->fHist2DLow->fXbins->toString()<<endl;
+    cout<<"Low hist"<<endl;
+    cout<<fSettings->particlePredictor->fHist2DLow->dataToString()<<endl;
+    cout<<"Energy bins"<<endl;
+    cout<<fSettings->particlePredictor->fHist2DHight->fXbins->toString()<<endl;
+    cout<<"Hight hist"<<endl;
+    cout<<fSettings->particlePredictor->fHist2DHight->dataToString()<<endl;
+
+    cout<< "Gamma"<<endl;
+    cout<<"Energy bins"<<endl;
+    cout<<fSettings->particlePredictor->fGammaHist2DLow->fXbins->toString()<<endl;
+    cout<<"Low hist"<<endl;
+    cout<<fSettings->particlePredictor->fGammaHist2DLow->dataToString()<<endl;
+    cout<<"Energy bins"<<endl;
+    cout<<fSettings->particlePredictor->fGammaHist2DHight->fXbins->toString()<<endl;
+    cout<<"Hight hist"<<endl;
+    cout<<fSettings->particlePredictor->fGammaHist2DHight->dataToString()<<endl;
     G4UserEventAction::EndOfEventAction(anEvent);
 }
 

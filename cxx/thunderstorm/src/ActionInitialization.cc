@@ -18,13 +18,14 @@ void ActionInitialization::Build() const {
 
     auto logger = Logger::instance();
 
-    auto eventAction = new EventAction();
+    auto eventAction = new EventAction(settings);
     SetUserAction(eventAction);
 
     if (settings->stacking == "one_generation") {
         SetUserAction(new OneGenerationStackingAction(settings));
         logger->print("Using stacking  action: one_generation");
     } else if (settings->stacking == "dwyer2003") {
+        settings->particlePredictor = new ParticlePredictor;
         SetUserAction(new Dwyer2003StackingAction(settings));
         logger->print("Using stacking  action: dwyer2003");
     } else if (settings->stacking == "simple") {

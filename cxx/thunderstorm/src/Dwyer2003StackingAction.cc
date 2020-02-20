@@ -25,17 +25,14 @@ Dwyer2003StackingAction::Dwyer2003StackingAction(Settings *settings) {
     foutPositron = DataFileManager::instance()->getDataFile<CylinderIdData>("positron");
     cut = settings->born_cut;
     Logger::instance()->print("One generation set cut: " + to_string(cut) + " MeV");
+    fParticlePredictor = settings->particlePredictor;
 //    temp = &DataFileManager::instance()->models;
+
 }
 
 G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Track * aTrack) {
-//    auto process = aTrack->GetCreatorProcess();
-//    auto model = aTrack->GetCreatorModelID();
 
-//    (*temp)[aTrack->GetCreatorModelName()] = aTrack->GetCreatorModelID();
 
-//    cout<<process->GetProcessName()<<endl;
-//    cout<<process->GetProcessType()<<endl;
     if (aTrack->GetParentID() == 0){
         return fUrgent;
     }
@@ -43,6 +40,8 @@ G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Tra
     if (aTrack->GetKineticEnergy() < cut){
         return fKill;
     }
+
+
 
     const auto& position = aTrack->GetPosition();
     if (aTrack->GetDefinition() == G4Electron::Definition()){
@@ -65,10 +64,18 @@ G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Tra
                     return fKill;
                 }
             }
+
+            if (!fParticlePredictor->accept(aTrack)){
+                return fKill;
+            }
+
             if (aTrack->GetKineticEnergy() < 0.08 * MeV) {
                 return fWaiting;
             }
             return fWaiting_3;
+        }
+        if (!fParticlePredictor->accept(aTrack)){
+            return fKill;
         }
     }
     else if (aTrack->GetDefinition() == G4Positron::Definition()){
@@ -88,6 +95,9 @@ void Dwyer2003StackingAction::PrepareNewEvent() {
 }
 
 G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyGamma(const G4Track *aTrack) {
+    if (!fParticlePredictor->accept(aTrack)){
+        return fKill;
+    }
     if (aTrack->GetKineticEnergy() < 0.08*MeV){
         return fUrgent;
     }

@@ -23,3 +23,4 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include DESTINATION .
 
 ADD_EXECUTABLE(test.exe test.cc ${sources} ${headers})
 TARGET_LINK_LIBRARIES(test.exe ${Geant4_LIBRARIES})
+

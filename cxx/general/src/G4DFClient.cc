@@ -49,7 +49,7 @@ void G4DFClient::read(istream &input) {
         if ((strcmp(command, "\r") == 0) or (strcmp(command, "\r\n") == 0) or (strcmp(command, "\n") == 0) or (strlen(command) == 0))  {
             break;
         }
-        UImanager->ApplyCommand(command);
+        UImanager->ApplyCommand(string(command));
     }
     countRead++;
 }

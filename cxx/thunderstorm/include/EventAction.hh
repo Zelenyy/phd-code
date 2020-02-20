@@ -9,11 +9,14 @@
 #include <G4UserEventAction.hh>
 #include "Data.hh"
 #include "DataManager.hh"
+#include "Settings.hh"
+#include <iostream>
 
 class EventAction : public G4UserEventAction {
 public:
-    EventAction(){
+    EventAction(Settings* settings){
         dataManager = DataManager::instance();
+        fSettings = settings;
     };
 
     void BeginOfEventAction(const G4Event *anEvent) override;
@@ -22,6 +25,7 @@ public:
 
 private:
     DataManager * dataManager;
+    Settings* fSettings;
 };
 
 
