@@ -4,7 +4,7 @@ from string import Template
 
 from dataforge import Meta
 from phd.thunderstorm.convert_to_hdf5 import READERS_TXT, READERS_CYLINDER_DATA, READERS_CYLINDER_ID_DATA, \
-    READER_TREE_SOCKET_DATA
+    READER_TREE_SOCKET_DATA, HistDwyer2003Reader
 from phd.utils.hdf5_tools import get_convertor
 from phd.utils.run_tools import multirun_command, \
     create_one_file, dir_name_generator, values_from_dict, InputData
@@ -29,8 +29,10 @@ INPUT_TEMPLATE = """/df/project test
 
 def gdml_generator(template_file):
     os.makedirs("./gdml", exist_ok=True)
-    fields = [10e-4, 7e-4, 6.0e-4, 5.5e-4, 5.0e-4, 4.5e-4, 4.0e-4]
-    heights = [100, 200, 300, 400, 500, 700, 1000]
+    # fields = [10e-4, 7e-4, 6.0e-4, 5.5e-4, 5.0e-4, 4.5e-4, 4.0e-4]
+    fields = [10e-4, 7e-4, 6.0e-4, 5.5e-4]
+    # heights = [100, 200, 300, 400, 500, 700, 1000]
+    heights = [100, 200, 300, 400]
     paths = []
     values_gdml = []
 
@@ -83,7 +85,7 @@ def main():
 
     values_macros = {
         "cut": [0.05],
-        'number': [1],
+        'number': [10],
         'energy': [1.0],
         'direction': ['0 0 -1'],
         'particle': 'e-'
@@ -96,7 +98,7 @@ def main():
 
     input_data = input_generator_custom_gdml_dwyer2003(meta, gdml_template, INPUT_TEMPLATE, gdml_generator)
     command = "../../build/thunderstorm/geant4-thunderstorm.exe"
-    readers = READERS_CYLINDER_ID_DATA + READERS_TXT + READER_TREE_SOCKET_DATA
+    readers = READERS_CYLINDER_ID_DATA + READERS_TXT + READER_TREE_SOCKET_DATA + [HistDwyer2003Reader("histDwyer2003.txt")]
     multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=False))
     return 0
 

@@ -65,6 +65,8 @@ class ConverterFromBinToHDF5:
                     if os.path.exists(pathToFile) and (os.path.getsize(path) != 0):
                         reader(pathToFile, h5file, group)
                 for table in h5file.iter_nodes(group):
+                    if (isinstance(table, Group)):
+                        continue
                     logging.debug(str(table))
                     if meta is not None:
                         for key, value in meta[indx].to_flat().items():

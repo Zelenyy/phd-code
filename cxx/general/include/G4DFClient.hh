@@ -32,7 +32,10 @@ public:
 
     void setup(G4VUserPhysicsList * physList, G4VUserActionInitialization * actions = nullptr);
     void initialize();
-    void read(istream& input);
+    int read(istream& input);
+
+    void startSocketServer();
+
 
     void stop(){
         delete runManager;
@@ -57,12 +60,19 @@ public:
         this->seed = seed;
     }
 
+    void setPort(int port){
+        this->port = port;
+    }
+
 private:
     int argc;
     char **argv;
     string project;
     string gdml;
     long seed = -1;
+    int port = 8777;
+    int new_socket{};
+    int server_fd{};
     G4DFClientMessenger* messenger;
     int countRead = 1;
 

@@ -4,6 +4,8 @@ PROJECT(geant4-dfclient)
 
 FIND_PACKAGE(Geant4 REQUIRED ui_all vis_all)
 
+add_subdirectory("dataforge")
+
 IF (NOT Geant4_FOUND)
     MESSAGE(FATAL_ERROR "Geant4 not found!")
 ENDIF (NOT Geant4_FOUND)
@@ -14,6 +16,8 @@ set(CMAKE_CONFIGURATION_TYPES Reales)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include)
 FILE(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
+
+
 add_library(geant4-dfclient SHARED ${sources})
 
 target_link_libraries(${PROJECT_NAME} ${Geant4_LIBRARIES})

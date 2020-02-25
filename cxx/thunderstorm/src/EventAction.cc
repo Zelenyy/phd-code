@@ -20,27 +20,65 @@ void EventAction::EndOfEventAction(const G4Event *anEvent) {
     }
     dataManager->EndEvent();
 
-    cout<<"Height bins" << endl;
-    cout<< fSettings->particlePredictor->fHist2DLow->fYbins->toString()<<endl;
-    cout<< "ELectron"<<endl;
-    cout<<"Energy bins"<<endl;
-    cout<<fSettings->particlePredictor->fHist2DLow->fXbins->toString()<<endl;
-    cout<<"Low hist"<<endl;
-    cout<<fSettings->particlePredictor->fHist2DLow->dataToString()<<endl;
-    cout<<"Energy bins"<<endl;
-    cout<<fSettings->particlePredictor->fHist2DHight->fXbins->toString()<<endl;
-    cout<<"Hight hist"<<endl;
-    cout<<fSettings->particlePredictor->fHist2DHight->dataToString()<<endl;
+    if (fSettings->particlePredictor != nullptr) {
+        ofstream &fout = *DataFileManager::instance()->getTextFile("histDwyer2003");
+        if (anEvent->GetEventID() == 0) {
+            fout << "Histogram Descripiton" << endl;
 
-    cout<< "Gamma"<<endl;
-    cout<<"Energy bins"<<endl;
-    cout<<fSettings->particlePredictor->fGammaHist2DLow->fXbins->toString()<<endl;
-    cout<<"Low hist"<<endl;
-    cout<<fSettings->particlePredictor->fGammaHist2DLow->dataToString()<<endl;
-    cout<<"Energy bins"<<endl;
-    cout<<fSettings->particlePredictor->fGammaHist2DHight->fXbins->toString()<<endl;
-    cout<<"Hight hist"<<endl;
-    cout<<fSettings->particlePredictor->fGammaHist2DHight->dataToString()<<endl;
+            fout << "Start description" << endl;
+            fout << "Type: low" << endl;
+            fout << "Particle: " << "electron" << endl;
+            fout << "X bins: energy (MeV)" << endl;
+            fout << fSettings->particlePredictor->fHist2DLow->fXbins->toString() << endl;
+            fout << "Y bins: height (meter)" << endl;
+            fout << fSettings->particlePredictor->fHist2DLow->fYbins->toString() << endl;
+            fout << "End description" << endl;
+
+            fout << "Start description" << endl;
+            fout << "Type: high" << endl;
+            fout << "Particle: " << "electron" << endl;
+            fout << "X bins: energy (MeV)" << endl;
+            fout << fSettings->particlePredictor->fHist2DHight->fXbins->toString() << endl;
+            fout << "Y bins: height (meter)" << endl;
+            fout << fSettings->particlePredictor->fHist2DHight->fYbins->toString() << endl;
+            fout << "End description" << endl;
+
+            fout << "Start description" << endl;
+            fout << "Type: low" << endl;
+            fout << "Particle: " << "gamma" << endl;
+            fout << "X bins: energy (MeV)" << endl;
+            fout << fSettings->particlePredictor->fGammaHist2DLow->fXbins->toString() << endl;
+            fout << "Y bins: height (meter)" << endl;
+            fout << fSettings->particlePredictor->fGammaHist2DLow->fYbins->toString() << endl;
+            fout << "End description" << endl;
+
+            fout << "Start description" << endl;
+            fout << "Type: high" << endl;
+            fout << "Particle: " << "gamma" << endl;
+            fout << "X bins: energy (MeV)" << endl;
+            fout << fSettings->particlePredictor->fGammaHist2DHight->fXbins->toString() << endl;
+            fout << "Y bins: height (meter)" << endl;
+            fout << fSettings->particlePredictor->fGammaHist2DHight->fYbins->toString() << endl;
+            fout << "End description" << endl;
+        }
+
+        fout << "Start event: " << anEvent->GetEventID() << endl;
+        fout << "Electron" << endl;
+        fout << "Low hist:" << endl;
+        fout << fSettings->particlePredictor->fHist2DLow->dataToString() << endl;
+        fout << "Electron" << endl;
+        fout << "High hist:" << endl;
+        fout << fSettings->particlePredictor->fHist2DHight->dataToString() << endl;
+        fout << "Gamma" << endl;
+        fout << "Low hist:" << endl;
+        fout << fSettings->particlePredictor->fGammaHist2DLow->dataToString() << endl;
+        fout << "Gamma" << endl;
+        fout << "High hist:" << endl;
+        fout << fSettings->particlePredictor->fGammaHist2DHight->dataToString() << endl;
+        fout << "End event." << endl;
+    }
+
+
     G4UserEventAction::EndOfEventAction(anEvent);
 }
 

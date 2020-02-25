@@ -8,7 +8,9 @@
 #include <random>
 #include "G4DFClient.hh"
 #include "G4DFClientMessenger.hh"
-
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 G4DFClient::G4DFClient() {
     messenger = new G4DFClientMessenger(this);
@@ -40,7 +42,8 @@ void G4DFClient::initialize() {
     runManager->Initialize();
 }
 
-void G4DFClient::read(istream &input) {
+int G4DFClient::read(istream &input) {
+    int exit_code = 0;
     char command[lengthOfCommand];
     G4UImanager *UImanager = G4UImanager::GetUIpointer();
     while (input.getline(command, lengthOfCommand)) {
@@ -49,19 +52,53 @@ void G4DFClient::read(istream &input) {
         if ((strcmp(command, "\r") == 0) or (strcmp(command, "\r\n") == 0) or (strcmp(command, "\n") == 0) or (strlen(command) == 0))  {
             break;
         }
+        if (strcmp(command, "exit") == 0){
+            exit_code = -1;
+            break;
+        }
         UImanager->ApplyCommand(string(command));
     }
     countRead++;
+    return exit_code;
 }
 
-//void G4DFClient::parse_input(int argc_, char **argv_) {
-//    this->argc=argc_;
-//    this->argv=argv_;
-//    for (int i =0; i<argc_; ++i){
-//        Logger::instance()->print("See what I get: " + string(argv[i]));
-//    }
-//    gdml = argv_[1];
-//    if (argc_==3){
-//        macros = argv_[2];
-//    }
-//}
+void G4DFClient::startSocketServer() {
+    //        // Server side C/C++ program to demonstrate Socket programming
+        struct sockaddr_in address{};
+        int opt = 1;
+        int addrlen = sizeof(address);
+//        char buffer[1024] = {0};
+
+        // Creating socket file descriptor
+        if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+            perror("socket failed");
+            exit(EXIT_FAILURE);
+        }
+
+        if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,
+                       &opt, sizeof(opt))) {
+            perror("setsockopt");
+            exit(EXIT_FAILURE);
+        }
+        address.sin_family = AF_LOCAL;
+        address.sin_addr.s_addr = INADDR_ANY;
+        address.sin_port = htons(port);
+
+        // Forcefully attaching socket to the custom port
+        if (bind(server_fd, (struct sockaddr *) &address,
+                 sizeof(address)) < 0) {
+            perror("bind failed");
+            exit(EXIT_FAILURE);
+        }
+        if (listen(server_fd, 3) < 0) {
+            perror("listen");
+            exit(EXIT_FAILURE);
+        }
+        if ((new_socket = accept(server_fd, (struct sockaddr *) &address,
+                                 (socklen_t *) &addrlen)) < 0) {
+            perror("accept");
+            exit(EXIT_FAILURE);
+        }
+
+}
+

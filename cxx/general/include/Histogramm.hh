@@ -109,6 +109,9 @@ public:
         }
     }
 
+
+
+
     void add(double x, double y){
         int i = fXbins->countIndx(x);
         int j = fYbins->countIndx(y);
@@ -116,6 +119,17 @@ public:
             return;
         }
         add(i, j);
+    }
+    pair<int,int> getIndex(double x, double y){
+        int i = fXbins->countIndx(x);
+        int j = fYbins->countIndx(y);
+        pair<int,int> result = {i,j};
+        return result;
+    }
+
+    int get(double x, double y){
+        auto indx = getIndex(x,y);
+        return get(indx.first, indx.second);
     }
 
     int get(int i, int j){

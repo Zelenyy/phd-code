@@ -44,13 +44,20 @@ public:
         fGammaHist2DHight = new Histogramm2D(energyHight, z);
 
         unif = new uniform_real_distribution<double>(0,1);
+        exp_dist = new exponential_distribution<>(1);
     }
+
+
     bool accept(const G4Track* aTrack){
+        double x = aTrack->GetKineticEnergy();
+        double y = aTrack->GetPosition().getZ() / meter;
+
         if (aTrack->GetDefinition()==G4Gamma::Definition()){
             if (aTrack->GetKineticEnergy() < 1){
-                fGammaHist2DLow->add(aTrack->GetKineticEnergy(), aTrack->GetPosition().getZ() / meter);
-                double sample = (*unif)(re);
-                return sample > 0.8;
+                fGammaHist2DLow->add(x,y);
+                double sample = (*exp_dist)(re);
+                int number = fGammaHist2DLow->get(x,y);
+                return sample > number/exp_scale;
             }
             else{
                 fGammaHist2DHight->add(aTrack->GetKineticEnergy(), aTrack->GetPosition().getZ() / meter);
@@ -61,9 +68,10 @@ public:
         }
         if (aTrack->GetDefinition() == G4Electron::Definition()){
             if (aTrack->GetKineticEnergy() < 1){
-                fHist2DLow->add(aTrack->GetKineticEnergy(), aTrack->GetPosition().getZ() /meter);
-                double sample = (*unif)(re);
-                return sample > 0.8;
+                fHist2DLow->add(x, y);
+                double sample = (*exp_dist)(re);
+                int number = fHist2DLow->get(x,y);
+                return sample > number/exp_scale;
             }
             else{
                 fHist2DHight->add(aTrack->GetKineticEnergy(), aTrack->GetPosition().getZ() / meter);
@@ -78,6 +86,8 @@ public:
 private:
     default_random_engine re;
     uniform_real_distribution<double>* unif;
+    exponential_distribution<>* exp_dist;
+    double exp_scale = 1000.0;
 
 };
 

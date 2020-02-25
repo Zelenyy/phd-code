@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
             dfClient->read(fin);
             dfClient->setup(new PhysicsList(settings->physics), new ActionInitialization(settings));
             dfClient->massWorld->setDetectorFactory(new SensitiveDetectorFactory(settings));
-            dfClient->massWorld->setFieldFactory(new FieldFactory);
+            dfClient->massWorld->setFieldFactory(new IFieldFactory);
             dfClient->initialize();
             dfClient->read(fin);
             G4UIExecutive* ui =  new G4UIExecutive(1, argv);
