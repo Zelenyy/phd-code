@@ -14,7 +14,7 @@
 #include "vector"
 #include "Settings.hh"
 #include "DataSatellite.hh"
-
+#include "DataStorage.hh"
 using namespace CLHEP;
 using namespace std;
 
@@ -39,6 +39,8 @@ public:
 private:
     EnergyDepositData data{};
     Settings* fSettings;
+
+    MonolithDataCell<EnergyDepositData,1000>* dataCell;
 
     DataFile<EnergyDepositData>* foutDeposit;
     SocketOutput<EnergyDepositData>* socketOutput;

@@ -36,7 +36,7 @@ public:
         if (textFileMap.find(name) == textFileMap.end()) {
             string nameFile = checkFileName(name, 0, ".txt");
             auto *fout = new ofstream;
-            fout->open(nameFile + ".txt");
+            fout->open(nameFile);
             textFileMap[name] = fout;
         }
         return textFileMap[name];

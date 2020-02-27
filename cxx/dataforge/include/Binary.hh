@@ -5,11 +5,9 @@
 #ifndef PHD_CODE_BINARY_HH
 #define PHD_CODE_BINARY_HH
 
-
 #include <cstddef>
 #include <istream>
 #include <functional>
-
 
 class Binary{
 public:

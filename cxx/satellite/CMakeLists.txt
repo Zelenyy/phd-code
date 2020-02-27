@@ -13,14 +13,15 @@ ENDIF(NOT Geant4_FOUND)
 INCLUDE(${Geant4_USE_FILE})
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../general/include)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../general/include/dataforge)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../dataforge/include)
 FILE(GLOB general ${PROJECT_SOURCE_DIR}/../general/src/*.cc)
+FILE(GLOB dataforge ${PROJECT_SOURCE_DIR}/../dataforge/src/*.cc)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include)
 FILE(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 
 ADD_EXECUTABLE(geant4-satellite.exe main.cc
-        ${sources} ${general}
+        ${sources} ${general} ${dataforge}
         )
 
 TARGET_LINK_LIBRARIES(geant4-satellite.exe

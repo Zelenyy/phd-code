@@ -2,9 +2,9 @@
 // Created by zelenyy on 24.02.2020.
 //
 
-#include "SimpleEnvelope.hh"
-#include "ArrayBinary.hh"
-#include "TaggedEnvelopeFormat.hh"
+#include "dataforge/include/SimpleEnvelope.hh"
+#include "dataforge/include/ArrayBinary.hh"
+#include "dataforge/include/TaggedEnvelopeFormat.hh"
 #include <iostream>
 #include <vector>
 

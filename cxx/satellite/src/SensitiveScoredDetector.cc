@@ -3,6 +3,7 @@
 //
 
 #include <utility>
+#include <DataStorage.hh>
 
 #include "SensitiveScoredDetector.hh"
 #include "Logger.hh"
@@ -12,9 +13,12 @@ SensitiveScoredDetector::SensitiveScoredDetector(G4String name, Settings *settin
         data.energy[i] = 0.0;
     }
 
+    auto storage = DataStorage::instance();
     if (fSettings->scoredDetectorMode == single){
         if (fSettings->outputMode == file){
-            foutDeposit = DataFileManager::instance()->getDataFile<EnergyDepositData>("cellEnergyDeposit");
+            dataCell = storage->getToFileMonolithDataCell<EnergyDepositData>("cellEnergyDeposit");
+//
+//            foutDeposit = DataFileManager::instance()->getDataFile<EnergyDepositData>("cellEnergyDeposit");
             Logger::instance()->print("Files: cellEnergyDeposit");
             Logger::instance()->print("Structure: energy");
         }
@@ -60,13 +64,13 @@ void SensitiveScoredDetector::EndOfEvent(G4HCofThisEvent *) {
 //    cout<<endl;
 //    cout<<edep<<endl;
     if (fSettings->scoredDetectorMode == single){
-
-        if (fSettings->outputMode == file){
-            foutDeposit->addData(data);
-        }
-        if (fSettings->outputMode == socket_client){
-            socketOutput->addData(data);
-        }
+        dataCell->addData(data);
+//        if (fSettings->outputMode == file){
+//            foutDeposit->addData(data);
+//        }
+//        if (fSettings->outputMode == socket_client){
+//            socketOutput->addData(data);
+//        }
     }
     else{
 

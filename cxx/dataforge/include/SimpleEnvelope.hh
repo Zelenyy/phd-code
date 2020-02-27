@@ -15,9 +15,4 @@ public:
 };
 
 
-SimpleEnvelope::SimpleEnvelope(Binary&data) {
-    this->binary = &data;
-}
-
-
 #endif //PHD_CODE_SIMPLEENVELOPE_HH
