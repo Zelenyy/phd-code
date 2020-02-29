@@ -14,13 +14,11 @@
 class TreeSocketSteppingAction : public G4UserSteppingAction {
 public:
     TreeSocketSteppingAction(){
-        socketOutput = DataFileManager::instance()->GetSocketOutput<TreeSocket>("TreeStepping");
     };
     void UserSteppingAction(const G4Step *step) override;
 
 private:
     TreeSocket data;
-    SocketOutput<TreeSocket>* socketOutput;
 };
 
 

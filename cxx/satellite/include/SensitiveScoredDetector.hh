@@ -43,7 +43,6 @@ private:
     MonolithDataCell<EnergyDepositData,1000>* dataCell;
 
     DataFile<EnergyDepositData>* foutDeposit;
-    SocketOutput<EnergyDepositData>* socketOutput;
 };
 
 

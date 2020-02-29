@@ -9,63 +9,82 @@
 #include "Envelope.hh"
 #include "TaggedEnvelopeFormat.hh"
 #include "FileUtils.hh"
+#include "SocketOutput.hh"
 #include <map>
+#include "Settings.hh"
+
 using namespace std;
-class DataStorage{
+
+
+class DataStorage {
 private:
-    TaggedEnvelopeFormat* format;
-    map<string, ostream*> outputs;
-    map<string, IDataCell*> dataCell;
+    TaggedEnvelopeFormat *format;
+    map<string, ostream *> outputs;
+    map<string, IDataCell *> dataCell;
+    map<string, SocketOutput *> sockets;
 public:
-    void writeEnvelope(string name, Envelope& envelope){
-        if (outputs.find(name) == outputs.end()){
-            return;
+    void writeEnvelope(string name, Envelope &envelope) {
+        if (outputs.find(name) != outputs.end()) {
+            format->writeEnvelope(envelope, *(outputs[name]));
         }
-        format->writeEnvelope(envelope, *(outputs[name]));
+        else if (sockets.find(name) != sockets.end()){
+            format->writeEnvelope(envelope, sockets[name]->getFileDescriptor());
+        }
     };
 
-    template <class T, int step_size=1000>
-    MonolithDataCell<T,step_size>* getToFileMonolithDataCell(const string &name){
+    template<class T, int step_size = 1000>
+    MonolithDataCell<T, step_size> *getMonolithDataCell(const string &name, OutputMode mode = OutputMode::file) {
 
-        if (outputs.find(name) == outputs.end()) {
-            string nameFile = checkFileName(name, 0, ".df");
-            auto *fout = new ofstream;
-            fout->open(nameFile);
-            outputs[name] = fout;
-            auto* datacell = new MonolithDataCell<T,step_size>(name, this);
-            dataCell[name] =  datacell;
+        if (dataCell.find(name) == dataCell.end()) {
+            if (mode == OutputMode::file){
+                string nameFile = checkFileName(name, 0, ".df");
+                auto *fout = new ofstream;
+                fout->open(nameFile);
+                outputs[name] = fout;
+            }
+            else{
+                auto* socket = new SocketOutput(name);
+                sockets[name] = socket;
+            }
+
+            auto *datacell = new MonolithDataCell<T, step_size>(name, this);
+            dataCell[name] = datacell;
         }
-        return (MonolithDataCell<T,step_size>*) dataCell[name];
+        return (MonolithDataCell<T, step_size> *) dataCell[name];
     };
 
-    template <class T, int step_size=1000>
-    MonolithDataCell<T,step_size>* getToSocketMonolithDataCell(const string &name) {
-        if (outputs.find(name) == outputs.end()) {
-//            __gnu_cxx::stdio_filebuf
-            auto *fout = new ofstream;
-            auto* datacell = new MonolithDataCell<T,step_size>(name, this);
-            dataCell[name] =  datacell;
+    template<class T, int step_size = 1000>
+    MonolithDataCell<T, step_size> *getToSocketMonolithDataCell(const string &name) {
+        if (dataCell.find(name) == dataCell.end()) {
+            auto *socket = new SocketOutput(name);
+            sockets[name] = socket;
+            auto *datacell = new MonolithDataCell<T, step_size>(name, this);
+            dataCell[name] = datacell;
         }
-        return (MonolithDataCell<T,step_size>*) dataCell[name];
+        return (MonolithDataCell<T, step_size> *) dataCell[name];
     }
 
-    void beginRun(){
+    void beginRun() {
 
     }
 
-    void endRun(){
-        for (auto it: dataCell){
+    void endRun() {
+        for (auto it: dataCell) {
             it.second->dropData();
         }
     }
+
     static DataStorage *instance() {
         static DataStorage dataStorage;
         dataStorage.format = new TaggedEnvelopeFormat;
         return &dataStorage;
     }
+
 private:
     DataStorage() = default;
-    DataStorage(DataStorage const&) = delete;
+
+    DataStorage(DataStorage const &) = delete;
+
     DataStorage &operator=(DataStorage const &) = delete;
 };
 

@@ -15,18 +15,7 @@ SensitiveScoredDetector::SensitiveScoredDetector(G4String name, Settings *settin
 
     auto storage = DataStorage::instance();
     if (fSettings->scoredDetectorMode == single){
-        if (fSettings->outputMode == file){
-            dataCell = storage->getToFileMonolithDataCell<EnergyDepositData>("cellEnergyDeposit");
-//
-//            foutDeposit = DataFileManager::instance()->getDataFile<EnergyDepositData>("cellEnergyDeposit");
-            Logger::instance()->print("Files: cellEnergyDeposit");
-            Logger::instance()->print("Structure: energy");
-        }
-        if (fSettings->outputMode == socket_client){
-            socketOutput = DataFileManager::instance()->GetSocketOutput<EnergyDepositData>("energyDeposit");
-            Logger::instance()->print("Socket: energyDeposit");
-            Logger::instance()->print("Structure: energy");
-        }
+        dataCell = storage->getMonolithDataCell<EnergyDepositData>("cellEnergyDeposit", fSettings->outputMode);
     }
 
 }

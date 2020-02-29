@@ -22,13 +22,14 @@ public:
        explicit TaggedEnvelopeFormat(TaggedEnvelopeFormatVersion version = TaggedEnvelopeFormatVersion::DF02);
 
     void writeEnvelope(const Envelope &obj, std::ostream &output) override;
+    void writeEnvelope(const Envelope &obj, int fileDescriptor);
 
     const std::string START_SEQUENCE = "#~";
     const std::string END_SEQUENCE = "~#\r\n";
 private:
     TaggedEnvelopeFormatVersion version;
 
-    void writeTag(std::ostream &output, short metaFormatKey, unsigned int metaSize, size_t dataSize);
+    std::string getHeader(short metaFormatKey, unsigned int metaSize, size_t dataSize);
 
 
 };

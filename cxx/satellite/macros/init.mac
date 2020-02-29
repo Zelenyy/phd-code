@@ -1,6 +1,7 @@
 /df/project test
 /df/gdml ../gdml/satellite.gdml
 /satellite/detector single
+/satellite/output socket
 
 /gps/particle proton
 /gps/number 1

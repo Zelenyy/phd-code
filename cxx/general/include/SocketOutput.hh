@@ -13,59 +13,23 @@
 
 using namespace std;
 
-class ISocketOutput {
 
-
-public:
-    virtual ~ISocketOutput() = default;
-    virtual void StopServer() = 0;
-};
-
-template<class Data>
-class SocketOutput : public ISocketOutput {
+class SocketOutput{
 private:
     int port;
     int new_socket{};
     int server_fd{};
-    vector<Data> dataArray;
-    int indxData;
-    int maxSizeData;
 public:
     explicit SocketOutput(const string &name, int aPort = 8777) {
         this->port = aPort;
         Logger::instance()->print("Open socket " + name + " on address " + to_string(this->port));
-        StartServer();
-
-        maxSizeData = 1024;
-        indxData = 0;
-        dataArray.reserve(maxSizeData);
+        openSocket();
     };
 
-    void AddDataToSocketStream(const string &data) {
-        send(new_socket, data.c_str(), data.length(), 0);
-    }
-
-    void addData(Data &data) {
-        char *filePointer = (char *) &data;
-        send(new_socket, filePointer, (sizeof data), 0);
-//        dataArray[indxData] = data;
-//        indxData++;
-//        if (indxData == maxSizeData) {
-//            writeData();
-//            indxData = 0;
-//        }
-    }
-
-
+    int getFileDescriptor(){ return server_fd;};
 private:
 
-//    void writeData() {
-//        char *filePointer = (char *) &dataArray.front();
-//        send(new_socket, filePointer, (sizeof dataArray[0]) * indxData, 0);
-//
-//    }
-
-    void StartServer() {
+    void openSocket() {
         // Server side C/C++ program to demonstrate Socket programming
         struct sockaddr_in address{};
         int opt = 1;
@@ -102,19 +66,11 @@ private:
             perror("accept");
             exit(EXIT_FAILURE);
         }
-
-
-    }
-
+    };
 
 public:
-    void StopServer() override {
+    ~SocketOutput() {
         close(server_fd);
-    }
-
-    ~SocketOutput() override {
-//        writeData();
-        StopServer();
     };
 };
 

@@ -65,13 +65,11 @@ class Geant4Server:
         self.process.stdin.flush()
 
         ultimate_buffer = b''
-        while True:
-            data = self.socket.recv(800)
-            print(data)
-            if not data: break
-            ultimate_buffer += data
-        data = np.frombuffer(ultimate_buffer, dtype=SOCKET_DTYPE)
-        return data
+        header = self.socket.recv(20)
+        print(header)
+        return None
+        # data = np.frombuffer(ultimate_buffer, dtype=SOCKET_DTYPE)
+        # return data
 
     def stop(self):
         self.process.stdin.write(b"exit")
@@ -104,7 +102,7 @@ def main():
     for energy in [30, 40, 50, 100]:
         text = get_request(energy)
         data = server.send(text)
-        plt.plot(data[0])
+        # plt.plot(data[0])
     server.stop()
     plt.show()
     return 0

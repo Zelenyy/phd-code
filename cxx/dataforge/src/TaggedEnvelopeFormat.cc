@@ -2,6 +2,8 @@
 // Created by zelenyy on 26.02.2020.
 //
 
+#include <sstream>
+#include <sys/socket.h>
 #include "TaggedEnvelopeFormat.hh"
 
 
@@ -11,7 +13,8 @@ TaggedEnvelopeFormat::TaggedEnvelopeFormat(TaggedEnvelopeFormatVersion version) 
 
 
 void TaggedEnvelopeFormat::writeEnvelope(const Envelope &obj, std::ostream &output) {
-    writeTag(output, 0, 0, obj.binary->getSize());
+    std::string header = getHeader(0, 0, obj.binary->getSize());
+    output<<header;
     //writeMeta
     output << "\r\n";
     if (obj.binary != nullptr) {
@@ -26,7 +29,7 @@ void TaggedEnvelopeFormat::writeEnvelope(const Envelope &obj, std::ostream &outp
 }
 
 
-void TaggedEnvelopeFormat::writeTag(std::ostream &output, short metaFormatKey, unsigned int metaSize, size_t dataSize) {
+std::string TaggedEnvelopeFormat::getHeader(short metaFormatKey, unsigned int metaSize, size_t dataSize) {
     int tagSize;
     std::string name;
     switch (version) {
@@ -39,18 +42,28 @@ void TaggedEnvelopeFormat::writeTag(std::ostream &output, short metaFormatKey, u
             name = "DF03";
             break;
     }
-    output << START_SEQUENCE;
-    output << name;
-    output << metaFormatKey;
-    output << metaSize;
+    std::string header = "";
+    std::stringstream temp("", std::ios::binary);
+    temp << START_SEQUENCE;
+    temp << name;
+    temp << metaFormatKey;
+    temp << metaSize;
     switch (version) {
         case TaggedEnvelopeFormatVersion::DF02:
-            output << static_cast<unsigned int>(dataSize);
+            temp << static_cast<unsigned int>(dataSize);
             break;
         case TaggedEnvelopeFormatVersion::DF03:
-            output << dataSize;
+            temp << dataSize;
             break;
     }
-    output << END_SEQUENCE;
+    temp << END_SEQUENCE;
+    temp.flush();
+    temp >> header;
+    return header;
+}
+
+void TaggedEnvelopeFormat::writeEnvelope(const Envelope &obj, int fileDescriptor) {
+    std::string header = getHeader(0, 0, obj.binary->getSize());
+    send(fileDescriptor, header.c_str(), header.length(), 0);
 
 }

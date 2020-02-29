@@ -43,14 +43,6 @@ public:
     }
 
 
-    template<class Data>
-    SocketOutput<Data>* GetSocketOutput(const string &name){
-        if (socketMap.find(name) == socketMap.end()){
-            socketMap[name] = new SocketOutput<Data>(name);
-        }
-        return (SocketOutput<Data>*) socketMap[name];
-    }
-
 
     ~DataFileManager() {
         for (auto &it : dataFileMap) {
@@ -59,9 +51,6 @@ public:
         for (auto it : textFileMap){
             it.second->close();
         }
-        for (auto it : socketMap){
-            delete it.second;
-        }
         for (auto it : models){
             cout<<it.first<<" "<<it.second<<endl;
         }
@@ -69,7 +58,6 @@ public:
 private:
     map<string, IDataFile *> dataFileMap;
     map<string, ofstream *> textFileMap;
-    map<string, ISocketOutput *> socketMap;
 
     DataFileManager() = default;
 
