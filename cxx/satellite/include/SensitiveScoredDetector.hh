@@ -15,6 +15,7 @@
 #include "Settings.hh"
 #include "DataSatellite.hh"
 #include "DataStorage.hh"
+#include "satellite.pb.h"
 using namespace CLHEP;
 using namespace std;
 
@@ -37,12 +38,13 @@ public:
     void EndOfEvent(G4HCofThisEvent *) override;
 
 private:
-    EnergyDepositData data{};
+//    EnergyDepositData data{};
     Settings* fSettings;
-
-    MonolithDataCell<EnergyDepositData,1000>* dataCell;
-
-    DataFile<EnergyDepositData>* foutDeposit;
+    satellite::Run* run;
+    satellite::Event* event;
+//    MonolithDataCell<EnergyDepositData,1000>* dataCell;
+//
+//    DataFile<EnergyDepositData>* foutDeposit;
 };
 
 

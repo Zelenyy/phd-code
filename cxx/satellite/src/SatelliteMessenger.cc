@@ -11,15 +11,15 @@ G4String SatelliteMessenger::GetCurrentValue(G4UIcommand *command) {
 void SatelliteMessenger::SetNewValue(G4UIcommand *command, G4String newValue) {
     if (command == detector) {
         if (newValue == "mean") {
-            settings->scoredDetectorMode = mean;
+            settings->scoredDetectorMode = ScoredDetectorMode::mean;
         } else if (newValue == "single") {
-            settings->scoredDetectorMode = single;
+            settings->scoredDetectorMode = ScoredDetectorMode::single;
         }
     } else if (command == output) {
         if (newValue == "file") {
-            settings->outputMode = file;
+            settings->outputMode = OutputMode ::file;
         } else if (newValue == "socket") {
-            settings->outputMode = socket_client;
+            settings->outputMode = OutputMode ::socket_client;
         }
     } else {
         G4UImessenger::SetNewValue(command, newValue);

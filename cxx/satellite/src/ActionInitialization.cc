@@ -7,5 +7,5 @@ using namespace std;
 
 void ActionInitialization::Build() const {
     auto logger = Logger::instance();
-    SetUserAction(new RunAction);
+    SetUserAction(new RunAction(settings));
 }

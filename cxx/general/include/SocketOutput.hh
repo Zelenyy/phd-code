@@ -26,7 +26,24 @@ public:
         openSocket();
     };
 
-    int getFileDescriptor(){ return server_fd;};
+    int getID(){ return new_socket;};
+
+    void write(string data){
+        auto buff = data.c_str();
+        size_t buffsize = data.length();
+        while(buffsize > 0) {
+            ssize_t res =send(new_socket, buff, buffsize, 0);
+            if (res<=0){
+                if(errno == EINTR)
+                    continue;
+                throw std::runtime_error("write() failed");
+            }
+            buff += res;
+            buffsize -=res;
+        }
+    }
+
+
 private:
 
     void openSocket() {
@@ -67,10 +84,16 @@ private:
             exit(EXIT_FAILURE);
         }
     };
+public:
+    void closeSocket(){
+        shutdown(server_fd, SHUT_WR);
+        close(server_fd);
+        close(new_socket);
+    }
 
 public:
     ~SocketOutput() {
-        close(server_fd);
+
     };
 };
 

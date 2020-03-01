@@ -5,9 +5,24 @@
 #ifndef PHD_CODE_DATASATELLITE_HH
 #define PHD_CODE_DATASATELLITE_HH
 
+#include "satellite.pb.h"
 
-struct EnergyDepositData {
-    double energy[100];
+class DataSatellite {
+public:
+    satellite::Run* run;
+    static DataSatellite *instance() {
+        static DataSatellite dataSatellite;
+
+        return &dataSatellite;
+    }
+private:
+    DataSatellite(){
+        run = new satellite::Run();
+    };
+
+    DataSatellite(DataSatellite const &) = delete;
+
+    DataSatellite &operator=(DataSatellite const &) = delete;
 };
 
 

@@ -9,20 +9,20 @@
 
 using namespace std;
 
-enum ScoredDetectorMode{
+enum class ScoredDetectorMode{
     mean,
     single
 };
 
-enum OutputMode{
+enum class OutputMode{
     file,
     socket_client
 };
 
 struct Settings{
     int number_of_cell = 100;
-    ScoredDetectorMode scoredDetectorMode = mean;
-    OutputMode outputMode = file;
+    ScoredDetectorMode scoredDetectorMode = ScoredDetectorMode::mean;
+    OutputMode outputMode =OutputMode::file;
 };
 
 #endif //PHD_CODE_SETTINGS_HH

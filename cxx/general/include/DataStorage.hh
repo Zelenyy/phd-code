@@ -28,7 +28,7 @@ public:
             format->writeEnvelope(envelope, *(outputs[name]));
         }
         else if (sockets.find(name) != sockets.end()){
-            format->writeEnvelope(envelope, sockets[name]->getFileDescriptor());
+            format->writeEnvelope(envelope, sockets[name]->getID());
         }
     };
 

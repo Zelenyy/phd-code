@@ -1,0 +1,10 @@
+syntax = "proto3";
+package satellite;
+
+message Event{
+    repeated double deposit = 1 [packed = true];
+}
+
+message Run{
+    repeated Event event = 1;
+}

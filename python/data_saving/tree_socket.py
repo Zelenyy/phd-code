@@ -4,8 +4,7 @@ import numpy as np
 import matplotlib as plt
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 8777       # The port used by the server
-#
+PORT = 8777
 # TREE_SOCKET_DTYPE = np.dtype([
 #     ("id", "i"),
 #     ("parent_id", "i"),
@@ -22,10 +21,10 @@ def main():
         s.connect((HOST, PORT))
         ultimate_buffer = b''
         while True:
-            data = s.recv(1024*60)
+            data = s.recv(1024)
             if not data : break
             ultimate_buffer += data
-        print(data)
+        print(ultimate_buffer)
         # print(repr(ultimate_buffer))
         # print(len(ultimate_buffer), TREE_SOCKET_DTYPE.itemsize)
         # data = np.frombuffer(ultimate_buffer, dtype=TREE_SOCKET_DTYPE)

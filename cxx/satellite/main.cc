@@ -52,10 +52,11 @@ int main(int argc, char **argv) {
             ui->SessionStart();
             delete ui;
         } else if (strcmp(argv[1], "server") == 0) {
+            logger->print("Start cin server");
             dfClient->read(std::cin);
             setupSimulation(dfClient, settings);
-            logger->print("Start cin server");
             while (true) {
+                logger->print("Start next run");
                 int code = dfClient->read(std::cin);
                 if (code == -1) {
                     break;
