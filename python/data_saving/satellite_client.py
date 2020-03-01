@@ -1,80 +1,8 @@
-import socket
-import time
-from enum import Enum
-from string import Template
-from typing import List
-
+import logging
 import numpy as np
 import matplotlib.pyplot as plt
-import subprocess
+from geant4_server import Geant4Server, DetectorMode
 
-HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 8777       # The port used by the server
-
-SOCKET_DTYPE = np.dtype([
-    ("deposit", "d", (100)),
-])
-
-INIT_TEMPLATE = Template(
-"""/df/project test
-/df/gdml satellite.gdml
-/satellite/output socket
-/satellite/detector ${mode}
-"""
-)
-
-SEPARATOR = b"\r\n"
-
-class DetectorMode(Enum):
-    SINGLE = "single"
-    MEAN = "mean"
-
-
-class Geant4Server:
-    def __init__(self, command: List[str]):
-        self.command = command
-
-    def start(self, mode : DetectorMode =DetectorMode.SINGLE):
-        print("Start server:", self.command)
-        self.process = subprocess.Popen(self.command,
-                                        shell=True,
-                                        stdin=subprocess.PIPE,
-                                        stdout=subprocess.PIPE)
-
-        text : str = INIT_TEMPLATE.substitute(
-            {"mode": mode.value}
-        )
-        self.process.stdin.write(text.encode())
-        self.process.stdin.write(SEPARATOR)
-        self.process.stdin.flush()
-
-
-        while True:
-            try:
-                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self.socket.connect((HOST, PORT))
-                break
-            except ConnectionRefusedError:
-                time.sleep(1)
-
-
-    def send(self, text: str):
-        print("Send request")
-        self.process.stdin.write(text.encode())
-        self.process.stdin.write(SEPARATOR)
-        self.process.stdin.flush()
-
-        ultimate_buffer = b''
-        header = self.socket.recv(20)
-        print(header)
-        return None
-        # data = np.frombuffer(ultimate_buffer, dtype=SOCKET_DTYPE)
-        # return data
-
-    def stop(self):
-        self.process.stdin.write(b"exit")
-        self.process.wait()
-        print("Stop server")
 
 def get_request(energy=100, theta=0, number = 1):
     """
@@ -96,13 +24,16 @@ def get_request(energy=100, theta=0, number = 1):
     return particle+energy+direction+position+number
 
 def main():
+    logging.root.setLevel(logging.INFO)
     server = Geant4Server(["./build/satellite/geant4-satellite.exe server"])
     server.start(DetectorMode.SINGLE)
-
+    # text = get_request(100)
+    # server.send(text)
     for energy in [30, 40, 50, 100]:
         text = get_request(energy)
-        data = server.send(text)
-        # plt.plot(data[0])
+        run = server.send(text)
+        for event in run.event:
+            plt.plot(event.deposit)
     server.stop()
     plt.show()
     return 0
