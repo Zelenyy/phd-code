@@ -10,7 +10,7 @@
 using namespace std;
 
 enum class ScoredDetectorMode{
-    mean,
+    sum,
     single
 };
 
@@ -21,7 +21,7 @@ enum class OutputMode{
 
 struct Settings{
     int number_of_cell = 100;
-    ScoredDetectorMode scoredDetectorMode = ScoredDetectorMode::mean;
+    ScoredDetectorMode scoredDetectorMode = ScoredDetectorMode::sum;
     OutputMode outputMode =OutputMode::file;
 };
 

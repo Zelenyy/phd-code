@@ -7,8 +7,6 @@ from string import Template
 from typing import List
 import subprocess
 
-HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 8777       # The port used by the server
 
 INIT_TEMPLATE = Template(
 """/df/project test
@@ -22,7 +20,7 @@ SEPARATOR = b"\r\n"
 
 class DetectorMode(Enum):
     SINGLE = "single"
-    MEAN = "mean"
+    SUM = "sum"
 
 
 class Geant4Server:
@@ -30,6 +28,12 @@ class Geant4Server:
         self.command = command
 
     def start(self, mode : DetectorMode =DetectorMode.SINGLE):
+        """
+        :param mode:
+            Если mode =  DetectorMode.SINGLE то сервер возвращает данные пособытийно, то есть распредление энерговыделегний в детекторе для каждого отдельного события
+            Если mode =  DetectorMode.SUM то сервер будет возвращать сумарное энерговыделение за сеанс от всех событий
+        :return:
+        """
         logging.info("Start server: {}".format(self.command))
         self.process = subprocess.Popen(self.command,
                                         shell=True,
@@ -39,19 +43,27 @@ class Geant4Server:
         text : str = INIT_TEMPLATE.substitute(
             {"mode": mode.value}
         )
-        self.process.stdin.write(text.encode())
-        self.process.stdin.write(SEPARATOR)
-        self.process.stdin.flush()
+        self._write(text)
         return 0
 
-    def send(self, text: str):
-        logging.info("Send request")
+    def _write(self, text):
         self.process.stdin.write(text.encode())
         self.process.stdin.write(SEPARATOR)
         self.process.stdin.flush()
+
+    def send(self, text: str, data_host='127.0.0.1', data_port = 8777) -> Run:
+        """
+
+        :param text: тескт сообщения посылаемого  на сервер
+        :param data_host: адресс хоста на котором сервер будет возвращать даные
+        :param data_port: порт через который сервер будет возращать данные
+        :return: Run --- десериализованный protbuff
+        """
+        self._write(text)
+        logging.info("Send request")
         time.sleep(3)
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
+            s.connect((data_host, data_port))
             ultimate_buffer = b''
             while True:
                 data = s.recv(1024)
@@ -61,6 +73,14 @@ class Geant4Server:
         run = Run()
         run.ParseFromString(ultimate_buffer)
         return run
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+        if exc_val:
+             raise
 
     def stop(self):
         self.process.stdin.write(b"exit\n")

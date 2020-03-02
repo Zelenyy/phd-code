@@ -10,8 +10,8 @@ G4String SatelliteMessenger::GetCurrentValue(G4UIcommand *command) {
 
 void SatelliteMessenger::SetNewValue(G4UIcommand *command, G4String newValue) {
     if (command == detector) {
-        if (newValue == "mean") {
-            settings->scoredDetectorMode = ScoredDetectorMode::mean;
+        if (newValue == "sum") {
+            settings->scoredDetectorMode = ScoredDetectorMode::sum;
         } else if (newValue == "single") {
             settings->scoredDetectorMode = ScoredDetectorMode::single;
         }
@@ -33,8 +33,8 @@ SatelliteMessenger::SatelliteMessenger(Settings *pSettings) : settings(pSettings
     detector = new G4UIcmdWithAString(detector_mode.c_str(), this);
     detector->SetGuidance("Set detector mode");
     detector->SetParameterName("mode", true);
-    detector->SetDefaultValue("mean");
-    detector->SetCandidates("mean single");
+    detector->SetDefaultValue("sum");
+    detector->SetCandidates("sum single");
 
     output = new G4UIcmdWithAString(output_mode.c_str(), this);
     output->SetGuidance("Set output mode");

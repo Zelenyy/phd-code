@@ -9,27 +9,23 @@
 SensitiveScoredDetector::SensitiveScoredDetector(G4String name, Settings *settings) : G4VSensitiveDetector(std::move(name)), fSettings(settings) {
     run = DataSatellite::instance()->run;
 
-//    for (int i = 0; i< fSettings->number_of_cell; ++i) {
-//        data.energy[i] = 0.0;
-//    }
 
-//    auto storage = DataStorage::instance();
-//    if (fSettings->scoredDetectorMode == single){
-//        dataCell = storage->getMonolithDataCell<EnergyDepositData>("cellEnergyDeposit", fSettings->outputMode);
-//    }
 
 }
 
 
 void SensitiveScoredDetector::Initialize(G4HCofThisEvent *) {
-    event = run->add_event();
-
-//    if (fSettings->scoredDetectorMode == single){
+    if (fSettings->scoredDetectorMode == ScoredDetectorMode::single){
+        event = run->add_event();
         for (int i = 0; i< fSettings->number_of_cell; ++i) {
-//            data.energy[i] = 0.0;
             event->add_deposit(0.0);
         }
-//    }
+    }
+    else  if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum){
+        event = run->mutable_event(0);
+    }
+
+
 
 }
 
@@ -54,18 +50,4 @@ void SensitiveScoredDetector::EndOfEvent(G4HCofThisEvent *) {
 //        cout<< event->deposit(it) <<" ";
 //    }
 //    cout<<endl;
-
-//    if (fSettings->scoredDetectorMode == single){
-////        dataCell->addData(data);
-////        if (fSettings->outputMode == file){
-////            foutDeposit->addData(data);
-////        }
-////        if (fSettings->outputMode == socket_client){
-////            socketOutput->addData(data);
-////        }
-//    }
-//    else{
-//
-//    }
-
 }
