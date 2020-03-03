@@ -11,7 +11,7 @@
 //Factory
 #include "SensitiveDetectorFactory.hh"
 #include "IFieldFactory.hh"
-#include "DataStorage.hh"
+
 
 void setupSimulation(G4DFClient *dfClient, Settings *settings) {
     dfClient->setup(new QGSP_BERT(-1), new ActionInitialization(settings));

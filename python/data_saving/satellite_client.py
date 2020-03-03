@@ -1,7 +1,7 @@
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
-from geant4_server import Geant4Server, DetectorMode
+from phd.satellite.geant4_server import Geant4Server, DetectorMode
 
 
 def get_request(energy=100, theta=0, number = 1):
@@ -25,17 +25,14 @@ def get_request(energy=100, theta=0, number = 1):
 
 def main():
     logging.root.setLevel(logging.INFO)
-    server = Geant4Server(["./build/satellite/geant4-satellite.exe server"])
-    server.start(DetectorMode.SINGLE)
-    # text = get_request(100)
-    # server.send(text)
-    for energy in [30, 40, 50, 100]:
-        text = get_request(energy)
-        run = server.send(text)
-        for event in run.event:
-            plt.plot(event.deposit)
-    server.stop()
-    plt.show()
+    with Geant4Server(["./build/satellite/geant4-satellite.exe server"]) as server:
+        server.start(DetectorMode.SUM)
+        for energy in [30, 40, 50, 100]:
+            text = get_request(energy, number=100)
+            run = server.send(text)
+            for event in run.event:
+                plt.plot(event.deposit)
+        plt.show()
     return 0
 
 if __name__ == '__main__':
