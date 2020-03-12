@@ -17,6 +17,7 @@
 #include "G4StackManager.hh"
 #include "map"
 #include "ParticlePredictor.hh"
+#include "thunderstorm.pb.h"
 
 class Dwyer2003StackingAction : public G4UserStackingAction {
 public:
@@ -27,14 +28,19 @@ public:
 
 private:
     double cut = 0.05*MeV;
-    Numbers* number;
+//    Numbers* number;
     set<int> positronIndx;
-    CylinderIdData data{};
-    DataFile<CylinderIdData> *foutGamma;
-    DataFile<CylinderIdData> *foutPositron;
+//    CylinderIdData data{};
+//    DataFile<CylinderIdData> *foutGamma;
+//    DataFile<CylinderIdData> *foutPositron;
 
     G4ClassificationOfNewTrack ClassifyGamma(const G4Track *);
     ParticlePredictor* fParticlePredictor;
+
+    thunderstorm::CylinderIdList* gammaData;
+    thunderstorm::CylinderIdList* positronData;
+    int eventId = -1;
+
 };
 
 

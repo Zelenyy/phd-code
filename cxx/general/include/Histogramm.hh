@@ -92,6 +92,10 @@ public:
         return result;
 
     }
+
+    vector<int> getData(){
+        return data;
+    }
 };
 
 class Histogramm2D : public IHistrogramm{

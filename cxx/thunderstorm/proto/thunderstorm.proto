@@ -1,0 +1,18 @@
+syntax = "proto3";
+package thunderstorm;
+
+message CylinderIdList{
+    int32 eventId = 1;
+    repeated CylinderId cylinderId = 2;
+}
+
+message CylinderId{
+    int32 id = 1;
+    int32 parent_id = 2;
+    int32 particle = 3;
+    double energy = 4;
+    double theta = 5;
+    double radius= 6;
+    double z = 7;
+}
+

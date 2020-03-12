@@ -14,6 +14,7 @@
 #include <G4Electron.hh>
 #include "Histogramm.hh"
 #include "G4SystemOfUnits.hh"
+#include "SerializeHistogram.hh"
 using namespace std;
 
 using namespace CLHEP;
@@ -71,6 +72,9 @@ public:
                 fHist2DLow->add(x, y);
                 double sample = (*exp_dist)(re);
                 int number = fHist2DLow->get(x,y);
+                if (number == 0){
+                    return true;
+                }
                 return sample > number/exp_scale;
             }
             else{
@@ -88,6 +92,56 @@ private:
     uniform_real_distribution<double>* unif;
     exponential_distribution<>* exp_dist;
     double exp_scale = 1000.0;
+
+
+public:
+
+    histogram::Histogram2DList* toHistogram2DList(){
+        auto list = new histogram::Histogram2DList();
+
+        auto hist2d = list->add_histogram();
+        fillHistType(hist2d, "low", "electron");
+        fillBinsUnit(hist2d);
+        fillPbHistogram2D(fHist2DLow, hist2d);
+
+        hist2d = list->add_histogram();
+        fillHistType(hist2d, "high", "electron");
+        fillBinsUnit(hist2d);
+        fillPbHistogram2D(fHist2DHight, hist2d);
+
+        hist2d = list->add_histogram();
+        fillHistType(hist2d, "low", "gamma");
+        fillBinsUnit(hist2d);
+        fillPbHistogram2D(fGammaHist2DLow, hist2d);
+
+        hist2d = list->add_histogram();
+        fillHistType(hist2d, "high", "gamma");
+        fillBinsUnit(hist2d);
+        fillPbHistogram2D(fGammaHist2DHight, hist2d);
+        return list;
+    }
+
+private:
+
+    void fillHistType(histogram::Histogram2D* hist2d, string type, string particle){
+        auto meta = hist2d->add_meta();
+        meta->set_key("type");
+        meta->set_value(type);
+
+        meta = hist2d->add_meta();
+        meta->set_key("particle");
+        meta->set_value(particle);
+    }
+
+    void fillBinsUnit(histogram::Histogram2D* hist2d){
+        auto meta = hist2d->add_meta();
+        meta->set_key("xbins");
+        meta->set_value("energy (MeV)");
+
+        meta = hist2d->add_meta();
+        meta->set_key("ybins");
+        meta->set_value("height (meter)");
+    }
 
 };
 

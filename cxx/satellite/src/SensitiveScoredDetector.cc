@@ -7,7 +7,7 @@
 #include "Logger.hh"
 
 SensitiveScoredDetector::SensitiveScoredDetector(G4String name, Settings *settings) : G4VSensitiveDetector(std::move(name)), fSettings(settings) {
-    run = DataSatellite::instance()->run;
+    run = DataThunderstorm::instance()->run;
 
 
 
