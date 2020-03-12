@@ -9,7 +9,7 @@
 #include "RunAction.hh"
 #include "G4RunManager.hh"
 void RunAction::BeginOfRunAction(const G4Run *aRun) {
-    auto dataSatellite = DataSatellite::instance();
+    auto dataSatellite = DataThunderstorm::instance();
 
     dataSatellite->run->Clear();
     if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum){
@@ -23,7 +23,7 @@ void RunAction::BeginOfRunAction(const G4Run *aRun) {
 }
 
 void RunAction::EndOfRunAction(const G4Run *aRun) {
-    auto dataSatellite = DataSatellite::instance();
+    auto dataSatellite = DataThunderstorm::instance();
 //    if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum) {
 //        auto event = dataSatellite->run->mutable_event(0);
 //        for (int i = 0; i< fSettings->number_of_cell; ++i) {

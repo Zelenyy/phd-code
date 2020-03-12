@@ -2,6 +2,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.3 FATAL_ERROR)
 
 PROJECT(geant4-thunderstorm)
 
+find_package(Protobuf REQUIRED)
+include_directories(${Protobuf_INCLUDE_DIRS})
+
 FIND_PACKAGE(Geant4 REQUIRED ui_all vis_all)
 
 IF(NOT Geant4_FOUND)
@@ -10,6 +13,8 @@ ENDIF(NOT Geant4_FOUND)
 
 
 INCLUDE(${Geant4_USE_FILE})
+
+
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../general/include)
 FILE(GLOB general ${PROJECT_SOURCE_DIR}/../general/src/*.cc)
@@ -22,5 +27,5 @@ ADD_EXECUTABLE(geant4-thunderstorm.exe main.cc
         src/SteppingAction.cc include/SteppingAction.hh)
 
 TARGET_LINK_LIBRARIES(geant4-thunderstorm.exe
-        ${Geant4_LIBRARIES}
+        ${Geant4_LIBRARIES} ${Protobuf_LIBRARIES}
 )

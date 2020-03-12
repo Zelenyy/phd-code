@@ -42,6 +42,16 @@ public:
         return textFileMap[name];
     }
 
+    ofstream *getBinaryFile(const string &name) {
+        if (binaryFileMap.find(name) == binaryFileMap.end()) {
+            string nameFile = checkFileName(name, 0, ".bin");
+            auto *fout = new ofstream;
+            fout->open(nameFile, ios_base::binary | ios_base::out | ios_base::trunc);
+            binaryFileMap[name] = fout;
+        }
+        return binaryFileMap[name];
+    }
+
 
 
     ~DataFileManager() {
@@ -51,6 +61,9 @@ public:
         for (auto it : textFileMap){
             it.second->close();
         }
+        for (auto it : binaryFileMap){
+            it.second->close();
+        }
         for (auto it : models){
             cout<<it.first<<" "<<it.second<<endl;
         }
@@ -58,6 +71,7 @@ public:
 private:
     map<string, IDataFile *> dataFileMap;
     map<string, ofstream *> textFileMap;
+    map<string, ofstream *> binaryFileMap;
 
     DataFileManager() = default;
 

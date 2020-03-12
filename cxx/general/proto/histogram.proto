@@ -1,0 +1,22 @@
+syntax = "proto3";
+package histogram;
+
+message Histogram2DList{
+    repeated Histogram2D histogram = 1;
+}
+
+message Histogram2D{
+    repeated int32 data = 1 [packed=true];
+    Bins xbins = 2;
+    Bins ybins = 3;
+    repeated MetaPair meta = 4;
+}
+
+message Bins{
+    repeated double bins = 1 [packed=true];
+}
+
+message MetaPair{
+    string key = 1;
+    string value =2;
+}
