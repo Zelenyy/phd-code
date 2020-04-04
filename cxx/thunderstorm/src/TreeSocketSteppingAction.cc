@@ -7,5 +7,5 @@
 
 void TreeSocketSteppingAction::UserSteppingAction(const G4Step *step) {
     G4UserSteppingAction::UserSteppingAction(step);
-    data.fillFromStep(step);
+//    data.fillFromStep(step);
 }

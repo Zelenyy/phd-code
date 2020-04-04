@@ -11,10 +11,8 @@
 #include <G4ParticleDefinition.hh>
 #include "G4SystemOfUnits.hh"
 #include "Settings.hh"
-#include "Data.hh"
 #include "G4Track.hh"
 #include "DataFile.hh"
-#include <DataManager.hh>
 
 class SimpleCutStackingAction : public G4UserStackingAction{
 public:

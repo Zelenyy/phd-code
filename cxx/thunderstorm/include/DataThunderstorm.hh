@@ -5,8 +5,12 @@
 #ifndef PHD_CODE_DATATHUNDERSTORM_HH
 #define PHD_CODE_DATATHUNDERSTORM_HH
 
+#include "G4Track.hh"
 #include "histogram.pb.h"
 #include "thunderstorm.pb.h"
+#include "G4SystemOfUnits.hh"
+#include "DataFileManager.hh"
+using namespace CLHEP;
 
 class DataThunderstorm {
 public:
@@ -37,23 +41,40 @@ public:
         gammaData = new thunderstorm::CylinderIdList;
         positronData = new thunderstorm::CylinderIdList;
     }
-    void endEventDwyer2003StackingAction(){
+    void saveDwyer2003StackingAction(){
         if (gammaData != nullptr){
             int size = gammaData->ByteSize();
             auto fout = DataFileManager::instance()->getBinaryFile("gammaSeed");
             fout->write(reinterpret_cast<char*>(&size), sizeof size);
             gammaData->SerializeToOstream(fout);
+            gammaData->Clear();
         }
         if (positronData != nullptr){
             int size =positronData->ByteSize();
             auto fout = DataFileManager::instance()->getBinaryFile("positronSeed");
             fout->write(reinterpret_cast<char*>(&size), sizeof size);
             positronData->SerializeToOstream(fout);
+            positronData->Clear();
+        }
+    }
+    // TreeTracking
+    thunderstorm::CylinderIdList* treeTrackingData = nullptr;
+    void initTreeTracking(){
+        treeTrackingData = new thunderstorm::CylinderIdList;
+    }
+    void saveTreeTracking(){
+        if (treeTrackingData != nullptr){
+            int size = treeTrackingData->ByteSize();
+            auto fout = DataFileManager::instance()->getBinaryFile("treeTracking");
+            fout->write(reinterpret_cast<char*>(&size), sizeof size);
+            treeTrackingData->SerializeToOstream(fout);
+            treeTrackingData->Clear();
         }
     }
 
     void EndEvent(){
-        endEventDwyer2003StackingAction();
+        saveDwyer2003StackingAction();
+        saveTreeTracking();
     }
 
 private:

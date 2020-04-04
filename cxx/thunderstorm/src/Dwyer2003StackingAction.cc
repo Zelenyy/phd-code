@@ -5,6 +5,7 @@
 #include <G4Electron.hh>
 #include <G4Positron.hh>
 #include <G4Gamma.hh>
+#include <Logger.hh>
 #include "G4VProcess.hh"
 #include "Dwyer2003StackingAction.hh"
 #include "DataThunderstorm.hh"
@@ -20,23 +21,22 @@ eIoni 15
 phot 25
  */
 Dwyer2003StackingAction::Dwyer2003StackingAction(Settings *settings) {
-//    number = DataManager::instance()->createNumber("number");
-//    foutGamma = DataFileManager::instance()->getDataFile<CylinderIdData>("gamma");
-//    foutPositron = DataFileManager::instance()->getDataFile<CylinderIdData>("positron");
     cut = settings->born_cut;
     Logger::instance()->print("One generation set cut: " + to_string(cut) + " MeV");
     fParticlePredictor = settings->particlePredictor;
-    auto dataThunderstorm = DataThunderstorm::instance();
+    dataThunderstorm = DataThunderstorm::instance();
     dataThunderstorm->initDwyer2003StackingActionData();
     gammaData = dataThunderstorm->gammaData;
     positronData = dataThunderstorm->positronData;
-
 //    temp = &DataFileManager::instance()->models;
 
 }
 
 G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Track * aTrack) {
 
+    if (positronData->cylinderid_size() > 100000 or gammaData->cylinderid_size() > 100000){
+        dataThunderstorm->saveDwyer2003StackingAction();
+    }
 
     if (aTrack->GetParentID() == 0){
         return fUrgent;
@@ -46,30 +46,19 @@ G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Tra
         return fKill;
     }
 
-
-
     const auto& position = aTrack->GetPosition();
     if (aTrack->GetDefinition() == G4Electron::Definition()){
         if (position.getZ() > 0) {
             auto modelId = aTrack->GetCreatorModelID();
             if (modelId == 25 or modelId == 29 or modelId == 33) {
-//                cout<< "Gamma seed"<<endl;
                 auto cylinderId = gammaData->add_cylinderid();
                 DataThunderstorm::fillCylinderId(cylinderId, aTrack);
-//                data.fillFromTrack(aTrack);
-//                foutGamma->addData(data);
-//                number->gamma++;
                 return fKill;
             } else {
                 int indx = aTrack->GetParentID();
-//                cout<<"Electron "<<indx<<endl;
                 if (positronIndx.find(indx) != positronIndx.end()) {
-//                cout<< "Postron seed"<<endl;
                     auto cylinderId = positronData->add_cylinderid();
                     DataThunderstorm::fillCylinderId(cylinderId, aTrack);
-//                    data.fillFromTrack(aTrack);
-//                    foutPositron->addData(data);
-//                    number->positron++;
                     return fKill;
                 }
             }
@@ -88,7 +77,6 @@ G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Tra
         }
     }
     else if (aTrack->GetDefinition() == G4Positron::Definition()){
-//        cout<<"Positron "<<aTrack->GetTrackID()<<endl;
         positronIndx.insert(aTrack->GetTrackID());
         return fWaiting_4;
     }

@@ -2,6 +2,7 @@
 /df/gdml ../gdml/dwyer2003.gdml
 /thunderstorm/physics standard
 /thunderstorm/stacking dwyer2003
+/thunderstorm/tracking tree
 
 /gps/particle e-
 /gps/direction 0 0 -1

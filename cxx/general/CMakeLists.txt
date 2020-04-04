@@ -4,7 +4,6 @@ PROJECT(geant4-dfclient)
 
 FIND_PACKAGE(Geant4 REQUIRED ui_all vis_all)
 
-add_subdirectory("dataforge")
 
 IF (NOT Geant4_FOUND)
     MESSAGE(FATAL_ERROR "Geant4 not found!")

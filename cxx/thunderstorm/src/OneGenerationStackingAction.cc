@@ -8,13 +8,12 @@
 #include <G4Electron.hh>
 #include <DataFileManager.hh>
 #include "G4Positron.hh"
-#include "DataManager.hh"
 
 OneGenerationStackingAction::OneGenerationStackingAction(Settings *settings) {
-    number = DataManager::instance()->createNumber("number");
-    foutGamma = DataFileManager::instance()->getDataFile<CylinderData>("gamma");
-    foutElectron = DataFileManager::instance()->getDataFile<CylinderData>("electron");
-    foutPositron = DataFileManager::instance()->getDataFile<CylinderData>("positron");
+//    number = DataManager::instance()->createNumber("number");
+//    foutGamma = DataFileManager::instance()->getDataFile<CylinderData>("gamma");
+//    foutElectron = DataFileManager::instance()->getDataFile<CylinderData>("electron");
+//    foutPositron = DataFileManager::instance()->getDataFile<CylinderData>("positron");
     cut = settings->born_cut;
     Logger::instance()->print("One generation set cut: " + to_string(cut) + " MeV");
 }
@@ -30,22 +29,22 @@ G4ClassificationOfNewTrack OneGenerationStackingAction::ClassifyNewTrack(const G
             return fKill;
         }
 
-        data.fillFromTrack(aTrack);
-        if (aTrack->GetDefinition() == G4Electron::Definition()) {
-            foutElectron->addData(data);
-            number->electron++;
-            return fKill;
-        }
-        if (aTrack->GetDefinition() == G4Gamma::Definition()) {
-            foutGamma->addData(data);
-            number->gamma++;
-            return fKill;
-        }
-        if (aTrack->GetDefinition() == G4Positron::Definition()) {
-            foutPositron->addData(data);
-            number->positron++;
-            return fKill;
-        }
+//        data.fillFromTrack(aTrack);
+//        if (aTrack->GetDefinition() == G4Electron::Definition()) {
+//            foutElectron->addData(data);
+//            number->electron++;
+//            return fKill;
+//        }
+//        if (aTrack->GetDefinition() == G4Gamma::Definition()) {
+//            foutGamma->addData(data);
+//            number->gamma++;
+//            return fKill;
+//        }
+//        if (aTrack->GetDefinition() == G4Positron::Definition()) {
+//            foutPositron->addData(data);
+//            number->positron++;
+//            return fKill;
+//        }
     }
 
 

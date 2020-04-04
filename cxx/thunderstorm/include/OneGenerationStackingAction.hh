@@ -10,7 +10,6 @@
 #include <G4ParticleDefinition.hh>
 #include "G4SystemOfUnits.hh"
 #include "Settings.hh"
-#include "Data.hh"
 #include "G4Track.hh"
 #include "DataFile.hh"
 
@@ -27,11 +26,6 @@ public:
 private:
     double cut = 0.05*MeV;
     G4ParticleDefinition* primaryParticle;
-    Numbers* number;
-    CylinderData data;
-    DataFile<CylinderData> *foutGamma;
-    DataFile<CylinderData> *foutElectron;
-    DataFile<CylinderData> *foutPositron;
     bool flag = false;
 };
 

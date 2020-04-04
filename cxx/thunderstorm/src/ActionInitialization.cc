@@ -5,7 +5,7 @@
 #include <SimpleCutStackingAction.hh>
 #include <ParticleCylinderStacking.hh>
 #include <TreeSocketSteppingAction.hh>
-#include <TreeSocketTrackingAction.hh>
+#include <TreeTrackingAction.hh>
 #include <SteppingAction.hh>
 #include "ActionInitialization.hh"
 #include "GeneralParticleSource.hh"
@@ -44,8 +44,8 @@ void ActionInitialization::Build() const {
         logger->print("Using stepping  action: tree_socket");
     }
 
-    if (settings->tracking == "tree_socket") {
-        SetUserAction(new TreeSocketTrackingAction());
+    if (settings->tracking == "tree") {
+        SetUserAction(new TreeTrackingAction());
         logger->print("Using tracking  action: tree_socket");
     }
 
