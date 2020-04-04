@@ -3,6 +3,7 @@ import abc
 import logging
 import os
 import shutil
+import struct
 import sys
 from typing import List, Union, Optional
 
@@ -61,6 +62,7 @@ class ConverterFromBinToHDF5:
                     h5file.create_array(group, "meta", obj=meta_item).flush()
 
                 for reader in self.readers:
+                    self.logger.debug("Reader: {} {}".format(type(reader), reader.filename))
                     pathToFile = os.path.join(path, reader.filename)
                     if os.path.exists(pathToFile) and (os.path.getsize(path) != 0):
                         reader(pathToFile, h5file, group)
@@ -132,6 +134,7 @@ def get_convertor(readers: list, path_h5file, clear=False):
     filters = Filters(complevel=3, fletcher32=True)
     convertor = ConverterFromBinToHDF5(readers)
     for reader in readers:
+        logging.root.debug("Reader: {} {}".format(type(reader), reader.filename))
         reader.set_filters(filters)
 
     def post_run_processor(input_data: InputData):
@@ -141,3 +144,61 @@ def get_convertor(readers: list, path_h5file, clear=False):
             shutil.rmtree(path)
 
     return post_run_processor
+
+
+class ProtoReader(Reader):
+    def __init__(self, filename, proto_convertor):
+        self.proto_convertor = proto_convertor
+        Reader.__init__(self, filename)
+
+    def __call__(self, path: str, h5file: File, group: Group):
+        self.proto_convertor(path,  h5file, group, self.settings)
+
+class ProtoSetConvertor(abc.ABC):
+
+    def __init__(self, h5file: File, group: Group, filename: str = None, settings = None):
+        self.h5file = h5file
+        self.group = group
+        self.filename = filename
+        self.settings = settings
+
+    def init(self, proto_item = None):
+        pass
+
+    @abc.abstractmethod
+    def convert(self, data: bytes):
+        pass
+
+class DtypeProtoSetConvertor(ProtoSetConvertor):
+
+    dtype = None
+
+    def __init__(self, h5file: File, group: Group, filename: str = None, settings=None):
+        ProtoSetConvertor.__init__(self, h5file, group, filename, settings)
+        self.init()
+
+    def init(self, proto_item = None):
+        self.tableName = self.filename
+        if ("e-" in self.tableName):
+            self.tableName = self.tableName.replace("e-", "electron")
+        if ("e+" in self.tableName):
+            self.tableName = self.tableName.replace("e+", "positron")
+        my_table = self.h5file.create_table(self.group, self.tableName, description=self.dtype, **self.settings)
+        my_table.flush()
+
+class ProtoSetReader(Reader):
+    def __init__(self, filename, proto_set_convertor):
+        self.proto_convertor = proto_set_convertor
+        Reader.__init__(self, filename)
+
+    def __call__(self, path: str, h5file: File, group: Group):
+        filename = self.filename[:self.filename.rfind('.')]
+        convertor = self.proto_convertor(h5file, group, filename, self.settings)
+        with open(path, "rb") as fin:
+            while True:
+                size = fin.read(4)
+                if size == b"":
+                    break
+                size = struct.unpack("i", size)[0]
+                data = fin.read(size)
+                convertor.convert(data)

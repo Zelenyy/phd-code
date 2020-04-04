@@ -1,24 +1,5 @@
 import numpy as np
 
-TREE_SOCKET_DTYPE = np.dtype([
-    ("id", "i"),
-    ("parent_id", "i"),
-    ("particle", "i"),
-    ("zero", "i"),
-    ("energy", "d"),
-    ("theta", "d"),
-    ("radius", "d"),
-    ("z", "d"),
-])
-
-TREE_DTYPE = np.dtype([
-    ("id", "i"),
-    ("parent_id", "i"),
-    ("energy", "d"),
-    ("theta", "d"),
-    ("radius", "d"),
-    ("z", "d"),
-])
 
 def find_chain(data, parent_final):
     result = []

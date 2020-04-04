@@ -1,11 +1,12 @@
 import os
-from dataclasses import dataclass
 
 import numpy as np
-from dataforge import MetaRepr, Meta
-from tables import File, Group, Int32Col, IsDescription
+from phd.utils.hdf5_tools import ProtoSetConvertor, DtypeProtoSetConvertor
+from phd.utils.histogram_pb2 import Histogram2DList
+from tables import Int32Col, IsDescription
 
-from ..utils.hdf5_tools import txtDataReader, dtypeDataReader, Reader
+from phd.thunderstorm.thunderstorm_pb2 import CylinderIdList
+from ..utils.hdf5_tools import txtDataReader, dtypeDataReader
 
 names_txt = ['Primary', 'Gamma', 'Electron', 'Positron']
 dtype_txt = np.dtype([(name, 'i') for name in names_txt])
@@ -22,17 +23,17 @@ dtype_cylinder = np.dtype([(name, 'd') for name in names_cylinder])
 READERS_CYLINDER_DATA = [dtypeDataReader(file, dtype_cylinder) for file in
                          ['gamma.bin', 'electron.bin', 'positron.bin']]
 
-CYLINDER_ID_DTYPE = np.dtype([
-    ("id", "i"),
-    ("parent_id", "i"),
-    ("energy", "d"),
-    ("theta", "d"),
-    ("radius", "d"),
-    ("z", "d"),
-])
+# CYLINDER_ID_DTYPE = np.dtype([
+#     ("id", "i"),
+#     ("parent_id", "i"),
+#     ("energy", "d"),
+#     ("theta", "d"),
+#     ("radius", "d"),
+#     ("z", "d"),
+# ])
 
-READERS_CYLINDER_ID_DATA = [dtypeDataReader(file, CYLINDER_ID_DTYPE) for file in
-                         ['gamma.bin', 'electron.bin', 'positron.bin']]
+# READERS_CYLINDER_ID_DATA = [dtypeDataReader(file, CYLINDER_ID_DTYPE) for file in
+#                          ['gamma.bin', 'electron.bin', 'positron.bin']]
 
 TREE_SOCKET_DTYPE = np.dtype([
     ("id", "i"),
@@ -79,143 +80,93 @@ def get_named_number_readers_1(particles, prefix):
     readers_txt = [txtDataReader(txtFileName, dtype=dtype_txt, skiprows=1)]
     return readers_txt
 
-@dataclass
-class BinsDescription(MetaRepr):
-    bins: np.ndarray
-    bins_type: str
-    unit: str = None
-
-    def to_meta(self) -> 'Meta':
-        return Meta(
-            {
-                "type": self.bins_type,
-                "unit": self.unit
-            }
-        )
-
-@dataclass
-class HistDescription(MetaRepr):
-    bins_x: BinsDescription
-    bins_y: BinsDescription
-    hist_type: str = None
-    particle: str = None
-
-    def to_meta(self) -> 'Meta':
-        return Meta({
-            "type" : self.hist_type,
-            "particle" : self.particle,
-            "bins" : {
-                "x" : self.bins_x.to_meta(),
-                "y" : self.bins_y.to_meta(),
-            }
-        })
-
-@dataclass
-class HistogrammsDwyer2003:
-    description: HistDescription
-    number_of_event: int
-    data: list
+CYLINDER_ID_DTYPE = np.dtype([
+    ("event", "i"),
+    ("id", "i"),
+    ("parent_id", "i"),
+    ("particle", "i"),
+    ("energy", "d"),
+    ("theta", "d"),
+    ("radius", "d"),
+    ("z", "d"),
+])
 
 
-class HistDwyer2003Reader(Reader):
+class CylinderProtoSet(DtypeProtoSetConvertor):
+    dtype = CYLINDER_ID_DTYPE
 
-    NUMBER_OF_HIST = 4
-
-    def parse_description(self, fin):
-        hist_desc = []
-        fin.readline()
-        for i in range(self.NUMBER_OF_HIST):
-            fin.readline()
-            hist_type = fin.readline().split()[-1]
-            particle = fin.readline().split()[-1]
-            bins_x_type, x_unit = fin.readline().split()[-2:]
-            x_unit = x_unit[1:-1]
-            bins_x = np.fromstring(fin.readline().rstrip(), "d", sep=" ")
-            bins_y_type, y_unit = fin.readline().split()[-2:]
-            y_unit = y_unit[1:-1]
-            bins_y = np.fromstring(fin.readline().rstrip(), "d",  sep=" ")
-            fin.readline()
-            hist_desc.append(
-                HistDescription(
-                    BinsDescription(bins_x, bins_x_type, x_unit),
-                    BinsDescription(bins_y, bins_y_type, y_unit),
-                    hist_type,
-                    particle
-                )
-            )
-        return hist_desc
-
-    def parse_events(self,fin):
-        events = []
-        while True:
-            line = fin.readline()
-            print(line, end="")
-            if not line:
-                break
-            temp = []
-            for i in range(self.NUMBER_OF_HIST):
-                print(fin.readline(), end="")
-                print(fin.readline(), end="")
-                data = []
-                while True:
-                    line = fin.readline()
-                    if line.rstrip() == "":
-                        break
-                    data.append(np.fromstring(line.rstrip(), "i",  sep=" "))
-                data = np.array(data)
-                temp.append(data)
-            events.append(temp)
-            print(fin.readline(), end="")
-        return events
-
-    def parse(self, path: str):
-        with open(path, "r") as fin:
-            hist_desc =  self.parse_description(fin)
-            events = self.parse_events(fin)
-        number_of_event = len(events)
-        result = []
-        for i in range(self.NUMBER_OF_HIST):
-            hist = HistogrammsDwyer2003(
-                hist_desc[i],
-                number_of_event,
-                data = [event[i] for event in events]
-            )
-            result.append(hist)
-        return result
+    def convert(self, data: bytes):
+        cylinder_id_list = CylinderIdList()
+        cylinder_id_list.ParseFromString(data)
+        n = len(cylinder_id_list.cylinderId)
+        data = np.zeros(n, dtype=self.dtype)
+        data["event"] = cylinder_id_list.eventId
+        for indx, item in enumerate(cylinder_id_list.cylinderId):
+            data["id"][indx] = item.id
+            data["parent_id"][indx] = item.parent_id
+            data["particle"][indx] = item.particle
+            data["energy"][indx] = item.energy
+            data["theta"][indx] = item.theta
+            data["radius"][indx] = item.radius
+            data["z"][indx] = item.z
+        table = self.h5file.get_node(self.group, self.tableName)
+        table.append(data)
+        table.flush()
 
 
+class HistogramProtoSet(ProtoSetConvertor):
+    first = True
+    event = 0
+    def init(self, proto_item = None):
+        hists_group = self.h5file.create_group(self.group, "histogram")
+        for hist in proto_item.histogram:
+            meta = {}
+            for item in hist.meta:
+                meta[item.key] = item.value
+            name = meta["particle"] + "_" + meta["type"]
+            hist_gr = self.h5file.create_group(hists_group, name)
+            nx = len(hist.xbins.bins)
+            ny = len(hist.ybins.bins)
 
-
-    def __call__(self, path: str, h5file: File, group: Group):
-        hists = self.parse(path)
-        name  =  self.filename[:self.filename.rfind('.')]
-        print(name)
-        hists_group = h5file.create_group(group,name)
-        for hist in hists:
-            name = hist.description.particle + "_" + hist.description.hist_type
-            hist_gr = h5file.create_group(hists_group, name)
             for bins, name in zip(
-                    [hist.description.bins_x, hist.description.bins_y],
+                    [hist.xbins, hist.ybins],
                     ["xbins", "ybins"]
             ):
-                array = h5file.create_array(hist_gr, name, obj=bins.bins)
-                for key, value in bins.to_meta().to_flat().items():
+                array = self.h5file.create_array(hist_gr, name, obj=np.array(bins.bins))
+                for key, value in meta.items():
                     array.attrs[key] = value
                 array.flush()
 
-            nx = hist.description.bins_x.bins.size
-            ny = hist.description.bins_y.bins.size
-
             class HistByEvent(IsDescription):
-                number = Int32Col(pos=1)
-                histogramm = Int32Col(shape=(nx-1, ny-1), pos=2)
+                event = Int32Col(pos=1)
+                histogram = Int32Col(shape=(nx - 1, ny - 1), pos=2)
 
-            # print(nx-1, ny-1, hist.data[0].shape)
-            # print(nx-1, ny-1, hist.data[1].shape)
-            table = h5file.create_table(hist_gr, "histByEvent", description=HistByEvent)
-            table.append([(indx, item) for indx, item in enumerate(hist.data)])
+            table = self.h5file.create_table(hist_gr, "histByEvent", description=HistByEvent, **self.settings)
+            for key, value in meta.items():
+                table.attrs[key] = value
             table.flush()
 
-
-
+    def convert(self, data :bytes):
+        histList = Histogram2DList()
+        histList.ParseFromString(data)
+        if self.first:
+            self.init(histList)
+            self.first = False
+        hists_group = self.h5file.get_node(self.group, "histogram")
+        for hist in histList.histogram:
+            meta = {}
+            for item in hist.meta:
+                meta[item.key] = item.value
+            name = meta["particle"] + "_" + meta["type"]
+            hist_gr = self.h5file.get_node(hists_group, name)
+            table = self.h5file.get_node(hist_gr, "histByEvent")
+            row = table.row
+            row["event"] = self.event
+            self.event+=1
+            nx = self.h5file.get_node(hist_gr, "xbins").nrows
+            ny = self.h5file.get_node(hist_gr, "ybins").nrows
+            data = np.array(hist.data).reshape((nx - 1, ny - 1))
+            row["histogram"] = data
+            row.append()
+            table.flush()
 

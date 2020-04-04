@@ -11,7 +11,7 @@ from typing import Optional
 
 import numpy as np
 from dataforge import Meta, MetaRepr
-
+import abc
 
 def general_input_generator(meta: Meta, gdml_template_file: str, macros_template: str):
     macros_template = Template(macros_template)
@@ -39,8 +39,13 @@ def general_input_generator(meta: Meta, gdml_template_file: str, macros_template
         yield data
 
 
-def input_generator_custom_gdml(meta: Meta, gdml_template_file: str, macros_template: str, gdml_generator):
-    paths, values_gdml = gdml_generator(gdml_template_file)
+class GdmlGenerator(abc.ABC):
+    @abc.abstractmethod
+    def generate(self, template_file):
+        pass
+
+def input_generator_custom_gdml(meta: Meta, gdml_template_file: str, macros_template: str, gdml_generator : GdmlGenerator):
+    paths, values_gdml = gdml_generator.generate(gdml_template_file)
     paths = list(map(lambda x: os.path.join("..", x), paths))
     meta["macros"]["path"] = paths
     macros_template = Template(macros_template)
