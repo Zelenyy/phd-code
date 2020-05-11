@@ -43,8 +43,8 @@ def main():
             "macros": values_macros,
         }
     )
-    fields = [10e-4, 7e-4, 6.0e-4, 5.5e-4, 5.0e-4, 4.5e-4, 4.0e-4]
-    heights = [200, 300, 400, 400, 500, 700, 1000]
+    # fields = [10e-4, 7e-4, 6.0e-4, 5.5e-4, 5.0e-4, 4.5e-4, 4.0e-4]
+    # heights = [200, 300, 400, 400, 500, 700, 1000]
     fields = [10e-4, 7e-4]
     heights = [200, 300]
     ggfh = GGFieldHeigth(fields, heights)
