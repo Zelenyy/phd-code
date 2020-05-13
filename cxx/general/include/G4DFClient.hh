@@ -9,7 +9,7 @@
 #include "DetectorConstruction.hh"
 #include "G4VUserPhysicsList.hh"
 #include "G4VUserActionInitialization.hh"
-
+#define SO_REUSEPORT 15
 class G4DFClientMessenger;
 class G4RunManager;
 
