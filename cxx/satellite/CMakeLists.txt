@@ -12,7 +12,7 @@ ENDIF(NOT Geant4_FOUND)
 
 find_package(Protobuf REQUIRED)
 include_directories(${Protobuf_INCLUDE_DIRS})
-#protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS satellite.proto)
+PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ../proto/satellite.proto ../proto/histogram.proto)
 
 INCLUDE(${Geant4_USE_FILE})
 
@@ -26,6 +26,13 @@ FILE(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 
 ADD_EXECUTABLE(geant4-satellite.exe main.cc
         ${sources} ${general}
+        ${PROTO_SRCS}
+        ${PROTO_HDRS}
+        )
+
+target_include_directories(geant4-satellite.exe
+        PUBLIC
+        ${CMAKE_CURRENT_BINARY_DIR}
         )
 
 TARGET_LINK_LIBRARIES(geant4-satellite.exe
