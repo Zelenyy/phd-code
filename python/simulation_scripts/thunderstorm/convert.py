@@ -23,7 +23,7 @@ def create_parser():
 
 
 def main():
-    args = create_parser().parse_args(sys.argv)
+    args = create_parser().parse_args()
     path = args.input
 
     readers = [
