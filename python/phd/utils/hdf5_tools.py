@@ -47,7 +47,9 @@ class ConverterFromBinToHDF5:
         if meta is not None:
             if isinstance(meta, dict):
                 meta = [meta]
-        os.makedirs(os.path.split(path_h5file)[0], exist_ok=True)
+        parent = os.path.split(path_h5file)[0]
+        if parent != "":
+            os.makedirs(parent, exist_ok=True)
         with open_file(path_h5file, mode=mode, title='Auto convert from binary files', ) as h5file:
             for indx, path in enumerate(paths_data):
                 nameGroup = os.path.normpath(path).split(os.sep)[-1]
