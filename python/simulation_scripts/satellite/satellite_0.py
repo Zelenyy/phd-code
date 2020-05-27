@@ -80,7 +80,7 @@ def main():
     readers = [ProtoReader("deposit.proto.bin", proto_convertor=convert_satellite_proto)]
     # for data in input_data:
     #     print(data.text)
-    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=True))
+    multirun_command(input_data, command, post_processor=get_convertor(readers, "./proton.hdf5", clear=True))
     return 0
 
 
