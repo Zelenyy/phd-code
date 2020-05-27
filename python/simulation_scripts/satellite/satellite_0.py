@@ -5,11 +5,9 @@ from string import Template
 import numpy as np
 from dataforge import Meta
 from phd.satellite.covert_to_hdf5 import convert_satellite_proto
-from phd.thunderstorm.convert_to_hdf5 import READERS_TXT, READERS_CYLINDER_DATA, READERS_CYLINDER_ID_DATA, \
-    READER_TREE_SOCKET_DATA, HistDwyer2003Reader
 from phd.utils.hdf5_tools import get_convertor, ProtoReader
 from phd.utils.run_tools import multirun_command, \
-    create_one_file, dir_name_generator, values_from_dict, InputData
+    dir_name_generator, values_from_dict, InputData
 
 ROOT_PATH = os.path.dirname(__file__)
 
@@ -28,7 +26,7 @@ INPUT_TEMPLATE = """/df/project test
 
 
 
-def input_generator_satellite(meta: Meta, macros_template: str):
+def input_generator_satellite(meta: Meta, macros_template: str, init_pos):
     macros_template = Template(macros_template)
     for path, values in zip(
             dir_name_generator(".", "sim"),
@@ -39,10 +37,10 @@ def input_generator_satellite(meta: Meta, macros_template: str):
         theta = np.deg2rad(theta)
         posX = radius*np.sin(theta)
         posZ = radius*np.cos(theta)
-        dirX = np.sin(theta)
+        dirX = -np.sin(theta)
         dirZ = -np.cos(theta)
-        values["posX"] = posX
-        values["posZ"] = posZ
+        values["posX"] = posX + init_pos[0]
+        values["posZ"] = posZ + init_pos[2]
         values["dirX"] = dirX
         values["dirZ"] = dirZ
         text = macros_template.substitute(values)
@@ -64,10 +62,11 @@ def main():
         "mode" : "single",
         "radius" : 0.15,
         "shift" : 0,
-        "theta" : np.arange(0.0,31.0, 1),
+        "theta" : np.arange(0.0,71.0, 1),
+        # "theta" : [30], #[0.0],
         "theta_unit": "degree",
-        'energy': np.arange(130.0,151.0, 1),
-        'number': [10000],
+        'energy': np.arange(10.0,151.0, 1),
+        'number': [1000],
         'particle': 'proton'
     }
     meta = Meta(
@@ -76,10 +75,12 @@ def main():
         }
     )
 
-    input_data = input_generator_satellite(meta, INPUT_TEMPLATE)
+    input_data = input_generator_satellite(meta, INPUT_TEMPLATE, init_pos=[0.0,0.0, 0.1])
     command = "../../build/satellite/geant4-satellite.exe"
     readers = [ProtoReader("deposit.proto.bin", proto_convertor=convert_satellite_proto)]
-    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result_130_150.hdf5", clear=True))
+    # for data in input_data:
+    #     print(data.text)
+    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=True))
     return 0
 
 

@@ -17,7 +17,7 @@
     </solids>
     <structure>
         <volume name="Cell">
-        <materialref ref="G4_ANTHRACENE"/>
+        <materialref ref="G4_POLYSTYRENE"/>
         <solidref ref="cell"/>
         <auxiliary auxtype="SensDet" auxvalue="SensitiveScoredDetector"/>
         </volume>
