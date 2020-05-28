@@ -11,12 +11,14 @@
 void RunAction::BeginOfRunAction(const G4Run *aRun) {
     auto dataSatellite = DataSatellite::instance();
 
-    dataSatellite->run->Clear();
+
     if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum){
-        auto* event = dataSatellite->run->add_event();
+        auto meanRun = dataSatellite->meanRun;
         for (int i = 0; i< fSettings->number_of_cell; ++i) {
-            event->add_deposit(0.0);
+            meanRun->add_mean(0.0);
+            meanRun->add_variance(0.0);
         }
+        meanRun->set_number(0);
     }
 
     G4UserRunAction::BeginOfRunAction(aRun);
@@ -24,30 +26,43 @@ void RunAction::BeginOfRunAction(const G4Run *aRun) {
 
 void RunAction::EndOfRunAction(const G4Run *aRun) {
     auto dataSatellite = DataSatellite::instance();
-//    if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum) {
-//        auto event = dataSatellite->run->mutable_event(0);
-//        for (int i = 0; i< fSettings->number_of_cell; ++i) {
-//            auto dep = event->deposit(i);
-//            event->set_deposit(i, dep/);
-//        }
-//    }
+    if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum) {
+        auto run = dataSatellite->meanRun;
+        auto mean = run->mean();
+        auto var = run->variance();
+        for (int i = 0; i< fSettings->number_of_cell; ++i) {
+            run->set_mean(i, run->mean(i)/run->number());
+            run->set_variance(i, run->variance(i)/run->number() - run->mean(i)*run->mean(i));
+        }
+    }
 
 
  if (fSettings->outputMode == OutputMode::file){
      Logger::instance()->print("Write to deposit.proto.bin");
      ofstream fout;
      fout.open("deposit.proto.bin");
-     dataSatellite->run->SerializeToOstream(&fout);
+     if (fSettings->scoredDetectorMode == ScoredDetectorMode::single) {
+         dataSatellite->run->SerializeToOstream(&fout);
+     }
+     else if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum) {
+         dataSatellite->meanRun->SerializeToOstream(&fout);
+     }
      fout.flush();
      fout.close();
  } else if (fSettings->outputMode == OutputMode::socket_client){
 
      auto socket  =  new SocketOutput("deposit", 8777);
         int socketId = socket->getID();
-        auto data =  dataSatellite->run->SerializeAsString();
-        socket->write(data);
-        socket->closeSocket();
-         delete socket;
+     string data;
+     if (fSettings->scoredDetectorMode == ScoredDetectorMode::single) {
+         data = dataSatellite->run->SerializeAsString();
+     }
+     else if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum) {
+         data = dataSatellite->meanRun->SerializeAsString();
+     }
+     socket->write(data);
+     socket->closeSocket();
+     delete socket;
  }
     G4UserRunAction::EndOfRunAction(aRun);
 }

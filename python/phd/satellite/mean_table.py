@@ -1,7 +1,10 @@
 import os
+import shutil
 from dataclasses import dataclass
 import logging
 import numpy as np
+from phd.satellite.satellite_pb2 import MeanRun
+from phd.utils.run_tools import InputData
 from tables import open_file, Filters
 
 logger = logging.getLogger(__name__)
@@ -18,21 +21,24 @@ class MeanTable:
                 ("shift", "d"),
                 ("mean", "d", (event_size,)),
                 ("variance", "d", (event_size,)),
-                ("number", "i"),
-                ("theta_unit", "U6")
+                ("number", "i")
+                # ("theta_unit", "U6")
             ]
         )
-    def init_table(self, path):
-        self.file = open_file(path, mode="w", title="Mean energy deposit")
+    def init_table(self):
         filters = Filters(complevel=3, fletcher32=True)
         table = self.file.create_table(self.file.root, "deposit", description=self.dtype, filters=filters)
         return table
 
     def append_from_simulation(self, path):
+
+        if self.table is None:
+            self.table = self.init_table()
+
         logger.info("Start conversion from {}".format(path))
         sim_file = open_file(path)
         n = sim_file.root._v_nchildren
-        result = np.empty(n, dtype=self.dtype)
+        result = np.zeros(n, dtype=self.dtype)
         for indx, group in enumerate(sim_file.root):
             table = sim_file.get_node(group, "deposit")
             data = table.read()
@@ -41,16 +47,39 @@ class MeanTable:
             result[indx]["energy"] = table.attrs["values_macros_energy"]
             result[indx]["theta"] = table.attrs["values_macros_theta"]
             result[indx]["shift"] = table.attrs["values_macros_shift"]
-            result[indx]["theta_unit"] = table.attrs["values_macros_theta_unit"]
+            # result[indx]["theta_unit"] = table.attrs["values_macros_theta_unit"]
             result[indx]["number"] = table.attrs["values_macros_number"]
         self.table.append(result)
         self.table.flush()
         logger.info("End conversion from {}".format(path))
 
+    def append_from_input_data(self, input_data : InputData):
+        path = os.path.join(input_data.path, "deposit.proto.bin")
+        if self.table is None:
+            self.table = self.init_table()
+        run = MeanRun()
+        logger.info("Open file: {}".format(path))
+        with open(path, "rb") as fin:
+            run.ParseFromString(fin.read())
+        meta = input_data.to_meta().to_flat()
+        row = self.table.row
+        row["mean"] = run.mean
+        row["variance"] = run.variance
+        row["energy"] = meta["values.macros.energy"]
+        row["theta"] = meta["values.macros.theta"]
+        row["shift"] = meta["values.macros.shift"]
+        # row["theta_unit"] = table.attrs["values_macros_theta_unit"]
+        row["number"] = run.number
+        row.append()
+        self.table.flush()
+        if self.clear:
+            shutil.rmtree(input_data.path)
+
     def __enter__(self):
         path = self.path
         if not os.path.exists(path):
-            self.table = self.init_table(path)
+            self.file = open_file(path, mode="w", title="Mean energy deposit")
+            self.table = None
         else:
             self.file = open_file(path, mode="a")
             self.table = self.file.get_node(self.file.root, "deposit")

@@ -6,7 +6,7 @@
         <quantity value="0.25" name="worldRadius" unit="m"/>
         <quantity value="1" name="worldHeight" unit="m"/>
         <quantity value="1" name="cellThickness" unit="mm"/>
-        <quantity value="3" name="cellRadius" unit="cm"/>
+        <quantity value="1.5" name="cellRadius" unit="cm"/>
         <position name="centerPos"/>
         <variable value="0" name="x"/>
         <constant value="100" name="numberCell"/>

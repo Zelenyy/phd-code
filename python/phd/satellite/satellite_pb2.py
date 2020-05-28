@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='satellite',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x0fsatellite.proto\x12\tsatellite\"\x1c\n\x05\x45vent\x12\x13\n\x07\x64\x65posit\x18\x01 \x03(\x01\x42\x02\x10\x01\"&\n\x03Run\x12\x1f\n\x05\x65vent\x18\x01 \x03(\x0b\x32\x10.satellite.Eventb\x06proto3')
+  serialized_pb=_b('\n\x0fsatellite.proto\x12\tsatellite\"\x1c\n\x05\x45vent\x12\x13\n\x07\x64\x65posit\x18\x01 \x03(\x01\x42\x02\x10\x01\"&\n\x03Run\x12\x1f\n\x05\x65vent\x18\x01 \x03(\x0b\x32\x10.satellite.Event\"A\n\x07MeanRun\x12\x10\n\x04mean\x18\x01 \x03(\x01\x42\x02\x10\x01\x12\x14\n\x08variance\x18\x02 \x03(\x01\x42\x02\x10\x01\x12\x0e\n\x06number\x18\x03 \x01(\x05\x62\x06proto3')
 )
 
 
@@ -86,9 +86,55 @@ _RUN = _descriptor.Descriptor(
   serialized_end=98,
 )
 
+
+_MEANRUN = _descriptor.Descriptor(
+  name='MeanRun',
+  full_name='satellite.MeanRun',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='mean', full_name='satellite.MeanRun.mean', index=0,
+      number=1, type=1, cpp_type=5, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=_b('\020\001'), file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='variance', full_name='satellite.MeanRun.variance', index=1,
+      number=2, type=1, cpp_type=5, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=_b('\020\001'), file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='number', full_name='satellite.MeanRun.number', index=2,
+      number=3, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=100,
+  serialized_end=165,
+)
+
 _RUN.fields_by_name['event'].message_type = _EVENT
 DESCRIPTOR.message_types_by_name['Event'] = _EVENT
 DESCRIPTOR.message_types_by_name['Run'] = _RUN
+DESCRIPTOR.message_types_by_name['MeanRun'] = _MEANRUN
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Event = _reflection.GeneratedProtocolMessageType('Event', (_message.Message,), dict(
@@ -105,6 +151,15 @@ Run = _reflection.GeneratedProtocolMessageType('Run', (_message.Message,), dict(
   ))
 _sym_db.RegisterMessage(Run)
 
+MeanRun = _reflection.GeneratedProtocolMessageType('MeanRun', (_message.Message,), dict(
+  DESCRIPTOR = _MEANRUN,
+  __module__ = 'satellite_pb2'
+  # @@protoc_insertion_point(class_scope:satellite.MeanRun)
+  ))
+_sym_db.RegisterMessage(MeanRun)
+
 
 _EVENT.fields_by_name['deposit']._options = None
+_MEANRUN.fields_by_name['mean']._options = None
+_MEANRUN.fields_by_name['variance']._options = None
 # @@protoc_insertion_point(module_scope)

@@ -6,19 +6,29 @@
 #define PHD_CODE_DATASATELLITE_HH
 
 #include "satellite.pb.h"
+#include "Settings.hh"
 
 class DataSatellite {
 public:
-    satellite::Run* run;
+    satellite::Run* run = nullptr;
+    satellite::MeanRun* meanRun = nullptr;
+
+    void initialize(Settings* settings){
+        if (settings->scoredDetectorMode == ScoredDetectorMode::single){
+            run = new satellite::Run();
+        }
+        else{
+            meanRun = new satellite::MeanRun();
+        }
+    }
+
     static DataSatellite *instance() {
         static DataSatellite dataSatellite;
 
         return &dataSatellite;
     }
 private:
-    DataSatellite(){
-        run = new satellite::Run();
-    };
+    DataSatellite()= default;;
 
     DataSatellite(DataSatellite const &) = delete;
 

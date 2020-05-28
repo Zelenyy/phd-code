@@ -37,13 +37,8 @@ public:
     void EndOfEvent(G4HCofThisEvent *) override;
 
 private:
-//    EnergyDepositData data{};
     Settings* fSettings;
-    satellite::Run* run;
-    satellite::Event* event;
-//    MonolithDataCell<EnergyDepositData,1000>* dataCell;
-//
-//    DataFile<EnergyDepositData>* foutDeposit;
+    vector<double> deposit;
 };
 
 

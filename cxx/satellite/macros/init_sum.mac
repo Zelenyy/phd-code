@@ -1,0 +1,11 @@
+/df/project test
+/df/gdml ../gdml/satellite.gdml
+/satellite/detector sum
+/satellite/output file
+
+/gps/particle proton
+/gps/number 1
+/gps/direction 0 0 -1
+/gps/ene/mono 100 MeV
+/gps/position 0. 0. 0.25 m
+/run/beamOn 50
