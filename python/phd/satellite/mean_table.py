@@ -53,6 +53,19 @@ class MeanTable:
         self.table.flush()
         logger.info("End conversion from {}".format(path))
 
+    def append_from_mean_run(self, run: MeanRun, meta):
+        if self.table is None:
+            self.table = self.init_table()
+        row = self.table.row
+        row["mean"] = run.mean
+        row["variance"] = run.variance
+        row["energy"] = meta["energy"]
+        row["theta"] = meta["theta"]
+        row["shift"] = meta["shift"]
+        row["number"] = run.number
+        row.append()
+        self.table.flush()
+
     def append_from_input_data(self, input_data : InputData):
         path = os.path.join(input_data.path, "deposit.proto.bin")
         if self.table is None:

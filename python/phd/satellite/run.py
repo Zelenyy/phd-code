@@ -33,3 +33,33 @@ def input_generator_satellite(meta: Meta, macros_template: str, init_pos):
             values=Meta(input_data_meta)
         )
         yield data
+
+
+def request_generator(values, init_pos):
+    """
+    """
+
+    text = """/gps/particle ${particle}
+/gps/number 1
+/gps/direction ${dirX} 0.0 ${dirZ}
+/gps/ene/mono ${energy} MeV
+/gps/position ${posX} 0. ${posZ} m
+/run/beamOn ${number}
+    """
+    template = Template(text)
+    for value in values_from_dict(values):
+        theta = value["theta"]
+        radius = value["radius"]
+        theta = np.deg2rad(theta)
+
+        shift = value["shift"]
+
+        posX = radius*np.sin(theta)
+        posZ = radius*np.cos(theta)
+        dirX = -np.sin(theta)
+        dirZ = -np.cos(theta)
+        value["posX"] = posX + init_pos[0] + shift
+        value["posZ"] = posZ + init_pos[2]
+        value["dirX"] = dirX
+        value["dirZ"] = dirZ
+        yield template.substitute(value), value

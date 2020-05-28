@@ -211,7 +211,7 @@ class InputData(MetaRepr):
 
 def multirun_command(input_data_generator, command, n_cpu_cores=None, post_processor=None):
     if n_cpu_cores is None: n_cpu_cores = os.cpu_count()
-    with Pool(n_cpu_cores)as p:
+    with Pool(n_cpu_cores) as p:
         logging.debug("Start multirun")
         for data in p.imap_unordered(run_command, [(inputData, command) for inputData in input_data_generator]):
             logging.debug("End run in path: " + data.path)

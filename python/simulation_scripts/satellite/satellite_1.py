@@ -3,9 +3,13 @@ import os
 
 import numpy as np
 from dataforge import Meta
+from phd.satellite.geant4_server import Geant4Server, DetectorMode
 from phd.satellite.mean_table import MeanTable
-from phd.satellite.run import input_generator_satellite
+from phd.satellite.run import input_generator_satellite, request_generator
+from phd.satellite.satellite_pb2 import MeanRun
 from phd.utils.run_tools import multirun_command
+
+
 
 ROOT_PATH = os.path.dirname(__file__)
 
@@ -23,37 +27,35 @@ INPUT_TEMPLATE = """/df/project test
 """
 
 
+
+
+
 def main():
     logging.basicConfig(filename="run.log")
     logging.root.setLevel(logging.DEBUG)
 
-    values_macros = {
-        "mode" : "sum",
-        "radius" : 0.15,
-        "shift" : np.arange(0.0, 0.016, 0.001),
-        "theta" : np.arange(0.0,91.0, 1),
-        # "theta" : [30], #[0.0],
-        "theta_unit": "degree",
-        'energy': np.arange(10.0,151.0, 1),
-        'number': [1000],
-        'particle': 'proton'
+    meta = {
+        "gdml" : "../satellite.gdml",
+        "mode" : DetectorMode.SUM.value
     }
-    meta = Meta(
-        {
-            "macros": values_macros,
+
+    with Geant4Server(["../build/satellite/geant4-satellite.exe server"], meta) as server, MeanTable("proton.hdf5") as mean_table:
+        run = MeanRun()
+
+        values_macros = {
+            "radius": 0.15,
+            "shift": np.arange(0.0, 0.016, 0.001),
+            "theta": np.arange(0.0, 91.0, 1),
+            'energy': np.arange(10.0, 151.0, 1),
+            'number': [1000],
+            'particle': 'proton'
         }
-    )
 
-    input_data = input_generator_satellite(meta, INPUT_TEMPLATE, init_pos=[0.0,0.0, 0.1])
-    command = "../../build/satellite/geant4-satellite.exe"
-    # readers = [ProtoReader("deposit.proto.bin", proto_convertor=convert_satellite_proto)]
-    # for data in input_data:
-    #     print(data.text)
-    with MeanTable("proton.hdf5") as mean_table:
-        mean_table.clear = True
-        multirun_command(input_data, command, post_processor=mean_table.append_from_input_data)
+        for text, value in request_generator(values_macros, [0.0, 0.0, 0.1]):
+            data = server.send(text)
+            run.ParseFromString(data)
+            mean_table.append_from_mean_run(run, value)
     return 0
-
 
 if __name__ == '__main__':
     main()

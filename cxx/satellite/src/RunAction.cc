@@ -14,6 +14,7 @@ void RunAction::BeginOfRunAction(const G4Run *aRun) {
 
     if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum){
         auto meanRun = dataSatellite->meanRun;
+        meanRun->Clear();
         for (int i = 0; i< fSettings->number_of_cell; ++i) {
             meanRun->add_mean(0.0);
             meanRun->add_variance(0.0);
