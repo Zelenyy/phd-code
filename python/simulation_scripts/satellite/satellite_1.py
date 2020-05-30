@@ -39,16 +39,16 @@ def main():
         "mode" : DetectorMode.SUM.value
     }
 
-    with Geant4Server(["../build/satellite/geant4-satellite.exe server"], meta) as server, MeanTable("proton.hdf5") as mean_table:
+    with Geant4Server(["../build/satellite/geant4-satellite.exe server"], meta) as server, MeanTable("electron.hdf5") as mean_table:
         run = MeanRun()
 
         values_macros = {
             "radius": 0.15,
             "shift": np.arange(0.0, 0.016, 0.001),
             "theta": np.arange(0.0, 91.0, 1),
-            'energy': np.arange(10.0, 151.0, 1),
+            'energy': np.arange(1.0, 15.1, 0.5),
             'number': [1000],
-            'particle': 'proton'
+            'particle': 'e-'
         }
 
         for text, value in request_generator(values_macros, [0.0, 0.0, 0.1]):
