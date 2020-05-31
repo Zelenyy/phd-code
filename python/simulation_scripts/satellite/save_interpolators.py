@@ -9,7 +9,7 @@ def main():
 
     mean_items, points = convert_data_to_mean_points(data)
     file = "proton_inter_1.hdf5"
-    save_interpolators(file, mean_items, points, n=1, particle="proton")
+    save_interpolators(file, mean_items, points, n=1, particle="proton", n_cpu_cores=4)
     return 0
 
 if __name__ == '__main__':

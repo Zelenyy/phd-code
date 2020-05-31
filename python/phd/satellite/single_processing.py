@@ -90,7 +90,29 @@ def convert_data_to_mean_points(data):
 #
 #
 #
-# class SingleProcessing:
-#
-#     def __init__(self):
-#         self.filters
+
+from scipy.stats import norm
+
+class Likelihood:
+    def __init__(self, interpolators_mean : LinearNDInterpolator, interpolators_std : LinearNDInterpolator):
+        self.mean_list = interpolators_mean
+        self.std_list  = interpolators_std
+
+    def __call__(self, event: np.ndarray):
+        sum_ = 0
+        for i, temp in enumerate(zip(self.mean_list, self.std_list)):
+            mean, std = temp
+            mean = mean(event[i])
+            std = std(event[i])
+            sum_ += norm.logpdf(event[0], loc=mean, scale=std)
+        return sum_
+
+
+class SingleProcessing:
+
+    def __init__(self):
+        pass
+
+    def process(self, event: np.ndarray, error: np.ndarray = None):
+        pass
+
