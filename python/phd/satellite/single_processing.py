@@ -66,12 +66,16 @@ def convert_data_to_mean_points(data):
     n = data["mean"][0].size
     for i in range(n):
         temp = MeanItem(
-            mean= data["mean"][:, i],
-            variance=data["variance"][:, i],
+            mean= np.abs(np.round(data["mean"][:, i], decimals=10)),
+            variance=np.abs(np.round(data["variance"][:, i], decimals=10)),
             number= data["number"]
         )
         mean_items.append(temp)
     return mean_items, points
+
+
+
+
 
 # class Filter(abc.ABC):
 #     @abc.abstractmethod
