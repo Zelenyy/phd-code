@@ -3,9 +3,10 @@ import shutil
 from dataclasses import dataclass
 import logging
 import numpy as np
+import tables
 from phd.satellite.satellite_pb2 import MeanRun
 from phd.utils.run_tools import InputData
-from tables import open_file, Filters
+from tables import open_file, Filters, File
 
 logger = logging.getLogger(__name__)
 
@@ -132,3 +133,61 @@ class MeanItem:
             var += 2*(item.mean - mean)*item.number*item.mean
         var /= n_sum
         return MeanItem(mean, var, n_sum)
+
+
+class Normilizer:
+    def __init__(self, init=0.0, step=1.0, norm=1.0):
+        self.norm = norm
+        self.init = init
+        self.step = step
+
+    def normalize(self, data):
+        return (data - self.init) / self.norm
+
+    def unnormalize(self, data):
+        return data*self.norm + self.init
+
+    def index_of_non_normed(self, data):
+        data = self.normalize(data)
+        result: np.ndarray = np.rint(data / self.step)
+        return result.astype("i")
+
+    @staticmethod
+    def get_with_array(data):
+        data = np.sort(np.unique(data))
+        norm = data.max() - data.min()
+        normalizer = Normilizer(init=data.min(), norm=norm, step=1.0 / (data.size - 1))
+        return normalizer, normalizer.normalize(data)
+
+def convert_to_mesh(input_file : str, output: str, particle="proton"):
+    with tables.open_file(input_file) as h5file:
+        data = h5file.get_node("/", "deposit").read()
+    norms, normeds, indexes = [], [], []
+    names = ["energy","theta","shift"]
+    for name in names:
+        norm, normed = Normilizer.get_with_array(data[name][:])
+        indx = norm.index_of_non_normed(data[name][:])
+        indexes.append(indx)
+        normeds.append(normed)
+        norms.append(norm)
+
+    size = data["mean"][0].size
+    mean_mesh = np.zeros(shape=(size, normed[0].size, normed[1].size, normed[2].size), dtype="d")
+    var_mesh = np.zeros(shape=(size, normed[0].size, normed[1].size, normed[2].size), dtype="d")
+    for i, item in enumerate(zip(data["mean"], data["variance"])):
+        mean_mesh[:, indexes[0][i], indexes[1][i], indexes[2][i]] = item[0]
+        var_mesh[:, indexes[0][i],indexes[1][i], indexes[2][i]] = item[1]
+    with tables.open_file(output, "a") as h5file:
+        group = h5file.create_group(h5file.root, particle)
+        array = h5file.create_array(group, "mean", obj=mean_mesh)
+        array.flush()
+        array = h5file.create_array(group, "variance", obj=var_mesh)
+        array.flush()
+        for i, name in enumerate(names):
+            array = h5file.create_array(group, name, obj=normed[i])
+            norm = norms[i]
+            array.attrs["init"] = norm.init
+            array.attrs["norm"] = norm.norm
+            array.attrs["step"] = norm.step
+            array.flush()
+

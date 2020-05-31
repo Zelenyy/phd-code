@@ -110,8 +110,8 @@ class Likelihood:
 
 class SingleProcessing:
 
-    def __init__(self):
-        pass
+    def __init__(self, likelihood: Likelihood):
+        self.likelihood = likelihood
 
     def process(self, event: np.ndarray, error: np.ndarray = None):
         pass
