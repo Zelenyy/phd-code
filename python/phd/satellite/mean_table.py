@@ -172,11 +172,13 @@ def convert_to_mesh(input_file : str, output: str, particle="proton"):
         norms.append(norm)
 
     size = data["mean"][0].size
-    mean_mesh = np.zeros(shape=(size, normed[0].size, normed[1].size, normed[2].size), dtype="d")
-    var_mesh = np.zeros(shape=(size, normed[0].size, normed[1].size, normed[2].size), dtype="d")
-    for i, item in enumerate(zip(data["mean"], data["variance"])):
-        mean_mesh[:, indexes[0][i], indexes[1][i], indexes[2][i]] = item[0]
-        var_mesh[:, indexes[0][i],indexes[1][i], indexes[2][i]] = item[1]
+    mean_mesh = np.zeros(shape=(size, normeds[0].size, normeds[1].size, normeds[2].size), dtype="d")
+    var_mesh = np.zeros(shape=(size, normeds[0].size, normeds[1].size, normeds[2].size), dtype="d")
+
+    for i in range(size):
+        mean_mesh[i, indexes[0], indexes[1], indexes[2]] = data["mean"][:,i]
+        var_mesh[i, indexes[0],indexes[1], indexes[2]] = data["variance"][:,i]
+
     with tables.open_file(output, "a") as h5file:
         group = h5file.create_group(h5file.root, particle)
         array = h5file.create_array(group, "mean", obj=mean_mesh)
@@ -184,7 +186,7 @@ def convert_to_mesh(input_file : str, output: str, particle="proton"):
         array = h5file.create_array(group, "variance", obj=var_mesh)
         array.flush()
         for i, name in enumerate(names):
-            array = h5file.create_array(group, name, obj=normed[i])
+            array = h5file.create_array(group, name, obj=normeds[i])
             norm = norms[i]
             array.attrs["init"] = norm.init
             array.attrs["norm"] = norm.norm

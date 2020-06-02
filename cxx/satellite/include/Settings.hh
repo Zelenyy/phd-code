@@ -23,6 +23,7 @@ struct Settings{
     int number_of_cell = 100;
     ScoredDetectorMode scoredDetectorMode = ScoredDetectorMode::sum;
     OutputMode outputMode =OutputMode::file;
+    int port = 8777;
 };
 
 #endif //PHD_CODE_SETTINGS_HH

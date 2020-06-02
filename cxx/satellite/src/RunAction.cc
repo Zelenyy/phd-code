@@ -5,7 +5,7 @@
 #include <DataSatellite.hh>
 #include <fstream>
 #include <Logger.hh>
-#include <SocketOutput.hh>
+
 #include "RunAction.hh"
 #include "G4RunManager.hh"
 void RunAction::BeginOfRunAction(const G4Run *aRun) {
@@ -21,6 +21,11 @@ void RunAction::BeginOfRunAction(const G4Run *aRun) {
         }
         meanRun->set_number(0);
     }
+    else{
+        dataSatellite->run->Clear();
+    }
+
+
 
     G4UserRunAction::BeginOfRunAction(aRun);
 }
@@ -51,9 +56,6 @@ void RunAction::EndOfRunAction(const G4Run *aRun) {
      fout.flush();
      fout.close();
  } else if (fSettings->outputMode == OutputMode::socket_client){
-
-     auto socket  =  new SocketOutput("deposit", 8777);
-        int socketId = socket->getID();
      string data;
      if (fSettings->scoredDetectorMode == ScoredDetectorMode::single) {
          data = dataSatellite->run->SerializeAsString();
@@ -61,9 +63,10 @@ void RunAction::EndOfRunAction(const G4Run *aRun) {
      else if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum) {
          data = dataSatellite->meanRun->SerializeAsString();
      }
+     auto size = static_cast<unsigned long int>(data.length());
+     socket->write(size);
      socket->write(data);
-     socket->closeSocket();
-     delete socket;
+     Logger::instance()->print("Write"+to_string(size) +"bytes to socket on address " + to_string(fSettings->port));
  }
     G4UserRunAction::EndOfRunAction(aRun);
 }

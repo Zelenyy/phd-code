@@ -8,20 +8,23 @@
 
 #include <G4UserRunAction.hh>
 #include "Settings.hh"
-
+#include <SocketOutput.hh>
 class RunAction: public G4UserRunAction {
 public:
 
-    explicit RunAction(Settings* settings){
+    explicit RunAction(Settings* settings, SocketOutput *socket): socket(socket){
         fSettings = settings;
     }
 
     void EndOfRunAction(const G4Run *aRun) override;
 
     void BeginOfRunAction(const G4Run *aRun) override;
-
+    ~RunAction() override{
+        socket->closeSocket();
+    }
 private:
     Settings * fSettings;
+    SocketOutput *socket;
 };
 
 

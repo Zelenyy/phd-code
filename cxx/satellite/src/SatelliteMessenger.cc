@@ -21,6 +21,9 @@ void SatelliteMessenger::SetNewValue(G4UIcommand *command, G4String newValue) {
         } else if (newValue == "socket") {
             settings->outputMode = OutputMode ::socket_client;
         }
+        else if (command == port) {
+            settings->port = G4UIcmdWithAnInteger::GetNewIntValue(newValue);
+        }
     } else {
         G4UImessenger::SetNewValue(command, newValue);
     }
@@ -41,5 +44,8 @@ SatelliteMessenger::SatelliteMessenger(Settings *pSettings) : settings(pSettings
     output->SetParameterName("mode", true);
     output->SetDefaultValue("file");
     output->SetCandidates("file socket");
+
+    port = new G4UIcmdWithAnInteger(port_path.c_str(), this);
+    output->SetParameterName("port", false);
 
 }

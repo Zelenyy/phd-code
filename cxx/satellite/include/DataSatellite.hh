@@ -28,7 +28,7 @@ public:
         return &dataSatellite;
     }
 private:
-    DataSatellite()= default;;
+    DataSatellite()= default;
 
     DataSatellite(DataSatellite const &) = delete;
 

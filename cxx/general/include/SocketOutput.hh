@@ -31,6 +31,16 @@ public:
 
     int getID(){ return new_socket;};
 
+    void write(unsigned long int data){
+        char* buff;
+        size_t buffsize = sizeof(data);
+//        for (size_t i = buffsize; i!=0; --i){
+//            buff[i] = (int) ((data >> 8*(buffsize-i)) & 0XFF);
+//        }
+        buff = (char*)(&data);
+        ssize_t res =send(new_socket, buff, buffsize, 0);
+    }
+
     void write(string data){
         auto buff = data.c_str();
         size_t buffsize = data.length();
@@ -96,7 +106,6 @@ public:
 
 public:
     ~SocketOutput() {
-
     };
 };
 

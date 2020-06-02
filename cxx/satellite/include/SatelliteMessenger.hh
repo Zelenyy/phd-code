@@ -6,6 +6,7 @@
 #define PHD_CODE_SATELLITEMESSENGER_HH
 
 #include <G4UIcmdWithAString.hh>
+#include "G4UIcmdWithAnInteger.hh"
 #include <G4UIcmdWithADoubleAndUnit.hh>
 #include "G4UImessenger.hh"
 #include "Settings.hh"
@@ -28,10 +29,12 @@ private:
     G4UIcmdWithAString * physics;
     G4UIcmdWithAString * detector;
     G4UIcmdWithAString * output;
+    G4UIcmdWithAnInteger * port;
 private:
     string satellite_directory = "/satellite/";
     string detector_mode = satellite_directory + "detector";
     string output_mode = satellite_directory + "output";
+    string port_path = satellite_directory + "port";
 };
 
 
