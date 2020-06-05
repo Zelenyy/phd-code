@@ -189,18 +189,54 @@ def calculate_interpolators(energy, theta, shift, mean, var):
         inter_std_list.append(grid_inter_std)
     return inter_list, inter_std_list
 
-def load_likelihood_factory(path, particle="proton"):
-    with tables.open_file(path) as h5file:
-        group = tables.Group(h5file.root, particle)
-        mean = h5file.get_node(group, "mean").read()
-        var = h5file.get_node(group, "variance").read()
-        energy_node = h5file.get_node(group, "energy")
-        energy = energy_node.read()
-        energy_normilizer = Normilizer(energy_node.attrs["init"], step=energy_node.attrs["step"],
-                                       norm=energy_node.attrs["norm"])
-        theta = h5file.get_node(group, "theta").read()
-        shift = h5file.get_node(group, "shift").read()
+class DataMeshLoader:
+    def __init__(self, path, particle="proton"):
+        with tables.open_file(path) as h5file:
+            group = tables.Group(h5file.root, particle)
+            self.mean = h5file.get_node(group, "mean").read()
+            self.var = h5file.get_node(group, "variance").read()
+            energy_node = h5file.get_node(group, "energy")
+            self.energy = energy_node.read()
+            self.energy_normilizer = Normilizer(energy_node.attrs["init"], step=energy_node.attrs["step"],
+                                           norm=energy_node.attrs["norm"])
+            self.theta = h5file.get_node(group, "theta").read()
+            self.shift = h5file.get_node(group, "shift").read()
 
-    inter_list, inter_std_list = calculate_interpolators(energy, theta, shift, mean, var)
-    return LikelihoodFactory(inter_list, inter_std_list, energy_normilizer)
+def load_likelihood_factory(path, particle="proton"):
+    data_mesh_loader = DataMeshLoader(path, particle="proton")
+    inter_list, inter_std_list = calculate_interpolators(
+        data_mesh_loader.energy,
+        data_mesh_loader.theta,
+        data_mesh_loader.shift,
+        data_mesh_loader.mean,
+        data_mesh_loader.var)
+    return LikelihoodFactory(inter_list, inter_std_list, data_mesh_loader.energy_normilizer)
+
+def load_splitting_likelihood_factory(path, particle="proton", splitting = None):
+    if splitting is None:
+        return load_likelihood_factory(path , particle)
+    data_mesh_loader = DataMeshLoader(path, particle="proton")
+
+    n = len(splitting)
+
+    split_mean_mesh = np.zeros((n,) + data_mesh_loader.mean.shape[1:])
+    split_var_mesh = np.zeros((n,) + data_mesh_loader.var.shape[1:])
+
+    i = 0
+    for indx, split in enumerate(splitting):
+        temp = []
+        for mean, var in zip(data_mesh_loader.mean[i:i+split], data_mesh_loader.var[i:i+split]):
+            # FIXME for simulation with diff `number`
+            temp.append(MeanItem(mean, var, number=1))
+        temp = MeanItem.join_item(*temp)
+        split_mean_mesh[indx] = temp.mean
+        split_var_mesh[indx] = temp.var
+        i += split
+    inter_list, inter_std_list = calculate_interpolators(
+        data_mesh_loader.energy,
+        data_mesh_loader.theta,
+        data_mesh_loader.shift,
+        split_mean_mesh,
+        split_var_mesh)
+    return LikelihoodFactory(inter_list, inter_std_list, data_mesh_loader.energy_normilizer)
 

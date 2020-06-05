@@ -126,11 +126,14 @@ class MeanItem:
             mean += item.number*item.mean
             n_sum += item.number
         mean /= n_sum
-        var = item_0.number*item_0.variance + mean**2 - item_0.mean**2 + 2*(item_0.mean - mean)*item_0.number*item_0.mean
+        var = item_0.number*item_0.variance
         for item in args[1:]:
             var += item.number*item.variance
-            var += mean**2 - item.mean**2
-            var += 2*(item.mean - mean)*item.number*item.mean
+        # var = item_0.number*item_0.variance + mean**2 - item_0.mean**2 + 2*(item_0.mean - mean)*item_0.number*item_0.mean
+        # for item in args[1:]:
+        #     var += item.number*item.variance
+        #     var += mean**2 - item.mean**2
+        #     var += 2*(item.mean - mean)*item.number*item.mean
         var /= n_sum
         return MeanItem(mean, var, n_sum)
 

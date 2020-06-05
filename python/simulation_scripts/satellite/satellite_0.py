@@ -13,7 +13,7 @@ from phd.utils.run_tools import multirun_command, \
 ROOT_PATH = os.path.dirname(__file__)
 
 INPUT_TEMPLATE = """/df/project test
-/df/gdml ../../satellite.gdml
+/df/gdml ../../satellite_anthracene.gdml
 /satellite/output file
 /satellite/detector ${mode}
 
@@ -36,13 +36,16 @@ def main():
     values_macros = {
         "mode" : "single",
         "radius" : 0.15,
+        # "shift": [0.0, 0.005, 0.016],
+        # "theta": [0.0, 10.0, 20., 30.0, 50.0, 70.0],
         "shift" : 0,
-        "theta" : np.arange(0.0,71.0, 1),
+        "theta" : np.arange(0.0,31.0, 3),
         # "theta" : [30], #[0.0],
         "theta_unit": "degree",
-        'energy': np.arange(10.0,151.0, 1),
-        'number': [1000],
-        'particle': 'proton'
+        'energy': np.arange(0.5,15.1, 0.5),
+        'number': [10000],
+        'particle': 'e-'
+        # 'particle': 'proton'
     }
     meta = Meta(
         {
@@ -55,7 +58,7 @@ def main():
     readers = [ProtoReader("deposit.proto.bin", proto_convertor=convert_satellite_proto)]
     # for data in input_data:
     #     print(data.text)
-    multirun_command(input_data, command, post_processor=get_convertor(readers, "./proton.hdf5", clear=True))
+    multirun_command(input_data, command, post_processor=get_convertor(readers, "./mcmc_electron.hdf5", clear=True))
     return 0
 
 
