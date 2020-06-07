@@ -52,6 +52,15 @@ private:
     G4UIcmdWithADoubleAndUnit * field_z;
     string field_z_path = thunderstorm_path + "field_z";
 
+    G4UIdirectory * aragats;
+    string aragats_path = thunderstorm_path + "aragats/";
+
+    G4UIcmdWithAString* aragats_geo_type;
+    string aragats_geo_type_path = aragats_path + "geo_type";
+
+
+
+
 
 };
 
