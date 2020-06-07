@@ -63,18 +63,52 @@ public:
         treeTrackingData = new thunderstorm::CylinderIdList;
     }
     void saveTreeTracking(){
-        if (treeTrackingData != nullptr){
-            int size = treeTrackingData->ByteSize();
-            auto fout = DataFileManager::instance()->getBinaryFile("treeTracking");
+//        if (treeTrackingData != nullptr){
+//            int size = treeTrackingData->ByteSize();
+//            auto fout = DataFileManager::instance()->getBinaryFile();
+//            fout->write(reinterpret_cast<char*>(&size), sizeof size);
+//            treeTrackingData->SerializeToOstream(fout);
+//            treeTrackingData->Clear();
+//        }
+        saveProtoChunk("treeTracking", treeTrackingData);
+    }
+
+    static void saveProtoChunk(const std::string& filename, ::google::protobuf::Message* chunk){
+        if (chunk != nullptr){
+            int size = chunk->ByteSize();
+            auto fout = DataFileManager::instance()->getBinaryFile(filename);
             fout->write(reinterpret_cast<char*>(&size), sizeof size);
-            treeTrackingData->SerializeToOstream(fout);
-            treeTrackingData->Clear();
+            chunk->SerializeToOstream(fout);
+            chunk->Clear();
         }
+    }
+
+    // ParticleDetector
+    thunderstorm::ParticleDetectorList* particleDetectorList;
+    void initParticleDetector(){
+        particleDetectorList = new thunderstorm::ParticleDetectorList();
+    }
+
+    void fillParticleDetector(thunderstorm::ParticleDetectorData* data, const G4Track *aTrack){
+        data->set_particle( aTrack->GetDefinition()->GetPDGEncoding());
+        data->set_energy(aTrack->GetKineticEnergy() / MeV);
+        const G4ThreeVector &momentumDir = aTrack->GetMomentumDirection();
+        const G4ThreeVector &position = aTrack->GetPosition();
+        data->set_theta(momentumDir.getTheta() / radian);
+        data->set_radius(position.perp() / meter);
+        data->set_time(aTrack->GetGlobalTime() / ns);
+//        data.set
+    }
+
+    void saveParticleDetector(){
+        saveProtoChunk("particle_detector", particleDetectorList);
     }
 
     void EndEvent(){
         saveDwyer2003StackingAction();
         saveTreeTracking();
+        saveParticleDetector();
+
     }
 
 private:

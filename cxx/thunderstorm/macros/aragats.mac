@@ -1,0 +1,12 @@
+/npm/geometry/type custom
+/npm/visualization false
+/npm/thunderstorm/height 3750 m
+/npm/thunderstorm/field_z 220 kV/m
+/npm/thunderstorm/physics standard
+/npm/thunderstorm/energy/cut 0.01
+
+/gps/particle e-
+/gps/direction 0 0 -1
+/gps/ene/mono 1 MeV
+/run/beamOn 1
+exit

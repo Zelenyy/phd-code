@@ -5,7 +5,7 @@ from phd.utils.hdf5_tools import ProtoSetConvertor, DtypeProtoSetConvertor
 from phd.utils.histogram_pb2 import Histogram2DList
 from tables import Int32Col, IsDescription
 
-from phd.thunderstorm.thunderstorm_pb2 import CylinderIdList
+from phd.thunderstorm.thunderstorm_pb2 import CylinderIdList, ParticleDetectorList
 from ..utils.hdf5_tools import txtDataReader, dtypeDataReader
 
 names_txt = ['Primary', 'Gamma', 'Electron', 'Positron']
@@ -92,6 +92,7 @@ CYLINDER_ID_DTYPE = np.dtype([
 ])
 
 
+
 class CylinderProtoSet(DtypeProtoSetConvertor):
     dtype = CYLINDER_ID_DTYPE
 
@@ -109,6 +110,34 @@ class CylinderProtoSet(DtypeProtoSetConvertor):
             data["theta"][indx] = item.theta
             data["radius"][indx] = item.radius
             data["z"][indx] = item.z
+        table = self.h5file.get_node(self.group, self.tableName)
+        table.append(data)
+        table.flush()
+
+PARTICLE_DETECTOR_DTYPE = np.dtype([
+    ("event", "i"),
+    ("particle", "i"),
+    ("energy", "d"),
+    ("theta", "d"),
+    ("radius", "d"),
+    ("time", "d"),
+])
+
+class ParticleDetectorProtoSet(DtypeProtoSetConvertor):
+    dtype = PARTICLE_DETECTOR_DTYPE
+
+    def convert(self, data: bytes):
+        proto_list = ParticleDetectorList()
+        proto_list.ParseFromString(data)
+        n = len(proto_list.data)
+        data = np.zeros(n, dtype=self.dtype)
+        data["event"] = proto_list.eventId
+        for indx, item in enumerate(proto_list.data):
+            data["particle"][indx] = item.particle
+            data["energy"][indx] = item.energy
+            data["theta"][indx] = item.theta
+            data["radius"][indx] = item.radius
+            data["time"][indx] = item.time
         table = self.h5file.get_node(self.group, self.tableName)
         table.append(data)
         table.flush()

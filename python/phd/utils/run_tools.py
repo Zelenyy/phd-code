@@ -13,6 +13,21 @@ import numpy as np
 from dataforge import Meta, MetaRepr
 import abc
 
+def no_gdmL_input_generator(meta: Meta, macros_template: str):
+    macros_template = Template(macros_template)
+    for path, values in zip(
+            dir_name_generator(".", "sim"),
+            values_from_dict(meta)
+    ):
+
+        text = macros_template.substitute(values)
+        data = InputData(
+            text=text,
+            path=path,
+            values=Meta(values)
+        )
+        yield data
+
 def general_input_generator(meta: Meta, gdml_template_file: str, macros_template: str):
     macros_template = Template(macros_template)
 

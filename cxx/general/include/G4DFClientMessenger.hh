@@ -28,14 +28,17 @@ private:
     G4DFClient* dfClient;
 private:
     G4UIdirectory * directory;
+//    G4UIdirectory * geo_directory;
     G4UIcmdWithAString * project;
     G4UIcmdWithAString * gdml;
+
     G4UIcmdWithAnInteger * seed;
 
 private:
     string df_directory = "/df/";
     string project_path = df_directory + "project";
     string gdml_path = df_directory + "gdml";
+//    string geo_type_path = geo_dir_path + "type";
     string seed_path = df_directory + "seed";
 
 };

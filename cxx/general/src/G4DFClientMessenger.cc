@@ -18,6 +18,8 @@ void G4DFClientMessenger::SetNewValue(G4UIcommand *command, G4String newValue) {
         dfClient->setGDML(newValue);
     } else if (command == seed) {
         dfClient->setSeed(G4UIcmdWithAnInteger::GetNewIntValue(newValue));
+//    } else if (command == geo_type){
+////        dfClient
     }
 }
 
@@ -50,4 +52,5 @@ G4DFClientMessenger::G4DFClientMessenger(G4DFClient *client) : dfClient(client) 
     seed->SetGuidance("Set seed for random engine");
     seed->SetParameterName("seed", true);
     seed->SetDefaultValue(0);
+
 }

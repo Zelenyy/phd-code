@@ -20,7 +20,7 @@ G4String ThunderstormMessenger::GetCurrentValue(G4UIcommand *command) {
     else if (command == energyCut){
         return to_string(settings->born_cut);
     }
-    return G4UImessenger::GetCurrentValue(command);
+    return ServerMessenger::GetCurrentValue(command);
 }
 
 void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue) {
@@ -42,15 +42,21 @@ void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue)
         settings->particle_cylinder_stacking.push_back(newValue);
     } else if (command == detectorParticle){
         settings->particle_detector.push_back(newValue);
+    } else if (command == geo_height){
+        settings->geometrySettings->height = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    } else if (command == field_z){
+        settings->geometrySettings->field_z = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
     }
     else{
-        G4UImessenger::SetNewValue(command, newValue);
+        ServerMessenger::SetNewValue(command, newValue);
     }
 }
 
-ThunderstormMessenger::ThunderstormMessenger(Settings* pSettings) : settings(pSettings) {
-    directory = new G4UIdirectory(thunderstorm_directory.c_str());
-    directory->SetGuidance("This is helper");
+ThunderstormMessenger::ThunderstormMessenger(Settings* pSettings) : ServerMessenger(pSettings), settings(pSettings) {
+
+    thundestorm = new G4UIdirectory(thunderstorm_path.c_str());
+    thundestorm->SetGuidance("This is helper");
+
     physics = new G4UIcmdWithAString(physics_path.c_str(), this);
     physics ->SetGuidance("Set using physics.");
     physics ->SetParameterName("physics", true);
@@ -81,4 +87,14 @@ ThunderstormMessenger::ThunderstormMessenger(Settings* pSettings) : settings(pSe
     energyCut->SetParameterName("energy", true, false);
     energyCut->SetDefaultUnit("MeV");
 
+
+    geo_height = new G4UIcmdWithADoubleAndUnit(geo_height_path.c_str(), this);
+    geo_height->SetGuidance("Set height of cloud");
+    geo_height->SetParameterName("height", false);
+    geo_height->SetDefaultUnit("m");
+
+    field_z = new G4UIcmdWithADoubleAndUnit(field_z_path.c_str(), this);
+    field_z->SetGuidance("Set uniform Z-field in cloud");
+    field_z->SetParameterName("field", false);
+    field_z->SetDefaultUnit("kV/m");
 }

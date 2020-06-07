@@ -7,13 +7,14 @@
 
 #include <G4UIcmdWithAString.hh>
 #include <G4UIcmdWithADoubleAndUnit.hh>
+#include <G4Server.hh>
 #include "G4UImessenger.hh"
 #include "PhysicsList.hh"
 #include "Settings.hh"
 
 using namespace std;
 
-class ThunderstormMessenger : public G4UImessenger {
+class ThunderstormMessenger : public ServerMessenger {
 public:
 
     ThunderstormMessenger(Settings *pSettings);
@@ -25,7 +26,7 @@ public:
     void SetNewValue(G4UIcommand *command, G4String newValue) override;
 private:
     Settings* settings;
-    G4UIdirectory * directory;
+    G4UIdirectory * thundestorm;
     G4UIcmdWithAString * physics;
     G4UIcmdWithAString * stacking;
     G4UIcmdWithAString * stepping;
@@ -34,15 +35,24 @@ private:
     G4UIcmdWithAString * detectorParticle;
     G4UIcmdWithADoubleAndUnit * energyCut;
 private:
-    string thunderstorm_directory = "/thunderstorm/";
-    string physics_path = thunderstorm_directory + "physics";
-    string stacking_path = thunderstorm_directory + "stacking";
-    string stepping_path = thunderstorm_directory + "stepping";
-    string tracking_path = thunderstorm_directory + "tracking";
-    string cut_path = thunderstorm_directory +"cut/";
+    string thunderstorm_path = root_path + "thunderstorm/";
+    string physics_path = thunderstorm_path + "physics";
+    string stacking_path = thunderstorm_path + "stacking";
+    string stepping_path = thunderstorm_path + "stepping";
+    string tracking_path = thunderstorm_path + "tracking";
+    string cut_path = thunderstorm_path + "cut/";
     string energy_cut_path = cut_path +"energy";
-    string add_particle_stacking_path = thunderstorm_directory + "addParticleInPCS";
-    string add_particle_detector_path = thunderstorm_directory + "addParticleInPD";
+    string add_particle_stacking_path = thunderstorm_path + "addParticleInPCS";
+    string add_particle_detector_path = thunderstorm_path + "addParticleInPD";
+
+private:
+    G4UIcmdWithADoubleAndUnit * geo_height;
+    string geo_height_path = thunderstorm_path + "height";
+
+    G4UIcmdWithADoubleAndUnit * field_z;
+    string field_z_path = thunderstorm_path + "field_z";
+
+
 };
 
 

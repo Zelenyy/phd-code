@@ -8,8 +8,7 @@
 
 #include <G4VSensitiveDetector.hh>
 #include "Settings.hh"
-#include "DataFileManager.hh"
-#include "DataFile.hh"
+#include "DataThunderstorm.hh"
 
 class ParticleDetector : public G4VSensitiveDetector {
 public:
@@ -18,6 +17,7 @@ public:
     G4bool ProcessHits(G4Step *aStep, G4TouchableHistory *ROhist) override;
 
 private:
+    DataThunderstorm *dataThunderstorm;
     double cut = 0.05 * MeV;
 };
 
