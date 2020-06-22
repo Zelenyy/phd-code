@@ -32,12 +32,15 @@ def main():
         "port" : 8777
     }
 
+    max_theta_plus = 65.0
+    max_theta_minus = 75.0
+
     values_macros = {
         "radius": 0.15,
-        "shift": np.arange(0.0, 0.015, 0.006),
-        "theta": np.arange(-70.0, 55.0, 25),
-        'energy': np.arange(10.0, 12.1, 2),
-        'number': [10],
+        "shift": np.arange(0.0, 0.011, 0.002),
+        "theta": np.arange(-max_theta_minus, max_theta_plus+1, 2),
+        'energy': np.arange(10.0, 120.1, 1.0),
+        'number': [10000],
         'particle': 'proton'
         # 'particle': 'e-'
     }
