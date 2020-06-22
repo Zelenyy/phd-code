@@ -1,6 +1,7 @@
 from unittest import TestCase
 import numpy as np
 from phd.satellite.mean_table import MeanItem
+from phd.satellite.single_processing import DataMeshLoader
 
 
 class TestMeanItem(TestCase):
@@ -20,3 +21,12 @@ class TestMeanItem(TestCase):
         item = MeanItem.join_item(self.item1, self.item2)
         self.assertAlmostEqual(item.mean[0], self.item.mean[0])
         self.assertAlmostEqual(item.variance[0], self.item.variance[0], places=3)
+
+
+    def test_sum_real_data(self):
+        path = "/home/zelenyy/data/satellite/mean_mesh.hdf5"
+        dataLoaderProton = DataMeshLoader(path, particle="proton")
+        print(dataLoaderProton.mean[:, 0,0,0].sum())
+        mean = MeanItem.sum_item(*[MeanItem(dataLoaderProton.mean[i], dataLoaderProton.var[i], number=1) for i in range(dataLoaderProton.mean.shape[0])])
+        print(mean.mean[0, 0, 0].sum())
+        self.assertAlmostEqual(mean.mean[0, 0, 0].sum(), dataLoaderProton.mean[:, 0,0,0].sum())

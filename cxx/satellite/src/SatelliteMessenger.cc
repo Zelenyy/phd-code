@@ -5,7 +5,7 @@
 #include "SatelliteMessenger.hh"
 
 G4String SatelliteMessenger::GetCurrentValue(G4UIcommand *command) {
-    return G4UImessenger::GetCurrentValue(command);
+    return ServerMessenger::GetCurrentValue(command);
 }
 
 void SatelliteMessenger::SetNewValue(G4UIcommand *command, G4String newValue) {
@@ -17,21 +17,20 @@ void SatelliteMessenger::SetNewValue(G4UIcommand *command, G4String newValue) {
         }
     } else if (command == output) {
         if (newValue == "file") {
-            settings->outputMode = OutputMode ::file;
+            settings->outputMode = OutputMode::file;
         } else if (newValue == "socket") {
-            settings->outputMode = OutputMode ::socket_client;
+            settings->outputMode = OutputMode::socket_client;
         }
-        else if (command == port) {
-            settings->port = G4UIcmdWithAnInteger::GetNewIntValue(newValue);
-        }
+    } else if (command == port) {
+        settings->port = G4UIcmdWithAnInteger::GetNewIntValue(newValue);
     } else {
-        G4UImessenger::SetNewValue(command, newValue);
+        ServerMessenger::SetNewValue(command, newValue);
     }
 }
 
-SatelliteMessenger::SatelliteMessenger(Settings *pSettings) : settings(pSettings) {
-    directory = new G4UIdirectory(satellite_directory.c_str());
-    directory->SetGuidance("This is helper");
+SatelliteMessenger::SatelliteMessenger(Settings *pSettings) : ServerMessenger(pSettings), settings(pSettings) {
+    satellite = new G4UIdirectory(satellite_directory.c_str());
+    satellite->SetGuidance("This is helper");
 
     detector = new G4UIcmdWithAString(detector_mode.c_str(), this);
     detector->SetGuidance("Set detector mode");

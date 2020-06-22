@@ -6,6 +6,7 @@
 #define PHD_CODE_SETTINGS_HH
 
 #include "G4SystemOfUnits.hh"
+#include <G4Server.hh>
 
 using namespace std;
 
@@ -19,7 +20,8 @@ enum class OutputMode{
     socket_client
 };
 
-struct Settings{
+class Settings : public ServerSettings {
+public:
     int number_of_cell = 100;
     ScoredDetectorMode scoredDetectorMode = ScoredDetectorMode::sum;
     OutputMode outputMode =OutputMode::file;

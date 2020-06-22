@@ -1,9 +1,12 @@
+from multiprocessing.pool import Pool
+
 import tables
 from phd.satellite.geant4_server import DetectorMode, Geant4Server
 import numpy as np
 from phd.satellite.run import request_generator
 from phd.satellite.satellite_pb2 import Run
-from phd.satellite.single_processing import load_likelihood_factory, SingleProcessing
+from phd.satellite.single_processing import load_likelihood_factory
+from phd.satellite.processing.single_processing import SingleProcessing
 
 reconstructed_dtype = np.dtype(
 [
@@ -44,13 +47,15 @@ def main():
     with Geant4Server(["../build/satellite/geant4-satellite.exe server"], meta) as server:
         run = Run()
         with tables.open_file("reconstruction.hdf5", "w") as fout:
-            table = fout.create_table(fout.root, "proton_1", description=reconstructed_dtype)
+            table = fout.create_table(fout.root, "proton_2", description=reconstructed_dtype)
             for text, value in request_generator(values_macros, [0.0, 0.0, 0.1]):
                 data = server.send(text)
                 run.ParseFromString(data)
-                for event in run.event:
-                    result = single_processing.process(np.array(event.deposit))
-                    add_row(table, value, result)
+                with Pool() as p:
+                    generator = (np.array(event.deposit) for event in run.event)
+                    for result in p.imap_unordered(single_processing.process, generator):
+                        if result is not None:
+                            add_row(table, value, result)
                 table.flush()
                     # print(value["energy"], lh_fact.energy_normilizer.unnormalize(result.x[0]))
 

@@ -19,8 +19,12 @@ public:
     void EndOfRunAction(const G4Run *aRun) override;
 
     void BeginOfRunAction(const G4Run *aRun) override;
+
     ~RunAction() override{
-        socket->closeSocket();
+        if (fSettings->outputMode == OutputMode::socket_client){
+            socket->closeSocket();
+        }
+
     }
 private:
     Settings * fSettings;

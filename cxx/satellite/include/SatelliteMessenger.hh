@@ -10,10 +10,11 @@
 #include <G4UIcmdWithADoubleAndUnit.hh>
 #include "G4UImessenger.hh"
 #include "Settings.hh"
+#include <G4Server.hh>
 
 using namespace std;
 
-class SatelliteMessenger : public G4UImessenger {
+class SatelliteMessenger : public ServerMessenger {
 public:
 
     SatelliteMessenger(Settings *pSettings);
@@ -25,13 +26,12 @@ public:
     void SetNewValue(G4UIcommand *command, G4String newValue) override;
 private:
     Settings* settings;
-    G4UIdirectory * directory;
-    G4UIcmdWithAString * physics;
+    G4UIdirectory * satellite;
     G4UIcmdWithAString * detector;
     G4UIcmdWithAString * output;
     G4UIcmdWithAnInteger * port;
 private:
-    string satellite_directory = "/satellite/";
+    string satellite_directory = root_path + "satellite/";
     string detector_mode = satellite_directory + "detector";
     string output_mode = satellite_directory + "output";
     string port_path = satellite_directory + "port";

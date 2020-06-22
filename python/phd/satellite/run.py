@@ -1,4 +1,7 @@
+from dataclasses import dataclass
 from string import Template
+from typing import Union
+
 import numpy as np
 from dataforge import Meta
 from phd.utils.run_tools import dir_name_generator, values_from_dict, InputData
@@ -35,6 +38,13 @@ def input_generator_satellite(meta: Meta, macros_template: str, init_pos):
         yield data
 
 
+@dataclass
+class QueueData:
+    meta : dict
+    data : Union[str, bytes]
+
+from tqdm import tqdm
+
 def request_generator(values, init_pos):
     """
     """
@@ -45,7 +55,7 @@ def request_generator(values, init_pos):
 /gps/ene/mono ${energy} MeV
 /gps/position ${posX} 0. ${posZ} m
 /run/beamOn ${number}
-    """
+"""
     template = Template(text)
     for value in values_from_dict(values):
         theta = value["theta"]
@@ -62,4 +72,6 @@ def request_generator(values, init_pos):
         value["posZ"] = posZ + init_pos[2]
         value["dirX"] = dirX
         value["dirZ"] = dirZ
-        yield template.substitute(value), value
+
+        request  = template.substitute(value)
+        yield QueueData(value, request)

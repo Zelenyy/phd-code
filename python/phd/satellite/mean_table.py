@@ -115,10 +115,8 @@ class MeanItem:
     variance : np.ndarray
     number :int
 
-
     @staticmethod
     def join_item(*args: "MeanItem"):
-
         item_0 = args[0]
         mean = item_0.number*item_0.mean
         n_sum = item_0.number
@@ -129,13 +127,21 @@ class MeanItem:
         var = item_0.number*item_0.variance
         for item in args[1:]:
             var += item.number*item.variance
-        # var = item_0.number*item_0.variance + mean**2 - item_0.mean**2 + 2*(item_0.mean - mean)*item_0.number*item_0.mean
-        # for item in args[1:]:
-        #     var += item.number*item.variance
-        #     var += mean**2 - item.mean**2
-        #     var += 2*(item.mean - mean)*item.number*item.mean
         var /= n_sum
         return MeanItem(mean, var, n_sum)
+
+    @staticmethod
+    def sum_item(*args: "MeanItem"):
+        n = len(args)
+        for i in range(n):
+            assert args[0].number == args[i].number
+        item_0 = args[0]
+        mean = np.zeros(args[0].mean.shape)
+        var = np.zeros(args[0].variance.shape)
+        for item in args:
+            mean += item.mean
+            var += item.variance
+        return MeanItem(mean, var, number=args[0].number)
 
 
 class Normilizer:
@@ -161,6 +167,11 @@ class Normilizer:
         norm = data.max() - data.min()
         normalizer = Normilizer(init=data.min(), norm=norm, step=1.0 / (data.size - 1))
         return normalizer, normalizer.normalize(data)
+
+    @staticmethod
+    def load_normilizer(node):
+        return Normilizer(node.attrs["init"], step=node.attrs["step"],
+                          norm=node.attrs["norm"])
 
 def convert_to_mesh(input_file : str, output: str, particle="proton"):
     with tables.open_file(input_file) as h5file:

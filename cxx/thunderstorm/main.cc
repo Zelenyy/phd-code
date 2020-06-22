@@ -12,21 +12,12 @@
 
 
 #include "G4Server.hh"
-void startFromFile(const string& filename, Settings* settings){
-    fstream fin;
-    fin.open(filename);
-    G4DFClient *dfClient = G4DFClient::instance();
-    dfClient->read(fin);
-    dfClient->setup(new PhysicsList(settings->physics), new ActionInitialization(settings));
-    dfClient->massWorld->setDetectorFactory(new SensitiveDetectorFactory(settings));
-    dfClient->massWorld->setFieldFactory(new FieldFactory);
-    dfClient->initialize();
-    dfClient->read(fin);
-    dfClient->stop();
-    fin.close();
-}
 
 int main(int argc, char **argv) {
+
+    GeometryType type = GeometryType::gdml;
+    type = GeometryType ::gdml;
+
 
     auto logger = Logger::instance();
     logger->print("Number of arguments: " + to_string(argc));

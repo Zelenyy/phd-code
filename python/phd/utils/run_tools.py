@@ -104,13 +104,17 @@ def create_one_file(text, foutput, values: dict):
         fout.write(template.safe_substitute(values))
     return foutput
 
+from tqdm import tqdm
 
 def values_from_dict(values: dict):
     keys, product_ = meta_analysis(values)
-    for values in product_:
-        yield {
-            key: value for key, value in zip(keys, values)
-        }
+    n = len(product_)
+    with tqdm(total=n) as pbar:
+        for values in product_:
+            pbar.update(1)
+            yield {
+                key: value for key, value in zip(keys, values)
+            }
 
 
 def meta_analysis(values: dict):

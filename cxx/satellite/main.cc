@@ -5,6 +5,7 @@
 #include <G4UImanager.hh>
 #include <G4UIExecutive.hh>
 #include <QGSP_BERT.hh>
+#include <G4Server.hh>
 #include "Settings.hh"
 //Mandatory user option
 #include "ActionInitialization.hh"
@@ -13,21 +14,6 @@
 #include "IFieldFactory.hh"
 
 
-void setupSimulation(G4DFClient *dfClient, Settings *settings) {
-    dfClient->setup(new QGSP_BERT(-1), new ActionInitialization(settings));
-    dfClient->massWorld->setDetectorFactory(new SensitiveDetectorFactory(settings));
-    dfClient->massWorld->setFieldFactory(new IFieldFactory);
-    dfClient->initialize();
-}
-
-void startFromFile(G4DFClient *dfClient, const string &filename, Settings *settings) {
-    fstream fin;
-    fin.open(filename);
-    dfClient->read(fin);
-    setupSimulation(dfClient, settings);
-    dfClient->read(fin);
-    fin.close();
-}
 
 int main(int argc, char **argv) {
     auto logger = Logger::instance();
@@ -37,41 +23,57 @@ int main(int argc, char **argv) {
     }
 
     auto settings = new Settings();
-    auto messender = SatelliteMessenger(settings);
-    G4DFClient *dfClient = G4DFClient::instance();
-    if (argc > 1) {
-        if (strcmp(argv[1], "test") == 0) {
-            startFromFile(dfClient, "init.mac", settings);
-        } else if (strcmp(argv[1], "vis") == 0) {
-            startFromFile(dfClient, argv[2], settings);
-            G4UIExecutive *ui = new G4UIExecutive(1, argv);
-            G4VisManager *visManager = new G4VisExecutive;
-            visManager->Initialize();
-            G4UImanager *UImanager = G4UImanager::GetUIpointer();
-            UImanager->ApplyCommand("/control/execute init_vis.mac");
-            ui->SessionStart();
-            delete ui;
-        } else if (strcmp(argv[1], "server") == 0) {
-            logger->print("Start cin server");
-            dfClient->read(std::cin);
-            setupSimulation(dfClient, settings);
-            while (true) {
-                logger->print("Start next run");
-                int code = dfClient->read(std::cin);
-                if (code == -1) {
-                    break;
-                }
-            }
+    settings->argc = argc;
+    settings->argv = argv;
+    auto messender = new SatelliteMessenger(settings);
+    auto g4Server = new G4Server(messender, settings);
 
-        } else {
-            startFromFile(dfClient, argv[1], settings);
+    // Select input
+    istream *setup_in = &std::cin;
+    istream *mainloop_in = &std::cin;
+
+    vector<fstream*> open_files;
+    if (argc > 1) {
+        if (strcmp(argv[1], "vis") == 0){
+
         }
-    } else {
-        dfClient->read(std::cin);
-        setupSimulation(dfClient, settings);
-        dfClient->read(std::cin);
+        else{
+            string filename = argv[1];
+            if (strcmp(argv[1], "test") == 0) {
+                filename = "init.mac";
+            }
+            fstream *fin = new fstream;
+            fin->open(filename);
+            open_files.push_back(fin);
+            setup_in = fin;
+            mainloop_in = fin;
+        }
+
     }
-    dfClient->stop();
+
+    // Run server
+
+
+
+    g4Server->setup(*setup_in);
+    if (g4Server->massWorld == nullptr) {
+        cout<<"Not geometry"<<endl;
+        return 0;
+    } else {
+        g4Server->massWorld->setDetectorFactory(new SensitiveDetectorFactory(settings));
+        g4Server->massWorld->setFieldFactory(new IFieldFactory);
+    }
+
+    auto physList = new QGSP_BERT(-1);
+    g4Server->runManager->SetUserInitialization(physList);
+    auto actionInit = new ActionInitialization(settings);
+    g4Server->runManager->SetUserInitialization(actionInit);
+
+    g4Server->mainloop(*mainloop_in);
+    g4Server->stop();
+    for ( auto &&fin : open_files){
+        fin->close();
+    }
     return 0;
 }
 

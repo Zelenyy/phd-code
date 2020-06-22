@@ -66,7 +66,7 @@ void RunAction::EndOfRunAction(const G4Run *aRun) {
      auto size = static_cast<unsigned long int>(data.length());
      socket->write(size);
      socket->write(data);
-     Logger::instance()->print("Write"+to_string(size) +"bytes to socket on address " + to_string(fSettings->port));
+     Logger::instance()->print("Write "+to_string(size) +" bytes to socket on address " + to_string(fSettings->port));
  }
     G4UserRunAction::EndOfRunAction(aRun);
 }

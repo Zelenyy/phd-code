@@ -216,6 +216,9 @@ private:
                 (strlen(command) == 0)) {
                 break;
             }
+            if (strcmp(command, "separator") == 0){
+                break;
+            }
             if (strcmp(command, "exit") == 0) {
                 exit_code = ReadStatus::exit;
                 break;

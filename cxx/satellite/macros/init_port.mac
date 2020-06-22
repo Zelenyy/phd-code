@@ -1,19 +1,13 @@
 /npm/geometry/type gdml
 /npm/geometry/gdml ../gdml/satellite.gdml
 /npm/satellite/detector sum
-/npm/satellite/output file
+/npm/satellite/output socket
+/npm/satellite/port 8887
 
 /gps/particle proton
 /gps/number 1
 /gps/direction 0 0 -1
 /gps/ene/mono 100 MeV
 /gps/position 0. 0. 0.25 m
-/run/beamOn 5
-
-/gps/particle proton
-/gps/number 1
-/gps/direction 0 0 -1
-/gps/ene/mono 100 MeV
-/gps/position 0. 0. 0.25 m
-/run/beamOn 5
+/run/beamOn 50
 exit

@@ -6,28 +6,31 @@ import logging
 from dataclasses import dataclass
 from enum import Enum
 from string import Template
-from typing import List, Callable
+from typing import List, Callable, Union
 import subprocess
 
+from phd.satellite.mean_table import MeanTable
+from phd.satellite.run import QueueData, request_generator
+from phd.satellite.satellite_pb2 import MeanRun
 
 INIT_TEMPLATE = Template(
-"""/df/project test
-/df/gdml ${gdml}
-/satellite/output socket
-/satellite/port ${port}
-/satellite/detector ${mode}
+"""/npm/geometry/type gdml
+/npm/geometry/gdml ${gdml}
+/npm/satellite/output socket
+/npm/satellite/port ${port}
+/npm/satellite/detector ${mode}
 """
 )
 
-SEPARATOR = b"\r\n"
+SEPARATOR = b"separator\n"
 
 class DetectorMode(Enum):
     SINGLE = "single"
     SUM = "sum"
 
 class Geant4Server:
-    def __init__(self, command: List[str], meta: dict):
-        self.command = command
+    def __init__(self, meta: dict):
+        self.command = meta["command"]
         self.meta = meta
 
     def _start(self):
@@ -54,7 +57,7 @@ class Geant4Server:
                 self.socket.connect((data_host, self.meta["port"]))
                 break
             except Exception:
-                print("sleep")
+                # print("sleep")
                 time.sleep(0.1)
         return 0
 
@@ -100,60 +103,90 @@ class Geant4Server:
 from typing import Generator
 
 
-from multiprocessing import Process, Pipe, Queue
 
-# def multythread_server(commnad, meta_factory : Generator, request_factory: Generator, processor: Callable, n_workers = None):
-#     if n_workers is None: n_workers = os.cpu_count()
-#
-#     workers = []
-#     pipes = []
-#     for i in range(n_workers):
-#         parent, child = Pipe()
-#         meta = next(meta_factory)
-#         worker = Process(target=start_server_in_multythread, args=(commnad, meta, child))
-#         worker.start()
-#         workers.append(worker)
-#         pipes.append(parent)
-#
-#     count = 0
-#
-#     while True:
-#         try:
-#             request = next(request_factory)
-#             i = count % n_workers
-#             pipe = pipes[i]
-#             pipe.send(request)
-#             count+=1
-#             if (count // n_workers) % 3 == 0:
-#                 for pipe in pipes:
-#                     while True:
-#                         result = pipe.recv()
-#                         if s == "":
-#                             break
-#
-#         except StopIteration:
-#             for pipe, worker in zip(pipes, workers):
-#                 pipe.send("stop")
-#             break
-#     for worker in workers:
-#         worker.join()
+from multiprocessing import Process, Pipe, Queue, get_logger, log_to_stderr
 
-# def multythread_server(commnad, meta_factory : Generator, input_queue: Queue, output_queue: Queue, n_workers = None):
-#     workers = []
-#     for i in range(n_workers):
-#         meta = next(meta_factory)
-#         worker = Process(target=start_server_in_thread, args=(commnad, meta, input_queue, output_queue))
-#         worker.start()
-#         workers.append(worker)
-#     return workers
+@dataclass
+class MessageParameters:
+    name : str
+    type : str
 
-def start_server_in_thread(command, meta, input_queue: Queue, output_queue: Queue):
-    with Geant4Server(command, meta) as server:
+
+def server_run(meta_factory : Generator, values_macros: dict, parameters: MessageParameters, n_workers = None):
+    if n_workers is None: n_workers = os.cpu_count()
+    # logger = log_to_stderr(logging.INFO)
+    input_queue = Queue(maxsize=2*n_workers)
+    output_queue = Queue(maxsize=2*n_workers)
+    requester = Process(target=generate_request, args=(n_workers, values_macros, input_queue))
+    requester.start()
+    workers = multythread_server(meta_factory, input_queue, output_queue, n_workers)
+
+    processor = Process(target=process_message, args=(n_workers, output_queue, parameters))
+    processor.start()
+    # input_queue.join_thread()
+    # requester.join()
+    # processor.join()
+    return 0
+
+
+
+def generate_request(n_workers, values_macros: dict, input_queue: Queue):
+    # logger = log_to_stderr(logging.INFO)
+    for indx, data in enumerate(request_generator(values_macros, [0.0, 0.0, 0.1])):
+        input_queue.put(data)
+        # logger.info("Put request number {}".format(indx))
+
+    for i in range(n_workers):
+        input_queue.put("END")
+        # logger.info("Put END number {}".format(i))
+    # input_queue.close()
+    return 0
+
+
+def process_message(n_workers, output_queue: Queue, parameters: MessageParameters):
+    count = 0
+    # logger = log_to_stderr(logging.INFO)
+    # logger.info("Start process")
+    if parameters.type == "mean":
+        run = MeanRun()
+    with MeanTable(parameters.name) as mean_table:
         while True:
-            text = input_queue.get()
+            message = output_queue.get()
+            if message == "END":
+                count += 1
+                # logger.info("Get END number {}".format(count))
+                if count == n_workers:
+                    break
+                continue
+            run.ParseFromString(message.data)
+            mean_table.append_from_mean_run(run, message.meta)
+    # output_queue.close()
+    # output_queue.join_thread()
+    return 0
+
+
+def multythread_server(meta_factory : Generator, input_queue: Queue, output_queue: Queue, n_workers):
+    workers = []
+
+    for i in range(n_workers):
+        meta = next(meta_factory)
+        worker = Process(target=start_server_in_thread, args=(meta, input_queue, output_queue))
+        worker.start()
+        workers.append(worker)
+    return workers
+
+
+def start_server_in_thread(meta, input_queue: Queue, output_queue: Queue):
+    # logger = log_to_stderr(logging.INFO)
+    # logger.info("Start worker")
+    with Geant4Server(meta) as server:
+        for input_data in iter(input_queue.get, "END"):
+            text = input_data.data
+            # logger.info(input_data)
+            meta = input_data.meta
             data = server.send(text)
-            output_queue.put(data)
-            input_queue.task_done()
+            output_queue.put(QueueData(meta, data))
+    output_queue.put("END")
     return 0
 
 
