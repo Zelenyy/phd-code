@@ -22,6 +22,7 @@ public:
 
 private:
     double cut = 0.05*MeV;
+    bool only_muon = false;
 };
 
 

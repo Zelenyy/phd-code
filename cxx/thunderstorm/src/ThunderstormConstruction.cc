@@ -99,18 +99,21 @@ G4VPhysicalVolume *AragatsConstruction::Construct() {
     double h_high = settings->aragatsSettings->high_boundary;
     auto air_no_field = createAirForHeight(h_obs_lvl + (h_low - h_obs_lvl) / 2);
 
-    auto noFieldSolid = getCylinder("noField", radius, h_low - h_obs_lvl);
-    auto detectorSolid = getCylinder("detector", radius, 10 * meter);
-    detectorLogic = new G4LogicalVolume(detectorSolid, air_obs_lvl, "detector");
-    auto noFieldLogic = new G4LogicalVolume(noFieldSolid, air_no_field, "noField");
     double cloud_size = (h_high - h_low) / 2;
     double no_field_position = -(h_low - h_obs_lvl) / 2 - cloud_size;
+
+    if (h_low - h_obs_lvl > 0.0){
+        auto noFieldSolid = getCylinder("noField", radius, h_low - h_obs_lvl);
+        auto noFieldLogic = new G4LogicalVolume(noFieldSolid, air_no_field, "noField");
+        auto nofieldPhys = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, no_field_position), noFieldLogic, "noField",
+                                             logicWorld, false, 0, checkOverlaps);
+    }
+
+    auto detectorSolid = getCylinder("detector", radius, 10 * meter);
+    detectorLogic = new G4LogicalVolume(detectorSolid, air_obs_lvl, "detector");
     double detector_position = -5.0 * meter - (h_low - h_obs_lvl) / 2 + no_field_position;
     auto detectorPhys = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, detector_position), detectorLogic, "detector",
                                           logicWorld, false, 0, checkOverlaps);
-    auto nofieldPhys = new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, no_field_position), noFieldLogic, "noField",
-                                         logicWorld, false, 0, checkOverlaps);
-
     return world;
 }
 

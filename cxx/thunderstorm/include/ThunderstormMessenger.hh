@@ -58,6 +58,20 @@ private:
     G4UIcmdWithAString* aragats_geo_type;
     string aragats_geo_type_path = aragats_path + "geo_type";
 
+    G4UIcmdWithABool* aragats_only_muon;
+    string aragats_only_muon_path = aragats_path + "only_muon";
+
+    G4UIdirectory * aragats_pie;
+    string aragats_pie_path = aragats_path + "pie/";
+
+    G4UIcmdWithADoubleAndUnit * pie_low;
+    string pie_low_path = aragats_pie_path + "low";
+
+    G4UIcmdWithADoubleAndUnit * pie_high;
+    string pie_high_path = aragats_pie_path + "high";
+
+    G4UIcmdWithADoubleAndUnit * pie_obs_lvl;
+    string pie_obs_lvl_path = aragats_pie_path + "observed";
 
 
 

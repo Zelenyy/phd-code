@@ -28,9 +28,9 @@ void ActionInitialization::Build() const {
         settings->particlePredictor = new ParticlePredictor;
         SetUserAction(new Dwyer2003StackingAction(settings));
         logger->print("Using stacking  action: dwyer2003");
-    } else if (settings->stacking == "simple") {
+    } else if (settings->stacking == "default") {
         SetUserAction(new SimpleCutStackingAction(settings));
-        logger->print("Using stacking  action: simple");
+        logger->print("Using stacking  action: default simple");
     } else if (settings->stacking == "particle_cylinder") {
         SetUserAction(new ParticleCylinderStacking(settings));
         logger->print("Using stacking  action: particle_cylinder");

@@ -44,10 +44,20 @@ void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue)
         } else if (newValue == "pie") {
             settings->aragatsSettings->aragatsGeoType = AragatsGeoType::pie;
         }
-    } else {
-        ServerMessenger::SetNewValue(command, newValue);
+    } else if (command == aragats_only_muon) {
+        settings->aragatsSettings->only_muon = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    } else if (command == pie_low) {
+        settings->aragatsSettings->low_boundary = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    } else if (command == pie_high) {
+        settings->aragatsSettings->high_boundary = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    } else if (command == pie_obs_lvl) {
+        settings->aragatsSettings->observed_level = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
     }
-}
+    else {
+            ServerMessenger::SetNewValue(command, newValue);
+        }
+    }
+
 
 ThunderstormMessenger::ThunderstormMessenger(Settings *pSettings) : ServerMessenger(pSettings), settings(pSettings) {
 
@@ -102,4 +112,19 @@ ThunderstormMessenger::ThunderstormMessenger(Settings *pSettings) : ServerMessen
     aragats_geo_type->SetParameterName("type", false);
     aragats_geo_type->SetCandidates("uniform pie");
 
+    aragats_only_muon = new G4UIcmdWithABool(aragats_only_muon_path.c_str(), this);
+    aragats_only_muon->SetParameterName("flag", false);
+
+    aragats_pie = new G4UIdirectory(aragats_pie_path.c_str());
+    pie_high = new G4UIcmdWithADoubleAndUnit(pie_high_path.c_str(), this);
+    pie_high->SetParameterName("high_boundary", false);
+    pie_high->SetDefaultUnit("m");
+
+    pie_low = new G4UIcmdWithADoubleAndUnit(pie_low_path.c_str(), this);
+    pie_low->SetParameterName("low_boundary", false);
+    pie_low->SetDefaultUnit("m");
+
+    pie_obs_lvl = new G4UIcmdWithADoubleAndUnit(pie_obs_lvl_path.c_str(), this);
+    pie_obs_lvl->SetParameterName("observed_level", false);
+    pie_obs_lvl->SetDefaultUnit("m");
 }

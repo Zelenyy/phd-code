@@ -22,3 +22,4 @@ void SteppingAction::EnergyCut(const G4Step *step) {
         step->GetTrack()->SetTrackStatus(fStopAndKill);
     }
 }
+

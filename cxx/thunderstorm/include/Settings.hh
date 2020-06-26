@@ -34,6 +34,8 @@ public:
     double observed_level = 3200 * meter;
     double pie_step = 50 * meter;
     AragatsGeoType aragatsGeoType = AragatsGeoType::uniform;
+
+    bool only_muon = false;
 };
 
 

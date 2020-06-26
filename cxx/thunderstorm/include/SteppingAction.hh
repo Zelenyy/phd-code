@@ -19,6 +19,7 @@ private:
     bool energyCut = true;
     double energy_cut = 0.05*MeV;
     void EnergyCut(const G4Step *step);
+
 };
 
 
