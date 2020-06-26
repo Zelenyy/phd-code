@@ -41,7 +41,7 @@ def main():
     'energy' : np.logspace(-1, 3, 100, endpoint=True),
     'posZ' : [499.5],
     'direction' : ['0 0 -1'],
-    'particle' : 'e-',
+    'particle' : 'mu-',
     'field_z' : [200.0, 0.0],
                   }
     meta = Meta(values_macros)

@@ -9,7 +9,7 @@
 /npm/thunderstorm/aragats/pie/low 3325 m
 /npm/thunderstorm/aragats/pie/high 4225 m
 
-/gps/particle mu-
+/gps/particle mu+
 /gps/position 0.0 0.0 499.5 meter
 /gps/direction 0 0 -1
 /gps/ene/mono 1 GeV
