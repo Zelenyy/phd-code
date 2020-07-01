@@ -161,10 +161,7 @@ private:
 
 };
 
-class Histogramm3D{
-public:
-private:
-    vector<int> data;
+class Histogramm3D : IHistrogramm{
 public:
     Bins* fXbins;
     Bins* fYbins;
@@ -195,6 +192,46 @@ public:
 private:
     void add(int i, int j, int k){
         long indx = i*fYbins->size()*fZbins->size() + j*fZbins->size() + k;
+        data[indx]++;
+    }
+
+};
+
+
+class Histogramm4D : public IHistrogramm{
+public:
+    Bins* fXbins;
+    Bins* fYbins;
+    Bins* fZbins;
+    Bins* fTbins;
+    Histogramm4D(
+            Bins* xbins,
+            Bins* ybins,
+            Bins* zbins,
+            Bins* tbins
+    ): fXbins(xbins), fYbins(ybins), fZbins(zbins), fTbins(tbins) {
+        long size = xbins->size()*ybins->size()*zbins->size()*tbins->size();
+        data.reserve(size);
+        for (long i =0; i<size; i++){
+            data.push_back(0);
+        }
+    }
+
+    void add(double x, double y, double z, double t){
+        int i = fXbins->countIndx(x);
+        int j = fYbins->countIndx(y);
+        int k = fZbins->countIndx(z);
+        int l = fTbins->countIndx(t);
+        if ((i<0) || (j<0) || (k<0) || (t<0)){
+            return;
+        }
+        add(i, j, k, l);
+    }
+
+
+private:
+    void add(int i, int j, int k, int l){
+        long indx = i*fYbins->size()*fZbins->size()*fTbins->size() + j*fZbins->size()*fTbins->size() + k*fTbins->size() + l;
         data[indx]++;
     }
 

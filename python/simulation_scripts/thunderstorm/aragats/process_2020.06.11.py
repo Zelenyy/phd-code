@@ -52,6 +52,25 @@ def convert():
                 hist_table.flush()
     return 0
 
+def process():
+    with tables.open_file("hist_220_expacs.hd5") as fin:
+        hist_table = fin.get_node("/", "histogram")
+        data = hist_table.read()
+        print(np.sort(data["energy"]))
+
+
+import argparse
+def main():
+    parser = argparse.ArgumentParser(description='Process aragats EXAPCS.')
+    parser.add_argument('--convert', action='store_true')
+    parser.add_argument('--process', action='store_true')
+
+    args = parser.parse_args()
+
+    if args.convert:
+        convert()
+    elif args.process:
+        process()
 
 if __name__ == '__main__':
-    convert()
+    main()

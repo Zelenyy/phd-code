@@ -104,11 +104,22 @@ public:
         saveProtoChunk("particle_detector", particleDetectorList);
     }
 
+
+    // Concentration
+    histogram::Histogram4D* histogram4D;
+    void initConcentration(){
+        histogram4D = new histogram::Histogram4D();
+    }
+
+    void saveConcentration(){
+        saveProtoChunk("concentration", histogram4D);
+    }
+
     void EndEvent(){
         saveDwyer2003StackingAction();
         saveTreeTracking();
         saveParticleDetector();
-
+        saveConcentration();
     }
 
 private:

@@ -20,3 +20,12 @@ message MetaPair{
     string key = 1;
     string value =2;
 }
+
+message Histogram4D{
+    repeated int32 data = 1 [packed=true];
+    Bins xbins = 2;
+    Bins ybins = 3;
+    Bins zbins = 4;
+    Bins tbins = 5;
+    repeated MetaPair meta = 6;
+}
