@@ -88,6 +88,8 @@ G4VPhysicalVolume *AragatsConstruction::Construct() {
         cloudLogic = CreateUniformCloud();
     } else if (settings->aragatsSettings->aragatsGeoType == AragatsGeoType::pie) {
         cloudLogic = CreateAirPie();
+    } else if (settings->aragatsSettings->aragatsGeoType == AragatsGeoType::CORSIKA_USSA){
+
     }
 
     auto cloudPhys = new G4PVPlacement(0, G4ThreeVector(), cloudLogic, "cloud", logicWorld, false, 0, checkOverlaps);
@@ -143,4 +145,92 @@ void AragatsConstruction::ConstructSDandField() {
     );
     auto fChordFinder = new G4ChordFinder(integrationDriver);
     fieldManager->SetChordFinder(fChordFinder);
+}
+
+G4LogicalVolume *AragatsConstruction::CreateAirPie() {
+    double start = settings->aragatsSettings->low_boundary;
+    double end = settings->aragatsSettings->high_boundary;
+    double step = settings->aragatsSettings->pie_step;
+    double positionShift = -1 * (start + end) / 2;
+    double height;
+    double thinkness, halfThinkness;
+    G4Material *mat;
+    G4Tubs *cellSolid;
+    G4LogicalVolume *cellLogic;
+    G4VPhysicalVolume *cell;
+    G4ThreeVector position;
+    string name;
+
+    auto cloudSolid = getCylinder("cloud_pie", settings->geometrySettings->radius, end-start);
+    auto cloudLogic = new G4LogicalVolume(cloudSolid, vacuum, "cloud_pie");
+
+    int indx = 0;
+    for (double i = start; i < end; i += step) {
+        if (i + step <= end) {
+            height = i + step / 2;
+            thinkness = step;
+
+        } else {
+            height = i + (end - i) / 2;
+            thinkness = (end - i);
+        }
+        mat = createAirForHeight(height);
+        name = "cell_" + to_string((int) ceil(height / meter));
+        cellSolid = getCylinder(name, settings->geometrySettings->radius, thinkness);
+        position = G4ThreeVector(0, 0, height + positionShift);
+        cellLogic = new G4LogicalVolume(cellSolid, mat, name);
+        cell = new G4PVPlacement(0, position, cellLogic, name, cloudLogic, false, indx);
+        indx++;
+    }
+
+    return cloudLogic;
+}
+
+G4LogicalVolume *AragatsConstruction::CreateUniformCloud() {
+    auto aragats_air_mean = createAirForHeight(settings->geometrySettings->height);
+    double start = settings->aragatsSettings->low_boundary;
+    double end = settings->aragatsSettings->high_boundary;
+    auto cloudSolid = getCylinder("cloud", settings->geometrySettings->radius, end-start);
+
+    auto cloudLogic = new G4LogicalVolume(cloudSolid, aragats_air_mean, "cloud");
+    return cloudLogic;
+}
+
+G4LogicalVolume *AragatsConstruction::CreateCORSIKA() {
+    double start = settings->aragatsSettings->low_boundary;
+    double end = settings->aragatsSettings->high_boundary;
+    double step = settings->aragatsSettings->pie_step;
+    double positionShift = -1 * (start + end) / 2;
+    double height;
+    double thinkness, halfThinkness;
+    G4Material *mat;
+    G4Tubs *cellSolid;
+    G4LogicalVolume *cellLogic;
+    G4VPhysicalVolume *cell;
+    G4ThreeVector position;
+    string name;
+
+    auto cloudSolid = getCylinder("cloud_pie", settings->geometrySettings->radius, end-start);
+    auto cloudLogic = new G4LogicalVolume(cloudSolid, vacuum, "cloud_pie");
+
+    int indx = 0;
+    for (double i = start; i < end; i += step) {
+        if (i + step <= end) {
+            height = i + step / 2;
+            thinkness = step;
+
+        } else {
+            height = i + (end - i) / 2;
+            thinkness = (end - i);
+        }
+        mat = createAirForHeight(height);
+        name = "cell_" + to_string((int) ceil(height / meter));
+        cellSolid = getCylinder(name, settings->geometrySettings->radius, thinkness);
+        position = G4ThreeVector(0, 0, height + positionShift);
+        cellLogic = new G4LogicalVolume(cellSolid, mat, name);
+        cell = new G4PVPlacement(0, position, cellLogic, name, cloudLogic, false, indx);
+        indx++;
+    }
+
+    return cloudLogic;
 }

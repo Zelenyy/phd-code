@@ -24,7 +24,8 @@ struct GeometrySettings {
 
 enum class AragatsGeoType {
     uniform,
-    pie
+    pie,
+    CORSIKA_USSA
 };
 
 class AragatsSettings {
