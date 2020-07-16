@@ -70,6 +70,11 @@ public:
         geo_type->SetParameterName("type", false);
         geo_type->SetCandidates("gdml custom");
 
+        generator = new G4UIdirectory(gen_path.c_str());
+        gen_type = new G4UIcmdWithAString(gen_type_path.c_str(), this);
+        gen_type->SetParameterName("type", false);
+        gen_type->SetCandidates("gps custom");
+
         visualization = new G4UIcmdWithABool(visualization_path.c_str(), this);
         visualization->SetParameterName("flag", false);
 
@@ -98,7 +103,15 @@ public:
             else if (newValue == "custom"){
                 serverSettings->geometry = GeometryType::custom;
             }
-        } else if (command == visualization){
+        } else if (command == gen_type){
+            if (newValue == "gps"){
+                serverSettings->generator = PrimaryGeneratorType::gps;
+            }
+            else if (newValue == "custom"){
+                serverSettings->generator = PrimaryGeneratorType::custom;
+            }
+        }
+        else if (command == visualization){
             serverSettings->visualization = G4UIcmdWithABool::GetNewBoolValue(newValue);
         }
         else {
@@ -123,6 +136,12 @@ protected:
 
     G4UIcmdWithABool * visualization;
     std::string visualization_path = root_path + "visualization";
+
+    G4UIdirectory *generator;
+    std::string gen_path = root_path + "generator/";
+
+    G4UIcmdWithAString *gen_type;
+    std::string gen_type_path = gen_path + "type";
 
 
 

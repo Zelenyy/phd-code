@@ -11,6 +11,7 @@
 #include "G4UImessenger.hh"
 #include "PhysicsList.hh"
 #include "Settings.hh"
+#include "G4UIcmdWith3VectorAndUnit.hh"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ public:
 
     void SetNewValue(G4UIcommand *command, G4String newValue) override;
 private:
+    G4ParticleTable* particleTable;
     Settings* settings;
     G4UIdirectory * thundestorm;
     G4UIcmdWithAString * physics;
@@ -46,6 +48,9 @@ private:
     string add_particle_detector_path = thunderstorm_path + "addParticleInPD";
 
 private:
+    G4UIcmdWithAString* thunderstorm_gen_type;
+    string thunderstorm_gen_type_path = thunderstorm_path + "geo_type";
+
     G4UIcmdWithADoubleAndUnit * geo_height;
     string geo_height_path = thunderstorm_path + "height";
 
@@ -73,8 +78,14 @@ private:
     G4UIcmdWithADoubleAndUnit * pie_obs_lvl;
     string pie_obs_lvl_path = aragats_pie_path + "observed";
 
+    G4UIdirectory * parma;
+    string parma_path = thunderstorm_path + "parma/";
 
+    G4UIcmdWithAString* parma_particle;
+    string parma_particle_path = parma_path + "particle";
 
+    G4UIcmdWith3VectorAndUnit* parma_position;
+    string parma_position_path = parma_path + "position";
 
 };
 

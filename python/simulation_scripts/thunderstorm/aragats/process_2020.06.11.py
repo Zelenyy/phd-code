@@ -5,6 +5,12 @@ import numpy as np
 bins_1 = np.arange(0.05, 1.01, 0.05)
 bins_2 = np.arange(1, 202, 2)
 
+TOTAL_FLUX = 0.0301143 # /cm2/s
+
+EXPACS = np.array([1646,  909,  601,  459,  372,  341,  267,  246,  203,  210,  171,
+        145,  122,  109,  104,   89,   81,   77,  127,   99,   95,   73,
+         62,   82,  121,  243,   67,  111,   81,   71,  125,  184])
+
 
 def get_values(data):
     values_low, _ = np.histogram(data, bins=bins_1)
@@ -82,10 +88,30 @@ def add_1mev():
         hist_table.flush()
 
 def process():
+
+    def count_total_hist(data, hist, bins):
+        hist = data[hist]
+        bins = data[bins]
+        number = data["number"]
+        total_hist = np.zeros(hist[0].size)
+        for i in range(EXPACS.size):
+            total_hist += EXPACS[i]*hist/number
+        total_hist *= TOTAL_FLUX
+        total_hist /= np.diff(bins)
+        return total_hist
+
     with tables.open_file("hist_220_expacs.hd5") as fin:
         hist_table = fin.get_node("/", "histogram")
         data = hist_table.read()
-        print(np.sort(data["energy"]))
+        data.sort(order="energy")
+
+        th_elow = count_total_hist(data, "electron_hist_low", "bins_low")
+        th_ehigh = count_total_hist(data, "electron_hist_high", "bins_high")
+        th_glow = count_total_hist(data, "gamma_hist_low", "bins_low")
+        th_ehigh = count_total_hist(data, "gamma_hist_high", "bins_high")
+
+        # np.save("elow", th_elow)
+        # np.save("ehigh")
 
 
 import argparse

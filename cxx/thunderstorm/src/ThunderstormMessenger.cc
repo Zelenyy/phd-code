@@ -52,6 +52,12 @@ void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue)
         settings->aragatsSettings->high_boundary = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
     } else if (command == pie_obs_lvl) {
         settings->aragatsSettings->observed_level = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    } else if (command == parma_particle){
+//        particleTable = G4ParticleTable::GetParticleTable();
+//        G4ParticleDefinition* pd = particleTable->FindParticle(newValue);
+        settings->parmaSettings->particle->set(newValue);
+    } else if (command == parma_position){
+        settings->parmaSettings->position = G4UIcmdWith3VectorAndUnit::GetNew3VectorValue(newValue);
     }
     else {
             ServerMessenger::SetNewValue(command, newValue);
@@ -127,4 +133,26 @@ ThunderstormMessenger::ThunderstormMessenger(Settings *pSettings) : ServerMessen
     pie_obs_lvl = new G4UIcmdWithADoubleAndUnit(pie_obs_lvl_path.c_str(), this);
     pie_obs_lvl->SetParameterName("observed_level", false);
     pie_obs_lvl->SetDefaultUnit("m");
+
+
+    parma = new G4UIdirectory(parma_path.c_str());
+
+    parma_particle = new G4UIcmdWithAString(parma_particle_path.c_str(), this);
+    parma_particle->SetParameterName("particleName",true);
+    parma_particle->SetDefaultValue("mu-");
+    G4String candidateList = "mu- mu+";
+//    G4int nPtcl = particleTable->entries();
+//    for(G4int i=0;i<nPtcl;i++)
+//    {
+//        candidateList += particleTable->GetParticleName(i);
+//        candidateList += " ";
+//    }
+    parma_particle->SetCandidates(candidateList);
+
+    parma_position = new G4UIcmdWith3VectorAndUnit(parma_position_path.c_str(),this);
+    parma_position->SetGuidance("Set starting position of the particle.");
+    parma_position->SetParameterName("X","Y","Z",true,true);
+    parma_position->SetDefaultUnit("cm");
+    parma_position->SetUnitCandidates("micron mm cm m km");
+
 }

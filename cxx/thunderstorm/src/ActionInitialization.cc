@@ -13,8 +13,14 @@
 using namespace std;
 
 void ActionInitialization::Build() const {
-//    GeneralParticleSource *generalParticleSource = new GeneralParticleSource();
-//    SetUserAction(generalParticleSource);
+    if (settings->generator == PrimaryGeneratorType::gps){
+        GeneralParticleSource *generalParticleSource = new GeneralParticleSource();
+        SetUserAction(generalParticleSource);
+    } else if (settings->pgSubType == ThunderstomPGSubType::parma){
+        auto generator = new PARMAPrimaryGenerator(settings);
+        SetUserAction(generator);
+    }
+
 
     auto logger = Logger::instance();
 

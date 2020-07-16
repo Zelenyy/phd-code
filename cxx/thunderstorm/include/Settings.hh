@@ -9,8 +9,10 @@
 #include <G4Server.hh>
 #include "G4SystemOfUnits.hh"
 #include "ParticlePredictor.hh"
-
+#include "G4MuonMinus.hh"
+#include "ParticleField.hh"
 using namespace std;
+
 
 enum class ThunderstormSubType {
     aragats
@@ -28,6 +30,20 @@ enum class AragatsGeoType {
     CORSIKA_USSA
 };
 
+enum class ThunderstomPGSubType{
+    parma
+};
+
+class ParmaSettings{
+public:
+//    G4String particle = "mu-";
+    ParticleField* particle = new ParticleField("mu-");
+    G4ThreeVector position = G4ThreeVector();
+};
+
+
+
+
 class AragatsSettings {
 public:
     double high_boundary = 4250 * meter;
@@ -42,6 +58,7 @@ public:
 
 class Settings : public ServerSettings {
 public:
+    ThunderstomPGSubType pgSubType = ThunderstomPGSubType::parma;
     ThunderstormSubType geoSubType = ThunderstormSubType::aragats;
     string physics = "default";
     string stacking = "default";
@@ -52,7 +69,7 @@ public:
     vector<string> particle_detector;
 
     GeometrySettings *geometrySettings = new GeometrySettings;
-
+    ParmaSettings* parmaSettings = new ParmaSettings;
     //SteppingAction
     bool stepping_energy_cut = true;
     ParticlePredictor *particlePredictor;
