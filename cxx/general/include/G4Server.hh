@@ -13,6 +13,7 @@
 #include <random>
 #include <G4UImanager.hh>
 #include "DetectorConstruction.hh"
+#include "ServerSettings.hh"
 #include <G4VisManager.hh>
 #include <G4VisExecutive.hh>
 #include <G4UImanager.hh>
@@ -23,30 +24,6 @@ enum class ReadStatus {
     exit
 };
 
-enum class GeometryType {
-    gdml,
-    custom
-};
-
-enum class PrimaryGeneratorType {
-    gps,
-    custom
-};
-
-
-
-class ServerSettings {
-public:
-    GeometryType geometry = GeometryType::gdml;
-    std::string gdml = "default.gdml";
-    PrimaryGeneratorType generator = PrimaryGeneratorType::gps;
-    long seed = -1;
-    int numberOfAdditionalWaitingStacks = 4;
-    int lengthOfCommand = 1000;
-    bool visualization = false;
-    int argc = 0;
-    char** argv;
-};
 
 class ServerMessenger : public G4UImessenger {
 public:
@@ -182,11 +159,7 @@ public:
             massWorld = new DetectorConstruction(serverSettings->gdml);
             runManager->SetUserInitialization(massWorld);
         }
-
-
         runManager->SetNumberOfAdditionalWaitingStacks(serverSettings->numberOfAdditionalWaitingStacks);
-
-
     }
 
     void mainloop(istream &input) {

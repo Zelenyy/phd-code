@@ -12,7 +12,7 @@
 #include "DataFile.hh"
 #include "FileUtils.hh"
 #include "SocketOutput.hh"
-
+#include "ProtoWrapper.hh"
 
 using namespace std;
 
@@ -23,6 +23,37 @@ public:
         static DataFileManager dataFileManager;
         return &dataFileManager;
     }
+
+    void registerDataContainer(string name , DataContainer* container){
+        if (dataContainerMap.find(name) == dataContainerMap.end()) {
+            dataContainerMap[name] = container;
+        }
+    }
+
+    virtual void initializeRun(){
+        for (auto &it :dataContainerMap) {
+            auto fout = getBinaryFile(it.first);
+            it.second->initializeRun(fout);
+        }
+    };
+    virtual void initializeEvent(int eventID){
+        for (auto &it :dataContainerMap) {
+            it.second->initializeEvent(eventID);
+        }
+    };
+    void finishEvent(){
+        for (auto &it :dataContainerMap) {
+            it.second->finishEvent();
+        }
+    };
+    void finishRun(){
+        for (auto &it :dataContainerMap) {
+            auto fout = getBinaryFile(it.first);
+            it.second->finishRun();
+            fout->close();
+            binaryFileMap.erase(it.first);
+        }
+    };
 
     template<class Data>
     DataFile<Data> *getDataFile(const string &name) {
@@ -55,6 +86,9 @@ public:
 
 
     ~DataFileManager() {
+        for (auto &it :dataContainerMap) {
+            delete it.second;
+        }
         for (auto &it : dataFileMap) {
             delete it.second;
         }
@@ -69,9 +103,11 @@ public:
         }
     };
 private:
+    map<string, DataContainer* > dataContainerMap;
     map<string, IDataFile *> dataFileMap;
     map<string, ofstream *> textFileMap;
     map<string, ofstream *> binaryFileMap;
+
 
     DataFileManager() = default;
 

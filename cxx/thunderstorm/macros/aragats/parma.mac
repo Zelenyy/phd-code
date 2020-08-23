@@ -8,9 +8,9 @@
 /npm/thunderstorm/energy/cut 0.01
 /npm/thunderstorm/aragats/only_muon true
 /npm/thunderstorm/aragats/pie/low 3225 m
-/npm/thunderstorm/aragats/pie/high 4225 m
-
+/npm/thunderstorm/aragats/pie/high 4725 m
 /npm/thunderstorm/parma/particle mu+
-/npm/thunderstorm/parma/position 0 0 500 m
+
+/npm/thunderstorm/parma/position 0 0 750 m
 /run/beamOn 1
 exit

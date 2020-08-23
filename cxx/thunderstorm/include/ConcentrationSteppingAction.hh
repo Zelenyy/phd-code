@@ -13,7 +13,6 @@ public:
     void UserSteppingAction(const G4Step *step) override;
 
 private:
-    DataThunderstorm *data;
 };
 
 

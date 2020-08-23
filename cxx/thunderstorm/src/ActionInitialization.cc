@@ -2,13 +2,15 @@
 #include <OneGenerationStackingAction.hh>
 #include <Logger.hh>
 #include <Dwyer2003StackingAction.hh>
-#include <SimpleCutStackingAction.hh>
+#include <StackingAction.hh>
 #include <ParticleCylinderStacking.hh>
 #include <TreeSocketSteppingAction.hh>
 #include <TreeTrackingAction.hh>
 #include <SteppingAction.hh>
 #include "ActionInitialization.hh"
 #include "GeneralParticleSource.hh"
+#include "ServerSettings.hh"
+#include "RunAction.hh"
 
 using namespace std;
 
@@ -21,9 +23,9 @@ void ActionInitialization::Build() const {
         SetUserAction(generator);
     }
 
-
     auto logger = Logger::instance();
-
+    auto runAction = new RunAction(settings);
+    SetUserAction(runAction);
     auto eventAction = new EventAction(settings);
     SetUserAction(eventAction);
 
@@ -35,7 +37,7 @@ void ActionInitialization::Build() const {
         SetUserAction(new Dwyer2003StackingAction(settings));
         logger->print("Using stacking  action: dwyer2003");
     } else if (settings->stacking == "default") {
-        SetUserAction(new SimpleCutStackingAction(settings));
+        SetUserAction(new StackingAction(settings));
         logger->print("Using stacking  action: default simple");
     } else if (settings->stacking == "particle_cylinder") {
         SetUserAction(new ParticleCylinderStacking(settings));

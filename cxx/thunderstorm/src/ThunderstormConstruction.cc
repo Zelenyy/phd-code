@@ -16,7 +16,7 @@
 G4VPhysicalVolume *ThunderstormConstruction::constuctWorld() {
 
     G4double world_radius = 4.5 * kilometer;
-    G4double world_sizeZ = 1.5 * kilometer;
+    G4double world_sizeZ = 4.5 * kilometer;
 
     G4VSolid *solidWorld =
             getCylinder("World",

@@ -10,10 +10,12 @@
 void EventAction::BeginOfEventAction(const G4Event *anEvent) {
     cout << "\033[A\033[2K\r"; // Magic sequence for clear last line
     cout << "Start event: " << anEvent->GetEventID();
+    dataFileManager->initializeEvent(anEvent->GetEventID());
     G4UserEventAction::BeginOfEventAction(anEvent);
 }
 
 void EventAction::EndOfEventAction(const G4Event *anEvent) {
+    dataFileManager->finishEvent();
     if ((anEvent->GetEventID() + 1) % 10 == 0) {
         Logger::instance()->print("End event number: " + to_string(anEvent->GetEventID()));
     }
@@ -26,8 +28,6 @@ void EventAction::EndOfEventAction(const G4Event *anEvent) {
         list->SerializeToOstream(fout);
         delete list;
     }
-
-    DataThunderstorm::instance()->EndEvent();
 
     G4UserEventAction::EndOfEventAction(anEvent);
 }

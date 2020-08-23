@@ -1,7 +1,4 @@
-#include <G4DFClient.hh>
 #include <SatelliteMessenger.hh>
-#include <G4VisManager.hh>
-#include <G4VisExecutive.hh>
 #include <G4UImanager.hh>
 #include <G4UIExecutive.hh>
 #include <QGSP_BERT.hh>

@@ -24,19 +24,16 @@ Dwyer2003StackingAction::Dwyer2003StackingAction(Settings *settings) {
     cut = settings->born_cut;
     Logger::instance()->print("One generation set cut: " + to_string(cut) + " MeV");
     fParticlePredictor = settings->particlePredictor;
-    dataThunderstorm = DataThunderstorm::instance();
-    dataThunderstorm->initDwyer2003StackingActionData();
-    gammaData = dataThunderstorm->gammaData;
-    positronData = dataThunderstorm->positronData;
+    dataFileManager = DataFileManager::instance();
+    gammaData = new CylinderId();
+    positronData = new CylinderId;
+    dataFileManager->registerDataContainer("gammaSeed", gammaData);
+    dataFileManager->registerDataContainer("positronSeed", positronData);
 //    temp = &DataFileManager::instance()->models;
 
 }
 
 G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Track * aTrack) {
-
-    if (positronData->cylinderid_size() > 100000 or gammaData->cylinderid_size() > 100000){
-        dataThunderstorm->saveDwyer2003StackingAction();
-    }
 
     if (aTrack->GetParentID() == 0){
         return fUrgent;
@@ -51,14 +48,12 @@ G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Tra
         if (position.getZ() > 0) {
             auto modelId = aTrack->GetCreatorModelID();
             if (modelId == 25 or modelId == 29 or modelId == 33) {
-                auto cylinderId = gammaData->add_cylinderid();
-                DataThunderstorm::fillCylinderId(cylinderId, aTrack);
+                gammaData->addTrack(aTrack);
                 return fKill;
             } else {
                 int indx = aTrack->GetParentID();
                 if (positronIndx.find(indx) != positronIndx.end()) {
-                    auto cylinderId = positronData->add_cylinderid();
-                    DataThunderstorm::fillCylinderId(cylinderId, aTrack);
+                    positronData->addTrack(aTrack);
                     return fKill;
                 }
             }
@@ -89,12 +84,6 @@ G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyNewTrack(const G4Tra
 void Dwyer2003StackingAction::PrepareNewEvent() {
     G4UserStackingAction::PrepareNewEvent();
         positronIndx.clear();
-        gammaData->Clear();
-        positronData->Clear();
-        eventId++;
-
-        gammaData->set_eventid(eventId);
-        positronData->set_eventid(eventId);
 }
 
 G4ClassificationOfNewTrack Dwyer2003StackingAction::ClassifyGamma(const G4Track *aTrack) {

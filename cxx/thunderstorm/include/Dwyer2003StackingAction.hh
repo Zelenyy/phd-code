@@ -32,12 +32,9 @@ private:
     G4ClassificationOfNewTrack ClassifyGamma(const G4Track *);
     ParticlePredictor* fParticlePredictor;
 
-    thunderstorm::CylinderIdList* gammaData;
-    thunderstorm::CylinderIdList* positronData;
-    int eventId = -1;
-
-    DataThunderstorm * dataThunderstorm;
-
+    CylinderId* gammaData;
+    CylinderId* positronData;
+    DataFileManager* dataFileManager;
 };
 
 

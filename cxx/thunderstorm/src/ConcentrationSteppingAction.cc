@@ -11,6 +11,4 @@ void ConcentrationSteppingAction::UserSteppingAction(const G4Step *step) {
 }
 
 ConcentrationSteppingAction::ConcentrationSteppingAction() {
-    data = DataThunderstorm::instance();
-    data->initConcentration();
 }

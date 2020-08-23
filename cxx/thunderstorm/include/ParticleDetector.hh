@@ -17,7 +17,8 @@ public:
     G4bool ProcessHits(G4Step *aStep, G4TouchableHistory *ROhist) override;
 
 private:
-    DataThunderstorm *dataThunderstorm;
+    DataFileManager *dataFileManager;
+    ParticleDetectorList* data;
     double cut = 0.05 * MeV;
 };
 

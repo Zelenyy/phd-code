@@ -5,12 +5,13 @@
 #ifndef PHD_CODE_SETTINGS_HH
 #define PHD_CODE_SETTINGS_HH
 
-#include <G4DFClient.hh>
 #include <G4Server.hh>
 #include "G4SystemOfUnits.hh"
 #include "ParticlePredictor.hh"
 #include "G4MuonMinus.hh"
 #include "ParticleField.hh"
+#include "ServerSettings.hh"
+
 using namespace std;
 
 
@@ -56,6 +57,12 @@ public:
 };
 
 
+struct StackingSettings{
+    bool disableGamma = true;
+    bool disablePositron = true;
+    bool disableMuon = true;
+};
+
 class Settings : public ServerSettings {
 public:
     ThunderstomPGSubType pgSubType = ThunderstomPGSubType::parma;
@@ -73,6 +80,8 @@ public:
     //SteppingAction
     bool stepping_energy_cut = true;
     ParticlePredictor *particlePredictor;
+
+    StackingSettings* stackingSettings = new StackingSettings;
 
     // Aragats
     AragatsSettings *aragatsSettings = new AragatsSettings;

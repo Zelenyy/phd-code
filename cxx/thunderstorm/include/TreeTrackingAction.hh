@@ -17,14 +17,14 @@ public:
     void PreUserTrackingAction(const G4Track *track) override;
 
     TreeTrackingAction(){
-        dataThunderstorm = DataThunderstorm::instance();
-        dataThunderstorm->initTreeTracking();
-        data = dataThunderstorm->treeTrackingData;
+        dataFileManager = DataFileManager::instance();
+        data = new CylinderId();
+        dataFileManager->registerDataContainer("treeTracking", data);
     }
 
 private:
-    DataThunderstorm *dataThunderstorm;
-    thunderstorm::CylinderIdList* data;
+    DataFileManager *dataFileManager;
+    CylinderId* data;
 };
 
 

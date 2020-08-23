@@ -9,11 +9,12 @@
 #include <G4UserEventAction.hh>
 #include "Settings.hh"
 #include <iostream>
+#include <DataFileManager.hh>
 
 class EventAction : public G4UserEventAction {
 public:
-    EventAction(Settings* settings){
-        fSettings = settings;
+    explicit EventAction(Settings* settings): G4UserEventAction(), fSettings(settings){
+        dataFileManager = DataFileManager::instance();
     };
 
     void BeginOfEventAction(const G4Event *anEvent) override;
@@ -21,6 +22,7 @@ public:
     void EndOfEventAction(const G4Event *anEvent) override;
 
 private:
+    DataFileManager* dataFileManager;
     Settings* fSettings;
 };
 

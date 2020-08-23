@@ -6,6 +6,7 @@
 #define PHD_CODE_SETTINGS_HH
 
 #include "G4SystemOfUnits.hh"
+#include "ServerSettings.hh"
 #include <G4Server.hh>
 
 using namespace std;

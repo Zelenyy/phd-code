@@ -1,4 +1,3 @@
-#include <G4DFClient.hh>
 #include <ThunderstormMessenger.hh>
 
 #include <ThunderstormConstruction.hh>
@@ -14,10 +13,6 @@
 #include "G4Server.hh"
 
 int main(int argc, char **argv) {
-
-    GeometryType type = GeometryType::gdml;
-    type = GeometryType ::gdml;
-
 
     auto logger = Logger::instance();
     logger->print("Number of arguments: " + to_string(argc));

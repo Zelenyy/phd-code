@@ -1,9 +1,6 @@
-#include <utility>
-
 //
 // Created by zelenyy on 16.07.2020.
 //
-
 #ifndef PHD_CODE_PARTICLEFIELD_HH
 #define PHD_CODE_PARTICLEFIELD_HH
 
@@ -30,6 +27,11 @@ public:
         }
         return field;
     }
+
+    R getBackField(){
+        return back_field;
+    }
+
     void set(R field){
         back_field = field;
         is_changed = true;
