@@ -14,8 +14,8 @@
         <constant value="normalPressure*exp(-1*M*gravityAccelerate*height/(R*temperature))" name="pressure"/>
         <constant value="pressure*M/(R*temperature)*1e-3" name="density"/>
         <quantity value="10000" name="worldWidth" unit="m"/>
-        <quantity value="6000" name="worldHeight" unit="m"/>
-        <quantity value="5000" name="cellHeight" unit="m"/>
+        <quantity value="2000" name="worldHeight" unit="m"/>
+        <quantity value="1000" name="cellHeight" unit="m"/>
         <quantity value="9000" name="cellWidth" unit="m"/>
         <quantity value="100" name="detectorThinckness" unit="mm"/>
         <position name="centerPos"/>

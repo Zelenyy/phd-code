@@ -15,13 +15,13 @@ import abc
 
 logger = logging.getLogger(__name__)
 
+
 def no_gdmL_input_generator(meta: Meta, macros_template: str):
     macros_template = Template(macros_template)
     for path, values in zip(
             dir_name_generator(".", "sim"),
             values_from_dict(meta)
     ):
-
         text = macros_template.substitute(values)
         data = InputData(
             text=text,
@@ -29,6 +29,7 @@ def no_gdmL_input_generator(meta: Meta, macros_template: str):
             values=Meta(values)
         )
         yield data
+
 
 def general_input_generator(meta: Meta, gdml_template_file: str, macros_template: str):
     macros_template = Template(macros_template)
@@ -40,13 +41,12 @@ def general_input_generator(meta: Meta, gdml_template_file: str, macros_template
             dir_name_generator(".", "sim"),
             values_from_dict(meta["macros"])
     ):
-
         text = macros_template.substitute(values)
         path_gdml = values["path"]
         indx = paths.index(path_gdml)
         input_data_meta = {
-            "macros" : values,
-            "gdml" : values_gdml[indx]
+            "macros": values,
+            "gdml": values_gdml[indx]
         }
         data = InputData(
             text=text,
@@ -61,7 +61,9 @@ class GdmlGenerator(abc.ABC):
     def generate(self, template_file):
         pass
 
-def input_generator_custom_gdml(meta: Meta, gdml_template_file: str, macros_template: str, gdml_generator : GdmlGenerator):
+
+def input_generator_custom_gdml(meta: Meta, gdml_template_file: str, macros_template: str,
+                                gdml_generator: GdmlGenerator):
     paths, values_gdml = gdml_generator.generate(gdml_template_file)
     paths = list(map(lambda x: os.path.join("..", x), paths))
     meta["macros"]["path"] = paths
@@ -83,6 +85,7 @@ def input_generator_custom_gdml(meta: Meta, gdml_template_file: str, macros_temp
             values=Meta(input_data_meta)
         )
         yield data
+
 
 def create_gdml(template_file, values: dict):
     values = values_from_dict(values)
@@ -106,7 +109,9 @@ def create_one_file(text, foutput, values: dict):
         fout.write(template.safe_substitute(values))
     return foutput
 
+
 from tqdm import tqdm
+
 
 def values_from_dict(values: dict):
     keys, product_ = meta_analysis(values)
@@ -162,27 +167,36 @@ def meta_analysis(values: dict):
     return keys, product_
 
 
-def dir_name_generator(path, prefix):
-    dirs = os.listdir(path)
-    n = len(prefix)
-    prefixDirs = []
-    numbers = []
-    for dir_ in dirs:
-        if dir_[:n] == prefix:
-            postfix = dir_[n:]
-            try:
-                number = int(postfix)
-                prefixDirs.append(dir_)
-                numbers.append(number)
-            except Exception:
-                pass
-    try:
-        max_ = max(numbers)
-    except Exception:
-        max_ = 0
+def dir_name_generator(path, prefix, start=0):
+    count = start
     while True:
-        max_ += 1
-        yield prefix + str(max_).rjust(4, '0')
+        name = prefix + str(count).rjust(4, '0')
+        if os.path.exists(name):
+            count += 1
+            continue
+        yield name
+        count += 1
+
+    # dirs = os.listdir(path)
+    # n = len(prefix)
+    # prefixDirs = []
+    # numbers = []
+    # for dir_ in dirs:
+    #     if dir_[:n] == prefix:
+    #         postfix = dir_[n:]
+    #         try:
+    #             number = int(postfix)
+    #             prefixDirs.append(dir_)
+    #             numbers.append(number)
+    #         except Exception:
+    #             pass
+    # try:
+    #     max_ = max(numbers)
+    # except Exception:
+    #     max_ = 0
+    # while True:
+    #     max_ += 1
+    #     yield prefix + str(max_).rjust(4, '0')
 
 
 def run_command(parameters):
@@ -262,10 +276,11 @@ def create_path(keys, dict_values):
 
 @dataclass
 class CinServerParameters:
-    command : str
+    command: str
+
 
 class G4CinServer:
-    def __init__(self, parameters : CinServerParameters):
+    def __init__(self, parameters: CinServerParameters):
         self.parameters = parameters
         self.is_start = False
 
@@ -279,14 +294,13 @@ class G4CinServer:
         command = self.parameters.command
         logger.info("Start cin server")
         self.process = subprocess.Popen(command, shell=True,
-                             # stdout=subprocess.PIPE,
-                             stdin=subprocess.PIPE,
-                             # stderr=subprocess.PIPE,
-                             encoding='utf-8'
-                             )
+                                        # stdout=subprocess.PIPE,
+                                        stdin=subprocess.PIPE,
+                                        # stderr=subprocess.PIPE,
+                                        encoding='utf-8'
+                                        )
         self._write(text)
         self.is_start = True
-
 
     def _write(self, text):
         self.process.stdin.write(text)

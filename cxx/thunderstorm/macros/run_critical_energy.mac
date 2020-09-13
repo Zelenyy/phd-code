@@ -15,5 +15,5 @@
 /gps/position 0.0 0.0 0.0 meter
 /gps/direction 0 0 -1
 /gps/ene/mono 0.05 MeV
-/run/beamOn 100
+/run/beamOn 2
 exit

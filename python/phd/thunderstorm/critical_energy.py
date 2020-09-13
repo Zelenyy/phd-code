@@ -121,5 +121,33 @@ class G4CinServerHandler(pyinotify.ProcessEvent):
 
 
 
+import star
+import numpy as np
+from phd.thunderstorm import atmosphere
+from scipy.optimize import root_scalar
 
+def get_critical_energy(height = 0, field = 0):
+    """
+
+    :param height: meters
+    :param field:kV/cm
+    :return:
+    """
+    material = star.electron.PredefinedMaterials.AIR_DRY_NEAR_SEA_LEVEL
+
+    density = atmosphere.ISACalculator.density(height)  # kg/m3
+
+    def critical_energy_equation(energy):
+        data = star.electron.calculate_stopping_power(material, np.asarray([energy]))
+        stopPower = data["stopping_power_total"][0]
+        return field - stopPower*density
+    try:
+        critical_energy_root = root_scalar(
+            critical_energy_equation,
+            bracket=(0.001, 2.0),
+                        )
+    except ValueError as err:
+        print(err)
+        return None
+    return critical_energy_root
 

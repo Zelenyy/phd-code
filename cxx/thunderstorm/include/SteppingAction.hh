@@ -37,9 +37,9 @@ public:
             initEnergy = step->GetTrack()->GetKineticEnergy();
             initEnergy -= step->GetDeltaEnergy();
         }
-//        cout<<step->GetTrack()->GetKineticEnergy()<<'\t'
-//            <<step->GetTotalEnergyDeposit()<<'\t'
-//            <<step->GetDeltaEnergy()<<endl;
+        cout<<step->GetTrack()->GetKineticEnergy()<<'\t'
+            <<step->GetTotalEnergyDeposit()<<'\t'
+            <<step->GetDeltaEnergy()<<endl;
         deltaEnergy += abs(step->GetDeltaEnergy());
         if (step->GetTrack()->GetKineticEnergy() > 3*initEnergy){
             step->GetTrack()->SetTrackStatus(fStopAndKill);
