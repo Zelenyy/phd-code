@@ -56,32 +56,50 @@ public:
     bool only_muon = false;
 };
 
+enum class StackingType{
+    simple
+};
 
 struct StackingSettings{
-    bool disableGamma = true;
-    bool disablePositron = true;
-    bool disableMuon = true;
+    StackingType type = StackingType::simple;
+    bool enableElectron = true;
+    bool enableGamma = false;
+    bool enablePositron = false;
+    bool enableMuon = false;
+
+    bool saveGamma = false;
+    bool saveElectron = false;
+    double saveElectronCut = 0.0;
+};
+
+enum class SteppingType{
+    simple,
+    critical_energy
+};
+
+struct SteppingSettings{
+    SteppingType type = SteppingType::simple;
 };
 
 class Settings : public ServerSettings {
 public:
+    double minimal_energy = 0.05 * MeV;
+
     ThunderstomPGSubType pgSubType = ThunderstomPGSubType::parma;
     ThunderstormSubType geoSubType = ThunderstormSubType::aragats;
     string physics = "default";
-    string stacking = "default";
-    string stepping = "default";
     string tracking = "default";
-    double born_cut = 0.05 * MeV;
+
     vector<string> particle_cylinder_stacking;
     vector<string> particle_detector;
 
     GeometrySettings *geometrySettings = new GeometrySettings;
     ParmaSettings* parmaSettings = new ParmaSettings;
     //SteppingAction
-    bool stepping_energy_cut = true;
     ParticlePredictor *particlePredictor;
 
     StackingSettings* stackingSettings = new StackingSettings;
+    SteppingSettings* steppingSettings = new SteppingSettings;
 
     // Aragats
     AragatsSettings *aragatsSettings = new AragatsSettings;

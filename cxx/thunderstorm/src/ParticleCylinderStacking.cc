@@ -5,7 +5,7 @@
 #include "ParticleCylinderStacking.hh"
 
 ParticleCylinderStacking::ParticleCylinderStacking(Settings *settings) : settings(settings) {
-    cut = settings->born_cut;
+    cut = settings->minimal_energy;
 
 //    number = DataManager::instance()->createNamedNumber("particle_cylinder_number");
 //    for (auto it : settings->particle_cylinder_stacking){

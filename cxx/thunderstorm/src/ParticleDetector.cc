@@ -19,7 +19,7 @@ G4bool ParticleDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *ROhist) 
 
 ParticleDetector::ParticleDetector(G4String name, Settings *settings) : G4VSensitiveDetector(name) {
     Logger::instance()->print("Create particle detector: " + name);
-    cut = settings->born_cut;
+    cut = settings->minimal_energy;
     dataFileManager = DataFileManager::instance();
     data = new ParticleDetectorList();
     dataFileManager->registerDataContainer("particle_detector", data);

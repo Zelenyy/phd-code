@@ -4,6 +4,7 @@
 #include <QGSP_BERT.hh>
 #include <G4Server.hh>
 #include "Settings.hh"
+#include "ServerSettings.hh"
 //Mandatory user option
 #include "ActionInitialization.hh"
 //Factory

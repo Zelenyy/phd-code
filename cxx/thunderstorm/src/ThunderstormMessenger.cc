@@ -7,29 +7,27 @@
 G4String ThunderstormMessenger::GetCurrentValue(G4UIcommand *command) {
     if (command == physics) {
         return settings->physics;
-    } else if (command == stacking) {
-        return settings->stacking;
-    } else if (command == stepping) {
-        return settings->stepping;
     } else if (command == tracking) {
         return settings->tracking;
-    } else if (command == energyCut) {
-        return to_string(settings->born_cut);
+    } else if (command == minimalEnergy) {
+        return to_string(settings->minimal_energy);
     }
     return ServerMessenger::GetCurrentValue(command);
 }
 
 void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue) {
+    if (setStackingSettings(command, newValue)) {
+        return;
+    }
+    if (setSteppingSettings(command, newValue)){
+        return;
+    }
     if (command == physics) {
         settings->physics = newValue;
-    } else if (command == stacking) {
-        settings->stacking = newValue;
-    } else if (command == stepping) {
-        settings->stepping = newValue;
     } else if (command == tracking) {
         settings->tracking = newValue;
-    } else if (command == energyCut) {
-        settings->born_cut = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    } else if (command == minimalEnergy) {
+        settings->minimal_energy = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
     } else if (command == stackingParticle) {
         settings->particle_cylinder_stacking.push_back(newValue);
     } else if (command == detectorParticle) {
@@ -52,35 +50,26 @@ void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue)
         settings->aragatsSettings->high_boundary = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
     } else if (command == pie_obs_lvl) {
         settings->aragatsSettings->observed_level = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
-    } else if (command == parma_particle){
-//        particleTable = G4ParticleTable::GetParticleTable();
-//        G4ParticleDefinition* pd = particleTable->FindParticle(newValue);
+    } else if (command == parma_particle) {
         settings->parmaSettings->particle->set(newValue);
-    } else if (command == parma_position){
+    } else if (command == parma_position) {
         settings->parmaSettings->position = G4UIcmdWith3VectorAndUnit::GetNew3VectorValue(newValue);
+    } else {
+        ServerMessenger::SetNewValue(command, newValue);
     }
-    else {
-            ServerMessenger::SetNewValue(command, newValue);
-        }
-    }
+}
 
 
 ThunderstormMessenger::ThunderstormMessenger(Settings *pSettings) : ServerMessenger(pSettings), settings(pSettings) {
 
     thundestorm = new G4UIdirectory(thunderstorm_path.c_str());
     thundestorm->SetGuidance("This is helper");
+    initStackingSettings();
+    initSteppingSettings();
 
     physics = new G4UIcmdWithAString(physics_path.c_str(), this);
     physics->SetGuidance("Set using physics.");
     physics->SetParameterName("physics", true);
-
-    stacking = new G4UIcmdWithAString(stacking_path.c_str(), this);
-    stacking->SetGuidance("Set using stacking action.");
-    stacking->SetParameterName("stacking", true);
-
-    stepping = new G4UIcmdWithAString(stepping_path.c_str(), this);
-    stepping->SetGuidance("Set using stepping action.");
-    stepping->SetParameterName("stepping", true);
 
     tracking = new G4UIcmdWithAString(tracking_path.c_str(), this);
     tracking->SetGuidance("Set using tracking action.");
@@ -94,11 +83,11 @@ ThunderstormMessenger::ThunderstormMessenger(Settings *pSettings) : ServerMessen
     detectorParticle->SetGuidance("Add particle in ParticleDetector.");
     detectorParticle->SetParameterName("particle", false);
 
-    auto cutDirectory = new G4UIdirectory(cut_path.c_str());
-    energyCut = new G4UIcmdWithADoubleAndUnit(energy_cut_path.c_str(), this);
-    energyCut->SetGuidance("Set minimal energy for particle");
-    energyCut->SetParameterName("energy", true, false);
-    energyCut->SetDefaultUnit("MeV");
+
+    minimalEnergy = new G4UIcmdWithADoubleAndUnit(energy_cut_path.c_str(), this);
+    minimalEnergy->SetGuidance("Set minimal energy for particle");
+    minimalEnergy->SetParameterName("energy", true, false);
+    minimalEnergy->SetDefaultUnit("MeV");
 
 
     geo_height = new G4UIcmdWithADoubleAndUnit(geo_height_path.c_str(), this);
@@ -138,21 +127,91 @@ ThunderstormMessenger::ThunderstormMessenger(Settings *pSettings) : ServerMessen
     parma = new G4UIdirectory(parma_path.c_str());
 
     parma_particle = new G4UIcmdWithAString(parma_particle_path.c_str(), this);
-    parma_particle->SetParameterName("particleName",true);
+    parma_particle->SetParameterName("particleName", true);
     parma_particle->SetDefaultValue("mu-");
     G4String candidateList = "mu- mu+";
-//    G4int nPtcl = particleTable->entries();
-//    for(G4int i=0;i<nPtcl;i++)
-//    {
-//        candidateList += particleTable->GetParticleName(i);
-//        candidateList += " ";
-//    }
     parma_particle->SetCandidates(candidateList);
 
-    parma_position = new G4UIcmdWith3VectorAndUnit(parma_position_path.c_str(),this);
+    parma_position = new G4UIcmdWith3VectorAndUnit(parma_position_path.c_str(), this);
     parma_position->SetGuidance("Set starting position of the particle.");
-    parma_position->SetParameterName("X","Y","Z",true,true);
+    parma_position->SetParameterName("X", "Y", "Z", true, true);
     parma_position->SetDefaultUnit("cm");
     parma_position->SetUnitCandidates("micron mm cm m km");
 
+}
+
+void ThunderstormMessenger::initStackingSettings() {
+    stacking = new G4UIdirectory(stacking_path.c_str());
+    enableGamma = new G4UIcmdWithABool(stacking_gamma_path.c_str(), this);
+    enableGamma->SetParameterName("flag", false);
+    enableMuon = new G4UIcmdWithABool(stacking_muon_path.c_str(), this);
+    enableMuon->SetParameterName("flag", false);
+    enableElectron = new G4UIcmdWithABool(stacking_electron_path.c_str(), this);
+    enableElectron->SetParameterName("flag", false);
+    enablePositron = new G4UIcmdWithABool(stacking_positron_path.c_str(), this);
+    enablePositron->SetParameterName("flag", false);
+    stacking_type = new G4UIcmdWithAString(stacking_type_path.c_str(), this);
+    stacking_type->SetGuidance("Set using stacking action.");
+    stacking_type->SetParameterName("stacking_type", true);
+
+    saveGamma = new G4UIcmdWithABool(stacking_gamma_save_path.c_str(), this);
+    saveGamma->SetParameterName("flag", false);
+    saveElectron = new G4UIcmdWithABool(stacking_electron_save_path.c_str(), this);
+    saveElectron->SetParameterName("flag", false);
+
+    saveElectronCut = new G4UIcmdWithADoubleAndUnit(stacking_electron_save_cut__path.c_str(), this);
+    saveElectronCut->SetParameterName("Minimal energy for save electron", false);
+    saveElectronCut->SetDefaultUnit("MeV");
+
+}
+
+bool ThunderstormMessenger::setStackingSettings(G4UIcommand *command, G4String newValue) {
+    auto stackingSettings = settings->stackingSettings;
+    if (command == enableGamma) {
+        stackingSettings->enableGamma = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    } else if (command == enableMuon) {
+        stackingSettings->enableMuon = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    } else if (command == enablePositron) {
+        stackingSettings->enablePositron = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    } else if (command == enableElectron) {
+        stackingSettings->enableElectron = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    }
+    else if( command == saveGamma){
+        stackingSettings->saveGamma = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    }
+    else if (command == saveElectron){
+        stackingSettings->saveElectron = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    }
+    else if (command == saveElectronCut){
+        stackingSettings->saveElectronCut = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    }
+    else if (command == stacking_type) {
+        if (newValue == "simple") {
+            stackingSettings->type = StackingType::simple;
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+void ThunderstormMessenger::initSteppingSettings() {
+    stepping = new G4UIdirectory(stepping_path.c_str());
+    stepping_type = new G4UIcmdWithAString(stepping_type_path.c_str(), this);
+    stepping_type->SetGuidance("Set using stepping action.");
+    stepping_type->SetParameterName("stepping_type", true);
+}
+
+bool ThunderstormMessenger::setSteppingSettings(G4UIcommand *command, G4String newValue) {
+    auto steppingSettings = settings->steppingSettings;
+    if (command == stepping_type) {
+        if (newValue == "simple"){
+            steppingSettings->type = SteppingType::simple;
+        } else if (newValue == "critical_energy"){
+            steppingSettings->type = SteppingType::critical_energy;
+        }
+    }else {
+            return false;
+        }
+    return true;
 }

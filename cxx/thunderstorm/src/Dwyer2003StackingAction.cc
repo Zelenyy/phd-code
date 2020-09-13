@@ -21,7 +21,7 @@ eIoni 15
 phot 25
  */
 Dwyer2003StackingAction::Dwyer2003StackingAction(Settings *settings) {
-    cut = settings->born_cut;
+    cut = settings->minimal_energy;
     Logger::instance()->print("One generation set cut: " + to_string(cut) + " MeV");
     fParticlePredictor = settings->particlePredictor;
     dataFileManager = DataFileManager::instance();

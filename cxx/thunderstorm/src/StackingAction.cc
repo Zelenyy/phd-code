@@ -11,8 +11,12 @@
 
 StackingAction::StackingAction(Settings *settings) : fSettings(settings){
     stackingSettings = fSettings->stackingSettings;
-    cut = settings->born_cut;
-    only_muon = settings->aragatsSettings->only_muon;
+    cut = settings->minimal_energy;
+
+    if (stackingSettings->saveGamma || stackingSettings->saveElectron){
+        data = new CylinderId;
+        DataFileManager::instance()->registerDataContainer("stacking_simple", data);
+    }
 }
 
 G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track * aTrack) {
@@ -44,7 +48,10 @@ void StackingAction::PrepareNewEvent() {
 }
 
 G4ClassificationOfNewTrack StackingAction::ClassifyGamma(const G4Track * aTrack) {
-    if (stackingSettings->disableGamma){
+    if (stackingSettings->saveGamma){
+        data->addTrack(aTrack);
+    }
+    if (!stackingSettings->enableGamma){
         return fKill;
     }
     if (aTrack->GetKineticEnergy() < 0.08*MeV){
@@ -57,6 +64,14 @@ G4ClassificationOfNewTrack StackingAction::ClassifyGamma(const G4Track * aTrack)
 }
 
 G4ClassificationOfNewTrack StackingAction::ClassifyElectron(const G4Track * aTrack) {
+    if (stackingSettings->saveElectron){
+        if (aTrack->GetKineticEnergy() >= stackingSettings->saveElectronCut){
+            data->addTrack(aTrack);
+        }
+    }
+    if (!stackingSettings->enableElectron){
+        return fKill;
+    }
     if (aTrack->GetKineticEnergy() < 0.08 * MeV) {
         return fWaiting;
     }
@@ -64,14 +79,14 @@ G4ClassificationOfNewTrack StackingAction::ClassifyElectron(const G4Track * aTra
 }
 
 G4ClassificationOfNewTrack StackingAction::ClassifyPositron(const G4Track * aTrack) {
-    if (stackingSettings->disablePositron){
+    if (!stackingSettings->enablePositron){
         return fKill;
     }
     return fWaiting_4;
 }
 
 G4ClassificationOfNewTrack StackingAction::ClassifyMuon(const G4Track * aTrack) {
-    if (stackingSettings->disableMuon){
+    if (!stackingSettings->enableMuon){
         return fKill;
     }
     return fWaiting_4;

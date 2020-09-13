@@ -13,6 +13,8 @@ import numpy as np
 from dataforge import Meta, MetaRepr
 import abc
 
+logger = logging.getLogger(__name__)
+
 def no_gdmL_input_generator(meta: Meta, macros_template: str):
     macros_template = Template(macros_template)
     for path, values in zip(
@@ -256,3 +258,46 @@ def create_path(keys, dict_values):
     for values in product_:
         name_dir = '_'.join(map(str, values))
     return paths
+
+
+@dataclass
+class CinServerParameters:
+    command : str
+
+class G4CinServer:
+    def __init__(self, parameters : CinServerParameters):
+        self.parameters = parameters
+        self.is_start = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+
+    def start(self, text: str):
+        command = self.parameters.command
+        logger.info("Start cin server")
+        self.process = subprocess.Popen(command, shell=True,
+                             # stdout=subprocess.PIPE,
+                             stdin=subprocess.PIPE,
+                             # stderr=subprocess.PIPE,
+                             encoding='utf-8'
+                             )
+        self._write(text)
+        self.is_start = True
+
+
+    def _write(self, text):
+        self.process.stdin.write(text)
+        self.process.stdin.flush()
+
+    def send(self, text: str):
+        self._write(text)
+
+    def stop(self):
+        logger.info("Stop cin server")
+        self._write("exit\n")
+        exit = self.process.wait()
+        self.is_start = False
+        return exit

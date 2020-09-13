@@ -89,6 +89,7 @@ CYLINDER_ID_DTYPE = np.dtype([
     ("theta", "d"),
     ("radius", "d"),
     ("z", "d"),
+    ("time", "d")
 ])
 
 
@@ -110,6 +111,7 @@ class CylinderProtoSet(DtypeProtoSetConvertor):
             data["theta"][indx] = item.theta
             data["radius"][indx] = item.radius
             data["z"][indx] = item.z
+            data["time"][indx] = item.time
         table = self.h5file.get_node(self.group, self.tableName)
         table.append(data)
         table.flush()

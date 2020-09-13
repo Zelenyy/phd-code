@@ -189,6 +189,7 @@ class DtypeProtoSetConvertor(ProtoSetConvertor):
         my_table.flush()
 
 class ProtoSetReader(Reader):
+    BUFF_SIZE = 8
     def __init__(self, filename, proto_set_convertor):
         self.proto_convertor = proto_set_convertor
         Reader.__init__(self, filename)
@@ -198,9 +199,9 @@ class ProtoSetReader(Reader):
         convertor = self.proto_convertor(h5file, group, filename, self.settings)
         with open(path, "rb") as fin:
             while True:
-                size = fin.read(4)
+                size = fin.read(self.BUFF_SIZE)
                 if size == b"":
                     break
-                size = struct.unpack("i", size)[0]
+                size = struct.unpack("q", size)[0]
                 data = fin.read(size)
                 convertor.convert(data)

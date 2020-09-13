@@ -1,0 +1,19 @@
+/npm/geometry/type gdml
+/npm/geometry/gdml ../gdml/diff_models_0.gdml
+/npm/visualization false
+/npm/thunderstorm/physics standard
+/npm/thunderstorm/minimal_energy 0.05 MeV
+/npm/thunderstorm/stepping/type critical_energy
+/npm/thunderstorm/stacking/electron false
+/npm/thunderstorm/stacking/positron false
+/npm/thunderstorm/stacking/gamma false
+/npm/thunderstorm/stacking/save_gamma false
+/npm/thunderstorm/stacking/save_electron true
+/npm/thunderstorm/stacking/save_electron_cut 0.05 MeV
+
+/gps/particle e-
+/gps/position 0.0 0.0 0.0 meter
+/gps/direction 0 0 -1
+/gps/ene/mono 0.05 MeV
+/run/beamOn 100
+exit

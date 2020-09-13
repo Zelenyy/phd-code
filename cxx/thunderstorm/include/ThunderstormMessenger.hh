@@ -18,32 +18,29 @@ using namespace std;
 class ThunderstormMessenger : public ServerMessenger {
 public:
 
-    ThunderstormMessenger(Settings *pSettings);
+    explicit ThunderstormMessenger(Settings *pSettings);
 
     ~ThunderstormMessenger() override = default;
 
     G4String GetCurrentValue(G4UIcommand *command) override;
 
     void SetNewValue(G4UIcommand *command, G4String newValue) override;
+
+
 private:
-    G4ParticleTable* particleTable;
     Settings* settings;
     G4UIdirectory * thundestorm;
     G4UIcmdWithAString * physics;
-    G4UIcmdWithAString * stacking;
-    G4UIcmdWithAString * stepping;
     G4UIcmdWithAString * tracking;
     G4UIcmdWithAString * stackingParticle;
     G4UIcmdWithAString * detectorParticle;
-    G4UIcmdWithADoubleAndUnit * energyCut;
+    G4UIcmdWithADoubleAndUnit * minimalEnergy;
 private:
     string thunderstorm_path = root_path + "thunderstorm/";
     string physics_path = thunderstorm_path + "physics";
-    string stacking_path = thunderstorm_path + "stacking";
-    string stepping_path = thunderstorm_path + "stepping";
+
     string tracking_path = thunderstorm_path + "tracking";
-    string cut_path = thunderstorm_path + "cut/";
-    string energy_cut_path = cut_path +"energy";
+    string energy_cut_path = thunderstorm_path + "minimal_energy";
     string add_particle_stacking_path = thunderstorm_path + "addParticleInPCS";
     string add_particle_detector_path = thunderstorm_path + "addParticleInPD";
 
@@ -87,6 +84,35 @@ private:
     G4UIcmdWith3VectorAndUnit* parma_position;
     string parma_position_path = parma_path + "position";
 
+private:
+    void initSteppingSettings();
+    bool setSteppingSettings(G4UIcommand *command, G4String newValue);
+    G4UIdirectory * stepping;
+    G4UIcmdWithAString * stepping_type;
+    string stepping_path = thunderstorm_path + "stepping/";
+    string stepping_type_path = stepping_path  + "type";
+private:
+    void initStackingSettings();
+    bool setStackingSettings(G4UIcommand *command, G4String newValue);
+    G4UIdirectory * stacking;
+    G4UIcmdWithAString * stacking_type;
+    G4UIcmdWithABool* enableGamma;
+    G4UIcmdWithABool* enablePositron;
+    G4UIcmdWithABool* enableElectron;
+    G4UIcmdWithABool* enableMuon;
+    string stacking_path = thunderstorm_path + "stacking/";
+    string stacking_type_path = stacking_path  + "type";
+    string stacking_gamma_path = stacking_path  + "gamma";
+    string stacking_electron_path = stacking_path  + "electron";
+    string stacking_positron_path = stacking_path  + "positron";
+    string stacking_muon_path = stacking_path  + "muon";
+
+    G4UIcmdWithABool* saveGamma;
+    G4UIcmdWithABool* saveElectron;
+    G4UIcmdWithADoubleAndUnit * saveElectronCut;
+    string stacking_gamma_save_path = stacking_path  + "save_gamma";
+    string stacking_electron_save_path = stacking_path  + "save_electron";
+    string stacking_electron_save_cut__path = stacking_path  + "save_electron_cut";
 };
 
 

@@ -28,7 +28,7 @@ def main():
     logging.basicConfig(filename="run.log")
     logging.root.setLevel(logging.DEBUG)
 
-    gdml_template = os.path.join(ROOT_PATH, "template", "diff_models_0.gdml")
+    gdml_template = os.path.join(ROOT_PATH, "template", "cylinder.gdml")
 
     values_macros = {
         "cut": [0.05],

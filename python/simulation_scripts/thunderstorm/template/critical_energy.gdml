@@ -3,7 +3,7 @@
 <gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="../../../../cxx/schema/gdml.xsd">
     <define>
-        <constant value="0" name="height"/>
+        <constant value="${height}" name="height"/>
         <constant value="288.15" name="normalTemperature"/>
         <constant value="-0.0065*kelvin / m" name="temperatureGrad" />
         <constant value="101325" name="normalPressure"/>
@@ -39,7 +39,7 @@
             <auxiliary auxtype="ElectricField" auxvalue="Uniform">
                 <auxiliary auxtype="Ex" auxvalue="0"/>
                 <auxiliary auxtype="Ey" auxvalue="0"/>
-                <auxiliary auxtype="Ez" auxvalue="10e-4"/>
+                <auxiliary auxtype="Ez" auxvalue="${field}"/>
             </auxiliary>
         </volume>
         <volume name="World">

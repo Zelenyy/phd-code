@@ -11,7 +11,7 @@
 #include "G4SystemOfUnits.hh"
 #include "Settings.hh"
 #include "G4Track.hh"
-#include "DataFile.hh"
+#include "DataThunderstorm.hh"
 
 class StackingAction : public G4UserStackingAction{
 public:
@@ -23,7 +23,8 @@ private:
     Settings* fSettings;
     StackingSettings * stackingSettings;
     double cut = 0.05*MeV;
-    bool only_muon = false;
+
+    CylinderId* data = nullptr;
 
     G4ClassificationOfNewTrack ClassifyGamma(const G4Track * aTrack);
     G4ClassificationOfNewTrack ClassifyElectron(const G4Track * aTrack);
