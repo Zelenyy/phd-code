@@ -1,43 +1,35 @@
-import logging
-import os
-from string import Template
-
-import pyinotify
-from phd.thunderstorm.critical_energy import create_gdml, CriticalEnergyProcessor, G4CinServerHandler, INPUT_TEMPLATE
-from phd.utils.run_tools import G4CinServer, CinServerParameters
-
-ROOT_PATH = os.path.dirname(__file__)
+from phd.thunderstorm import atmosphere
+from phd.thunderstorm.critical_energy import get_critical_energy
+import matplotlib.pyplot as plt
+import numpy as np
+from tabulate import tabulate
 
 def main():
-    logging.basicConfig(filename="run.log")
-    logging.root.setLevel(logging.DEBUG)
+    heights = np.arange(21)*1000.0
+    fields = np.arange(0.1, 11, 0.1)
+    dtype = np.dtype([
+        ("field", "d"),
+        ("height", "d"),
+        ("critical_energy", "d")
+    ])
+    data = np.zeros(heights.size*fields.size, dtype=dtype)
+    indx = 0
+    for height in heights:
+        for field in fields:
+            data["field"][indx] = field
+            data["height"][indx] = height
+            temp = get_critical_energy(height, field)
+            if temp is None or not temp.converged:
+                data["critical_energy"][indx] = float('nan')
+            else:
+                data["critical_energy"][indx] = temp.root
+            indx += 1
 
-    gdml_template = os.path.join(ROOT_PATH, "template", "critical_energy.gdml")
-
-    meta = {
-        'number': 10,
-        'energy': 0.05,
-        "physics": "standard_opt_4",
-        'height': 0,
-        'field': 10e-4,
-    }
-    create_gdml(gdml_template, meta)
-    processor = CriticalEnergyProcessor(meta)
-
-    parameters = CinServerParameters(
-        command="../build/thunderstorm/geant4-thunderstorm.exe"
-    )
-
-    with  G4CinServer(parameters) as server:
-        server.start(Template(INPUT_TEMPLATE).substitute(meta))
-        wm = pyinotify.WatchManager()
-        notifier = pyinotify.Notifier(wm)
-        wm.add_watch('.', pyinotify.ALL_EVENTS,
-                     proc_fun=G4CinServerHandler(
-                         server=server,
-                         processor=processor
-                     ))
-        notifier.loop()
+    print(tabulate(data, headers=dtype.names))
+    with open("critical_energy.csv", "w") as fout:
+        res = tabulate(data, headers=dtype.names, tablefmt="plain")
+        fout.write(res)
+    np.save("critical_energy.npy", data)
     return 0
 
 

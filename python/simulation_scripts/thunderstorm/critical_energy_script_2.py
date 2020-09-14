@@ -25,7 +25,7 @@ INPUT_TEMPLATE = """/npm/geometry/type gdml
 /gps/number 1
 /gps/direction 0 0 -1
 /gps/ene/mono ${energy} MeV
-/gps/position 0.0 0.0 -499.0 m
+/gps/position 0.0 0.0 499.0 m
 /run/beamOn ${number}
 exit
 """
@@ -38,7 +38,7 @@ def input_generator_critical_energy():
     gdml_template = os.path.join(ROOT_PATH, "template", "critical_energy.gdml")
     macros_template = Template(INPUT_TEMPLATE)
     count = 0
-    for field in np.arange(3.0, 10.0):
+    for field in np.arange(3.0, 11.0):
         temp = get_critical_energy(heigth, field)
         if temp is None or not temp.converged:
             continue
@@ -55,7 +55,7 @@ def input_generator_critical_energy():
                 "path": [os.path.join("..",path)],
                 "physics": ["standard_opt_4"],
                 'number': [100],
-                'energy': np.arange(critical_energy/2, critical_energy*5, 0.003),
+                'energy': np.arange(critical_energy/2, critical_energy*2, 0.001),
                 'min_energy': [critical_energy/2],
             }
 
