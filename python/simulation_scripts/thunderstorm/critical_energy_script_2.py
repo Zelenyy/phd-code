@@ -45,8 +45,8 @@ def input_generator_critical_energy():
         critical_energy = temp.root
 
         values_gdml = {
-            'height': [heigth],
-            'field': [field*1e-4],
+            'height': heigth,
+            'field': field*1e-4,
         }
 
         paths, _ = create_gdml(gdml_template, values_gdml)
@@ -55,7 +55,7 @@ def input_generator_critical_energy():
                 "path": [os.path.join("..",path)],
                 "physics": ["standard_opt_4"],
                 'number': [100],
-                'energy': np.arange(critical_energy/2, critical_energy*3, 0.001),
+                'energy': np.arange(critical_energy/2, critical_energy*5, 0.003),
                 'min_energy': [critical_energy/2],
             }
 
