@@ -32,6 +32,7 @@ class ISACalculator:
     @staticmethod
     def density(height: np.ndarray) -> np.ndarray:
         """
+        height: meters
         ISA density in kg/m3m
         
         """

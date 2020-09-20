@@ -3,7 +3,6 @@
 #include <Dwyer2003StackingAction.hh>
 #include <StackingAction.hh>
 #include <ParticleCylinderStacking.hh>
-#include <TreeSocketSteppingAction.hh>
 #include <TreeTrackingAction.hh>
 #include <SteppingAction.hh>
 #include "ActionInitialization.hh"
