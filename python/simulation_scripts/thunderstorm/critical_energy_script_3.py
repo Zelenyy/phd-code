@@ -36,7 +36,6 @@ import numpy as np
 
 
 def input_generator_critical_energy():
-    heigth = 0.0
     gdml_template = os.path.join(ROOT_PATH, "template", "critical_energy.gdml")
     macros_template = Template(INPUT_TEMPLATE)
     count = 0
@@ -48,13 +47,13 @@ def input_generator_critical_energy():
         field_min = np.floor(zero_field_min/ratio)
         field_max = np.ceil(zero_field_max/ratio)
         for field in np.linspace(field_min, field_max, 10):
-            temp = get_critical_energy(heigth, field)
+            temp = get_critical_energy(height, field)
             if temp is None or not temp.converged:
                 continue
             critical_energy = temp.root
 
             values_gdml = {
-                'height': heigth,
+                'height': height,
                 'field': field*1e-4,
             }
 
