@@ -151,3 +151,35 @@ def get_critical_energy(height = 0, field = 0):
         return None
     return critical_energy_root
 
+from scipy.linalg import lstsq
+
+def calculate_secondary_production_rate(path):
+    bins = np.arange(-500.0, 501, 1)
+    x = bins[:-1]
+    M = x[:, np.newaxis] ** [0, 1]
+
+    dtype = np.dtype(
+        [
+            ("field", "d"),
+            ("height", "d"),
+            ("energy", "d"),
+            ("k", "d"),
+            ("b", "d")
+        ]
+    )
+
+    with tables.open_file(path) as h5file:
+        result = []
+        for group in h5file.root:
+            table = h5file.get_node(group, "stacking_simple")
+            data = table.read()
+            field = table.attrs["values_gdml_field"][0]
+            height = table.attrs["values_gdml_height"][0]
+            energy =  table.attrs["values_macros_energy"]
+            number =  table.attrs["values_macros_number"]
+            temp, _ = np.histogram(data["z"], bins=bins)
+            temp = np.cumsum(temp)
+            y = temp / number
+            p, res, rnk, s = lstsq(M, y)
+            result.append((field, height, energy, p[1], p[0]))
+        return np.array(result, dtype=dtype)
