@@ -1,5 +1,6 @@
 import logging
 import os
+from dataclasses import dataclass
 from string import Template
 
 import numpy as np
@@ -182,4 +183,62 @@ def calculate_secondary_production_rate(path):
             y = temp / number
             p, res, rnk, s = lstsq(M, y)
             result.append((field, height, energy, p[1], p[0]))
+        return np.array(result, dtype=dtype)
+
+@dataclass
+class FieldHeigth:
+    field: float
+    height : float
+
+def get_group(path):
+    with tables.open_file(path) as h5file:
+        result = {}
+        for group in h5file.root:
+            table = h5file.get_node(group, "stacking_simple")
+            data = table.read()
+            field = table.attrs["values_gdml_field"][0]
+            height = table.attrs["values_gdml_height"][0]
+            energy =  table.attrs["values_macros_energy"]
+            key = FieldHeigth(field, height)
+            if key in result.keys():
+                result[key].append((energy, group._v_name))
+            else:
+                result[key] = [(energy, group._v_name)]
+        for value in result.values():
+            value.sort(lambda x: x[0])
+        return result
+
+def calculate_secondary_production_rate_v1(path, rate_cut = 0.001):
+    groups = get_group(path)
+    bins = np.arange(-500.0, 501, 1)
+    x = bins[:-1]
+    M = x[:, np.newaxis] ** [0, 1]
+    result = []
+
+    dtype = np.dtype(
+        [
+            ("field", "d"),
+            ("height", "d"),
+            ("energy", "d"),
+            ("k", "d"),
+            ("b", "d")
+        ]
+    )
+
+    with tables.open_file(path) as h5file:
+        for key, value in groups.items():
+            energy_cut = value[0][0]
+            for energy, group_name in value:
+                table: tables.Table = h5file.get_node("/{}".format(group_name), "stacking_simple")
+                data = table.read()
+                data = data[data["energy"] > energy_cut]
+                number = table.attrs["values_macros_number"]
+                temp, _ = np.histogram(data["z"], bins=bins)
+                temp = np.cumsum(temp)
+                y = temp / number
+                p, res, rnk, s = lstsq(M, y)
+                k = p[1]
+                if k<= rate_cut:
+                    energy_cut = energy
+                result.append((key.field, key.height, energy, p[1], p[0]))
         return np.array(result, dtype=dtype)

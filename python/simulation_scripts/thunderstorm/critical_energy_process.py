@@ -28,7 +28,7 @@ def create_parser():
 
 def main():
     args = create_parser().parse_args()
-    if args.seconary_rate:
+    if args.secondary_rate:
         process_secondary_rate(args)
     return 0
 
