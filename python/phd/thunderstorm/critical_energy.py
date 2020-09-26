@@ -207,7 +207,7 @@ def get_group(path):
             else:
                 result[key] = [(energy, group._v_name)]
         for value in result.values():
-            value.sort(lambda x: x[0])
+            value.sort(key=lambda x: x[0])
         return result
 
 def calculate_secondary_production_rate(path, rate_cut = 0.001):
