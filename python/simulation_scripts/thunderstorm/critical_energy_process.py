@@ -10,7 +10,7 @@ def process_secondary_rate(args):
         data = calculate_secondary_production_rate(file)
         result.append(data)
     if len(result) > 1:
-        data = np.vstack(result)
+        data = np.hstack(result)
     else:
         data = result[0]
     np.save(args.output, data)
