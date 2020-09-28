@@ -210,7 +210,10 @@ def get_group(path):
             value.sort(key=lambda x: x[0])
         return result
 
-def calculate_secondary_production_rate(path, rate_cut = 0.001):
+
+def calculate_secondary_production_rate(path, rate_cut = 0.001, method="simple"):
+    if method not in ["simple", "rate-cut"]:
+        logging.root.warning("Bad method for {}".format(calculate_secondary_production_rate.__name__))
     groups = get_group(path)
     bins = np.arange(-500.0, 501, 1)
     x = bins[:-1]
@@ -240,7 +243,10 @@ def calculate_secondary_production_rate(path, rate_cut = 0.001):
                 y = temp / number
                 p, res, rnk, s = lstsq(M, y)
                 k = p[1]
-                if k<= rate_cut:
+                if method=="rate-cut":
+                    if k<= rate_cut:
+                        energy_cut = energy
+                elif method=="simple":
                     energy_cut = energy
                 result.append((key.field, key.height, energy, p[1], p[0]))
         return np.array(result, dtype=dtype)
