@@ -42,7 +42,7 @@ def input_generator_critical_energy():
     count = 0
     ratio = 0.03
     cep = CriticalEnergyProvider()
-    for height in np.arange(0.0, 1000.0, 1000.0):
+    for height in np.arange(0.0, 16000.0, 1000.0):
         min_field = get_minimal_field(height)
 
         for field in np.arange(min_field, min_field*1.5, min_field*ratio):
@@ -56,7 +56,7 @@ def input_generator_critical_energy():
             values = {
                 "path": [os.path.join("..",gdml_path)],
                 "physics": ["standard_opt_4"],
-                'number': [10],
+                'number': [1000],
                 'min_energy': [critical_energy],
             }
 
