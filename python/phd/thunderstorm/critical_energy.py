@@ -281,7 +281,7 @@ def calculate_secondary_production_rate(path, rate_cut = 0.001, method="simple")
                 data = data[data["energy"] > energy_cut]
                 number = table.attrs["values_macros_number"]
                 temp, _ = np.histogram(data["z"], bins=bins)
-                temp = np.cumsum(temp)
+                temp = np.cumsum(temp[::-1])
                 y = temp / number
                 p, res, rnk, s = lstsq(M, y)
                 k = p[1]
