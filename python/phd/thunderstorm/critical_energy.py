@@ -11,6 +11,7 @@ from phd.thunderstorm.convert_to_hdf5 import CylinderProtoSet
 from phd.utils.hdf5_tools import ProtoSetReader
 from phd.utils.run_tools import G4CinServer, CinServerParameters
 from tables import Filters, Table, Group
+import matplotlib.pyplot as plt
 
 ROOT_PATH = os.path.dirname(__file__)
 
@@ -210,6 +211,47 @@ def get_group(path):
             value.sort(key=lambda x: x[0])
         return result
 
+def plot_secondary_production_rate(path, output="plot"):
+
+    if not os.path.exists(output):
+        os.mkdir(output)
+
+    groups = get_group(path)
+    bins = np.arange(-500.0, 501, 1)
+    x = bins[:-1]
+    result = []
+    dtype = np.dtype(
+        [
+            ("field", "d"),
+            ("height", "d"),
+            ("energy", "d"),
+            ("k", "d"),
+            ("b", "d")
+        ]
+    )
+
+    with tables.open_file(path) as h5file:
+        for key, value in groups.items():
+            energy_cut = value[0][0]
+
+            plt.clf()
+            plt.figure()
+            for energy, group_name in value:
+                table: tables.Table = h5file.get_node("/{}".format(group_name), "stacking_simple")
+                data = table.read()
+                data = data[data["energy"] > energy_cut]
+                number = table.attrs["values_macros_number"]
+                temp, _ = np.histogram(data["z"], bins=bins)
+                temp = np.cumsum(temp[::-1])
+                y = temp / number
+                plt.plot(x, y)
+            path = os.path.join(output, "{}m_{}kV_m.png".format(key.height, key.field*1e4))
+            plt.xlabel("Height, meters")
+            plt.ylabel("Cumulative number of electron")
+            plt.tight_layout()
+            plt.savefig(path, format="png", transparent=True, dpi = 600)
+    return 0
+
 
 def calculate_secondary_production_rate(path, rate_cut = 0.001, method="simple"):
     if method not in ["simple", "rate-cut"]:
@@ -250,3 +292,24 @@ def calculate_secondary_production_rate(path, rate_cut = 0.001, method="simple")
                     energy_cut = energy
                 result.append((key.field, key.height, energy, p[1], p[0]))
         return np.array(result, dtype=dtype)
+
+
+class CriticalEnergyProvider:
+    def __init__(self):
+        data_path = os.path.join(os.path.dirname(__file__), "data", "critical_energy.npy")
+        self.data = np.load(data_path)
+        self.pairs = np.unique(self.data[["height", "field"]])
+
+    def get_critical_energy(self, height = 0.0, field = 0.0, length = 1000.0):
+        indx = self.pairs["height"] == height
+        if np.all(np.logical_not(indx)):
+            raise Exception("Non table height")
+        pairs = self.pairs[indx]
+        fields = np.sort(pairs["field"])
+        f_indx = (field < fields).argmax()
+        field = fields[f_indx]
+        indx = np.logical_and(self.data["height"] == height, self.data["field"] == field)
+        rate_cut = 1/length
+        data = self.data[indx]
+        indx = (data["k"] > rate_cut).argmax()
+        return data["energy"][indx]

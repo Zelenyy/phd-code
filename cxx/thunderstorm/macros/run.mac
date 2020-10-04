@@ -12,6 +12,6 @@
 /gps/particle e-
 /gps/position 0.0 0.0 499.0 meter
 /gps/direction 0 0 -1
-/gps/ene/mono 0.18 MeV
+/gps/ene/mono 1.2 MeV
 #/run/beamOn 1
 exit

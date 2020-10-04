@@ -39,7 +39,7 @@
             <auxiliary auxtype="ElectricField" auxvalue="Uniform">
                 <auxiliary auxtype="Ex" auxvalue="0"/>
                 <auxiliary auxtype="Ey" auxvalue="0"/>
-                <auxiliary auxtype="Ez" auxvalue="10e-4"/>
+                <auxiliary auxtype="Ez" auxvalue="2.04e-4"/>
             </auxiliary>
         </volume>
         <volume name="World">

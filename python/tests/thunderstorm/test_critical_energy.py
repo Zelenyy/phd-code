@@ -3,7 +3,8 @@ from unittest import TestCase
 import numpy as np
 import star
 from phd.thunderstorm import atmosphere
-from phd.thunderstorm.critical_energy import get_critical_energy, calculate_secondary_production_rate
+from phd.thunderstorm.critical_energy import get_critical_energy, calculate_secondary_production_rate, \
+    CriticalEnergyProvider, plot_secondary_production_rate
 import matplotlib.pyplot as plt
 from tabulate import tabulate
 
@@ -47,3 +48,14 @@ class Test(TestCase):
         data = calculate_secondary_production_rate(path)
         np.save("rate.npy", data)
         print(tabulate(data, headers=data.dtype.names, tablefmt="plain"))
+
+
+    def test_plot_secondary_production_rate(self):
+        path = "/mnt/storage2/phd/data/thunderstorm/critical_energy/result.hdf5"
+        plot_secondary_production_rate(path)
+
+    def test_critical_energy_provider(self):
+        cep = CriticalEnergyProvider()
+        print(cep.get_critical_energy(0.0, 10.5e-4))
+        print(cep.get_critical_energy(5000.0, 2e-4))
+        print(cep.get_critical_energy(0.0, 2e-4))
