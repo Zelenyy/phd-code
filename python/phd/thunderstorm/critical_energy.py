@@ -198,7 +198,6 @@ def get_group(path):
         result = {}
         for group in h5file.root:
             table = h5file.get_node(group, "stacking_simple")
-            data = table.read()
             field = table.attrs["values_gdml_field"][0]
             height = table.attrs["values_gdml_height"][0]
             energy =  table.attrs["values_macros_energy"]
