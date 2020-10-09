@@ -3,7 +3,7 @@
 #include <Dwyer2003StackingAction.hh>
 #include <StackingAction.hh>
 #include <ParticleCylinderStacking.hh>
-#include <TreeTrackingAction.hh>
+#include <TrackingAction.hh>
 #include <SteppingAction.hh>
 #include "ActionInitialization.hh"
 #include "GeneralParticleSource.hh"
@@ -49,14 +49,8 @@ void ActionInitialization::Build() const {
         SetUserAction(new CriticalEnergySteppingAction(settings));
         logger->print("Using stepping  action: critical_energy");
     }
-//    else if (settings->stepping == "tree_socket") {
-//        SetUserAction(new TreeSocketSteppingAction());
-//        logger->print("Using stepping  action: tree_socket");
-//    }
 
-    if (settings->tracking == "tree") {
-        SetUserAction(new TreeTrackingAction());
-        logger->print("Using tracking  action: tree_socket");
-    }
+    SetUserAction(new TrackingAction(settings));
+
 
 }

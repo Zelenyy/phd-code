@@ -56,6 +56,13 @@ public:
     bool only_muon = false;
 };
 
+
+struct TrackingSettings{
+    bool saveGamma = false;
+    bool saveElectron = false;
+    bool savePositron = false;
+};
+
 enum class StackingType{
     simple
 };
@@ -100,7 +107,7 @@ public:
 
     StackingSettings* stackingSettings = new StackingSettings;
     SteppingSettings* steppingSettings = new SteppingSettings;
-
+    TrackingSettings* trackingSettings = new TrackingSettings;
     // Aragats
     AragatsSettings *aragatsSettings = new AragatsSettings;
 };

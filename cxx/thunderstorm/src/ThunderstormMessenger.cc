@@ -19,7 +19,10 @@ void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue)
     if (setStackingSettings(command, newValue)) {
         return;
     }
-    if (setSteppingSettings(command, newValue)){
+    if (setSteppingSettings(command, newValue)) {
+        return;
+    }
+    if (setTrackingSettings(command, newValue)){
         return;
     }
     if (command == physics) {
@@ -66,14 +69,11 @@ ThunderstormMessenger::ThunderstormMessenger(Settings *pSettings) : ServerMessen
     thundestorm->SetGuidance("This is helper");
     initStackingSettings();
     initSteppingSettings();
+    initTrackingSettings();
 
     physics = new G4UIcmdWithAString(physics_path.c_str(), this);
     physics->SetGuidance("Set using physics.");
     physics->SetParameterName("physics", true);
-
-    tracking = new G4UIcmdWithAString(tracking_path.c_str(), this);
-    tracking->SetGuidance("Set using tracking action.");
-    tracking->SetParameterName("tracking", true);
 
     stackingParticle = new G4UIcmdWithAString(add_particle_stacking_path.c_str(), this);
     stackingParticle->SetGuidance("Add particle in ParticleCylinderStacking.");
@@ -175,17 +175,13 @@ bool ThunderstormMessenger::setStackingSettings(G4UIcommand *command, G4String n
         stackingSettings->enablePositron = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else if (command == enableElectron) {
         stackingSettings->enableElectron = G4UIcmdWithABool::GetNewBoolValue(newValue);
-    }
-    else if( command == saveGamma){
+    } else if (command == saveGamma) {
         stackingSettings->saveGamma = G4UIcmdWithABool::GetNewBoolValue(newValue);
-    }
-    else if (command == saveElectron){
+    } else if (command == saveElectron) {
         stackingSettings->saveElectron = G4UIcmdWithABool::GetNewBoolValue(newValue);
-    }
-    else if (command == saveElectronCut){
+    } else if (command == saveElectronCut) {
         stackingSettings->saveElectronCut = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
-    }
-    else if (command == stacking_type) {
+    } else if (command == stacking_type) {
         if (newValue == "simple") {
             stackingSettings->type = StackingType::simple;
         }
@@ -205,13 +201,37 @@ void ThunderstormMessenger::initSteppingSettings() {
 bool ThunderstormMessenger::setSteppingSettings(G4UIcommand *command, G4String newValue) {
     auto steppingSettings = settings->steppingSettings;
     if (command == stepping_type) {
-        if (newValue == "simple"){
+        if (newValue == "simple") {
             steppingSettings->type = SteppingType::simple;
-        } else if (newValue == "critical_energy"){
+        } else if (newValue == "critical_energy") {
             steppingSettings->type = SteppingType::critical_energy;
         }
-    }else {
-            return false;
-        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+void ThunderstormMessenger::initTrackingSettings() {
+    tracking = new G4UIdirectory(tracking_path.c_str());
+    trackingSaveGamma = new G4UIcmdWithABool(tracking_gamma_save_path.c_str(), this);
+    trackingSaveGamma->SetParameterName("flag", false);
+    trackingSaveElectron = new G4UIcmdWithABool(tracking_electron_save_path.c_str(), this);
+    trackingSaveElectron->SetParameterName("flag", false);
+    trackingSavePositron = new G4UIcmdWithABool(tracking_positron_save_path.c_str(), this);
+    trackingSavePositron->SetParameterName("flag", false);
+}
+
+bool ThunderstormMessenger::setTrackingSettings(G4UIcommand *command, G4String newValue) {
+    auto trackingSettings = settings->trackingSettings;
+    if (command == trackingSaveGamma) {
+        trackingSettings->saveGamma = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    } else if (command == trackingSaveElectron) {
+        trackingSettings->saveElectron = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    } else if (command == trackingSavePositron) {
+        trackingSettings->savePositron = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    } else {
+        return false;
+    }
     return true;
 }

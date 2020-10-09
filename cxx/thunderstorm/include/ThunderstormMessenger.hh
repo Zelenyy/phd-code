@@ -31,7 +31,6 @@ private:
     Settings* settings;
     G4UIdirectory * thundestorm;
     G4UIcmdWithAString * physics;
-    G4UIcmdWithAString * tracking;
     G4UIcmdWithAString * stackingParticle;
     G4UIcmdWithAString * detectorParticle;
     G4UIcmdWithADoubleAndUnit * minimalEnergy;
@@ -39,7 +38,6 @@ private:
     string thunderstorm_path = root_path + "thunderstorm/";
     string physics_path = thunderstorm_path + "physics";
 
-    string tracking_path = thunderstorm_path + "tracking";
     string energy_cut_path = thunderstorm_path + "minimal_energy";
     string add_particle_stacking_path = thunderstorm_path + "addParticleInPCS";
     string add_particle_detector_path = thunderstorm_path + "addParticleInPD";
@@ -94,6 +92,7 @@ private:
 private:
     void initStackingSettings();
     bool setStackingSettings(G4UIcommand *command, G4String newValue);
+
     G4UIdirectory * stacking;
     G4UIcmdWithAString * stacking_type;
     G4UIcmdWithABool* enableGamma;
@@ -113,6 +112,19 @@ private:
     string stacking_gamma_save_path = stacking_path  + "save_gamma";
     string stacking_electron_save_path = stacking_path  + "save_electron";
     string stacking_electron_save_cut__path = stacking_path  + "save_electron_cut";
+
+private:
+    void initTrackingSettings();
+    bool setTrackingSettings(G4UIcommand *command, G4String newValue);
+    G4UIdirectory * tracking;
+    G4UIcmdWithABool* trackingSaveGamma;
+    G4UIcmdWithABool* trackingSaveElectron;
+    G4UIcmdWithABool* trackingSavePositron;
+    string tracking_path = thunderstorm_path + "tracking/";
+    string tracking_gamma_save_path = tracking_path  + "save_gamma";
+    string tracking_electron_save_path = tracking_path  + "save_electron";
+    string tracking_positron_save_path = tracking_path  + "save_positron";
+
 };
 
 

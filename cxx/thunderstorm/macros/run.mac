@@ -8,6 +8,8 @@
 /npm/thunderstorm/stacking/gamma false
 /npm/thunderstorm/stacking/save_gamma false
 /npm/thunderstorm/stacking/save_electron false
+/npm/thunderstorm/tracking/save_gamma false
+/npm/thunderstorm/tracking/save_electron true
 
 /gps/particle e-
 /gps/position 0.0 0.0 499.0 meter
