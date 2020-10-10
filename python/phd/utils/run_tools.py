@@ -87,7 +87,7 @@ def input_generator_custom_gdml(meta: Meta, gdml_template_file: str, macros_temp
         yield data
 
 
-def create_gdml(template_file, values: dict):
+def create_gdml(template_file, values: dict, start: int = 0):
     values = values_from_dict(values)
     os.makedirs("./gdml", exist_ok=True)
     paths = []
@@ -96,7 +96,7 @@ def create_gdml(template_file, values: dict):
         gdml_template = fin.read()
         # gdml_template = Template(gdml_template)
     for indx, value in enumerate(values):
-        path = os.path.join("./gdml", "{}.gdml".format(indx))
+        path = os.path.join("./gdml", "{}.gdml".format(indx+start))
         paths.append(path)
         create_one_file(gdml_template, path, value)
     return paths, list(values)

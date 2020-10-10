@@ -44,7 +44,7 @@ def input_generator_critical_energy():
     count = 0
     ratio = 0.03
     cep = CriticalEnergyProvider()
-    for height in np.arange(0.0, 16000.0, 1000.0): # 16000.0
+    for h_index, height in enumerate(np.arange(0.0, 16000.0, 1000.0)): # 16000.0
         min_field = get_minimal_field(height)
 
         for field in np.arange(min_field, min_field*1.5, min_field*ratio):
@@ -53,12 +53,12 @@ def input_generator_critical_energy():
                 'field': field*1e-4,
             }
             critical_energy = cep.get_critical_energy(height, field*1e-4)
-            paths, _ = create_gdml(gdml_template, values_gdml)
+            paths, _ = create_gdml(gdml_template, values_gdml, h_index)
             gdml_path = paths[0]
             values = {
                 "path": [os.path.join("..",gdml_path)],
                 "physics": ["standard_opt_4"],
-                'number': [100],
+                'number': [1000],
                 'min_energy': [critical_energy],
             }
 
