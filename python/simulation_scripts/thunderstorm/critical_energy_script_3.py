@@ -41,7 +41,7 @@ def input_generator_critical_energy():
     count = 0
     zero_field_min, zero_field_max = 3.0, 11.0
     zero_density = atmosphere.ISACalculator.density(0.0)
-    for height in np.arange(0.0, 16000.0, 1000.0):
+    for h_index, height in enumerate(np.arange(0.0, 16000.0, 1000.0)):
         density = atmosphere.ISACalculator.density(height)
         ratio = zero_density/density
         field_min = np.floor(zero_field_min/ratio)
@@ -57,7 +57,7 @@ def input_generator_critical_energy():
                 'field': field*1e-4,
             }
 
-            paths, _ = create_gdml(gdml_template, values_gdml)
+            paths, _ = create_gdml(gdml_template, values_gdml, h_index)
             gdml_path = paths[0]
             values = {
                 "path": [os.path.join("..",gdml_path)],
