@@ -5,6 +5,8 @@
 #include <G4MuonPlus.hh>
 #include <G4MuonMinus.hh>
 #include <G4Positron.hh>
+#include <G4Neutron.hh>
+#include "G4AntiNeutron.hh"
 #include "G4Gamma.hh"
 #include "G4Electron.hh"
 #include "StackingAction.hh"
@@ -39,6 +41,9 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNewTrack(const G4Track * aTra
     }
     if (def == G4Positron::Definition()){
         return ClassifyPositron(aTrack);
+    }
+    if (def == G4Neutron::Definition() or def == G4AntiNeutron::Definition()){
+        return ClassifyNeutron(aTrack);
     }
     return fUrgent;
 }
@@ -90,6 +95,13 @@ G4ClassificationOfNewTrack StackingAction::ClassifyMuon(const G4Track * aTrack) 
         return fKill;
     }
     return fWaiting_4;
+}
+
+G4ClassificationOfNewTrack StackingAction::ClassifyNeutron(const G4Track *pTrack) {
+    if (stackingSettings->saveNeutron){
+        data->addTrack(pTrack);
+    }
+    return fKill;
 }
 
 

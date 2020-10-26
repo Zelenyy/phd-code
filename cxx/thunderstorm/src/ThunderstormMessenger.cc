@@ -22,7 +22,7 @@ void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue)
     if (setSteppingSettings(command, newValue)) {
         return;
     }
-    if (setTrackingSettings(command, newValue)){
+    if (setTrackingSettings(command, newValue)) {
         return;
     }
     if (command == physics) {
@@ -163,6 +163,9 @@ void ThunderstormMessenger::initStackingSettings() {
     saveElectronCut->SetParameterName("Minimal energy for save electron", false);
     saveElectronCut->SetDefaultUnit("MeV");
 
+    saveNeutron = new G4UIcmdWithABool(stacking_neutron_save_path.c_str(), this);
+    saveNeutron->SetParameterName("flag", false);
+
 }
 
 bool ThunderstormMessenger::setStackingSettings(G4UIcommand *command, G4String newValue) {
@@ -181,6 +184,8 @@ bool ThunderstormMessenger::setStackingSettings(G4UIcommand *command, G4String n
         stackingSettings->saveElectron = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else if (command == saveElectronCut) {
         stackingSettings->saveElectronCut = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    } else if (command == saveNeutron) {
+        stackingSettings->saveNeutron = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else if (command == stacking_type) {
         if (newValue == "simple") {
             stackingSettings->type = StackingType::simple;
@@ -190,6 +195,7 @@ bool ThunderstormMessenger::setStackingSettings(G4UIcommand *command, G4String n
     }
     return true;
 }
+
 
 void ThunderstormMessenger::initSteppingSettings() {
     stepping = new G4UIdirectory(stepping_path.c_str());

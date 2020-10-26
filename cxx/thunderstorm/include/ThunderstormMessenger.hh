@@ -108,10 +108,12 @@ private:
 
     G4UIcmdWithABool* saveGamma;
     G4UIcmdWithABool* saveElectron;
+    G4UIcmdWithABool* saveNeutron;
     G4UIcmdWithADoubleAndUnit * saveElectronCut;
     string stacking_gamma_save_path = stacking_path  + "save_gamma";
     string stacking_electron_save_path = stacking_path  + "save_electron";
     string stacking_electron_save_cut__path = stacking_path  + "save_electron_cut";
+    string stacking_neutron_save_path = stacking_path  + "save_neutron";
 
 private:
     void initTrackingSettings();

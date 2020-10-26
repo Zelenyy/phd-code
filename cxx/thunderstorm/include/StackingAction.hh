@@ -32,6 +32,7 @@ private:
     G4ClassificationOfNewTrack ClassifyMuon(const G4Track * aTrack);
 
 
+    G4ClassificationOfNewTrack ClassifyNeutron(const G4Track *pTrack);
 };
 
 

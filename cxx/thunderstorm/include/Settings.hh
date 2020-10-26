@@ -61,6 +61,7 @@ struct TrackingSettings{
     bool saveGamma = false;
     bool saveElectron = false;
     bool savePositron = false;
+
 };
 
 enum class StackingType{
@@ -77,6 +78,7 @@ struct StackingSettings{
     bool saveGamma = false;
     bool saveElectron = false;
     double saveElectronCut = 0.0;
+    bool saveNeutron = false;
 };
 
 enum class SteppingType{
