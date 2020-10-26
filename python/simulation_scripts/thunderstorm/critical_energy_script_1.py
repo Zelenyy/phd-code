@@ -40,7 +40,7 @@ def input_generator_critical_energy():
     zero_field_min, zero_field_max = 3.0, 11.0
     zero_density = atmosphere.ISACalculator.density(0.0)
     gdml_index = 0
-    for height in np.arange(0.0, 16000.0, 1000.0):
+    for height in np.arange(0.0, 6000.0, 1000.0):
         density = atmosphere.ISACalculator.density(height)
         ratio = zero_density/density
         field_min = np.floor(zero_field_min/ratio)
@@ -94,7 +94,7 @@ def main():
     readers = [
         ProtoSetReader("stacking_simple.bin", CylinderProtoSet)
     ]
-    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=True))
+    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=True), n_cpu_cores=12)
     return 0
 
 
