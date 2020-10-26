@@ -232,9 +232,7 @@ def plot_secondary_production_rate(path, output="plot"):
     with tables.open_file(path) as h5file:
         for key, value in groups.items():
             energy_cut = value[0][0]
-
             plt.clf()
-            plt.figure()
             for energy, group_name in value:
                 table: tables.Table = h5file.get_node("/{}".format(group_name), "stacking_simple")
                 data = table.read()
