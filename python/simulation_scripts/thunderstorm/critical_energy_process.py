@@ -38,7 +38,7 @@ def main():
     args = create_parser().parse_args()
     if args.secondary_rate is not None:
         process_secondary_rate(args)
-    if args.secondary_rate_plot is not None:
+    if args.secondary_rate_plot:
         plot_seconadry(args)
     return 0
 
