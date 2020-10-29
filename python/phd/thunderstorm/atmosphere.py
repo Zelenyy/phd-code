@@ -75,16 +75,17 @@ def read_msise(path):
     dtype = np.dtype([
         ("altitude", "d"),  # meter
         ("low_temperature", "d"),  # Kelvin
+        ("low_density", "d"),          # kg/m3
         ("low_pressure", "d"),  # Pascal
-        ("low_density", "d"),  # kg/m3
+
         ("low_molar_weight", "d"),
         ("mean_temperature", "d"),
-        ("mean_pressure", "d"),
         ("mean_density", "d"),
+        ("mean_pressure", "d"),
         ("mean_molar_weight", "d"),
         ("high_temperature", "d"),
-        ("high_pressure", "d"),
         ("high_density", "d"),
+        ("high_pressure", "d"),
         ("high_molar_weight", "d")
     ])
     data = np.loadtxt(path, dtype=dtype)
