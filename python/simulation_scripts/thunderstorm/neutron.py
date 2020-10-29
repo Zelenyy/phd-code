@@ -11,8 +11,7 @@ DEFOULT_PATH = "../NeutronFullAtmosphere.gdml"
 SPACECART_PATH = "../SpaceCraftFullAtmosphere.gdml"
 
 
-INPUT_TEMPLATE="""
-/npm/geometry/type gdml
+INPUT_TEMPLATE="""/npm/geometry/type gdml
 /npm/geometry/gdml ${path}
 /npm/thunderstorm/physics withoutEmStandard
 /npm/thunderstorm/minimal_energy 10.0 MeV
@@ -22,7 +21,7 @@ INPUT_TEMPLATE="""
 /npm/thunderstorm/stacking/save_gamma false
 /npm/thunderstorm/stacking/save_electron false
 /npm/thunderstorm/stacking/save_neutron true
-/npm/thunderstorm/tracking/save_gamma false
+/npm/thunderstorm/tracking/save_gamma true
 /npm/thunderstorm/tracking/save_electron false
 
 /gps/particle gamma
@@ -37,7 +36,7 @@ def input_generator_neutron(gdml_path, physics):
     values = {
         "path": [gdml_path],
         "physics": [physics],
-        'number': [100 for i in range(10)],
+        'number': [10000 for i in range(10)],
         'energy': [100],
     }
     macros_template = Template(INPUT_TEMPLATE)
@@ -80,7 +79,8 @@ def main():
     input_data = input_generator_neutron(gdml_path, physics)
     command = "../../build/thunderstorm/geant4-thunderstorm.exe"
     readers = [
-        ProtoSetReader("stacking_simple.bin", CylinderProtoSet)
+        ProtoSetReader("stacking_simple.bin", CylinderProtoSet),
+        ProtoSetReader("tracking_post.bin", CylinderProtoSet)
     ]
     multirun_command(input_data, command, post_processor=get_convertor(readers, args.output, clear=True), n_cpu_cores=12)
     return 0
