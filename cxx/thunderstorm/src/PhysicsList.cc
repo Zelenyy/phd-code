@@ -79,6 +79,29 @@ PhysicsList::PhysicsList(string physics) {
 
         // Neutron tracking cut
         RegisterPhysics( new G4NeutronTrackingCut(ver));
+    } else if (physics == "withoutEmStandard"){
+        int ver = -1;
+        defaultCutValue = 0.7*CLHEP::mm;
+        // Synchroton Radiation & GN Physics
+        RegisterPhysics( new G4EmExtraPhysics(ver) );
+
+        // Decays
+        RegisterPhysics( new G4DecayPhysics(ver) );
+
+        // Hadron Elastic scattering
+        RegisterPhysics( new G4HadronElasticPhysics(ver) );
+
+        // Hadron Physics
+        RegisterPhysics(  new G4HadronPhysicsFTFP_BERT(ver));
+
+        // Stopping Physics
+        RegisterPhysics( new G4StoppingPhysics(ver) );
+
+        // Ion Physics
+        RegisterPhysics( new G4IonPhysics(ver));
+
+        // Neutron tracking cut
+        RegisterPhysics( new G4NeutronTrackingCut(ver));
     }
 
 
