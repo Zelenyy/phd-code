@@ -13,7 +13,7 @@ SPACECART_PATH = "../SpaceCraftFullAtmosphere.gdml"
 
 INPUT_TEMPLATE="""/npm/geometry/type gdml
 /npm/geometry/gdml ${path}
-/npm/thunderstorm/physics withoutEmStandard
+/npm/thunderstorm/physics ${physics}
 /npm/thunderstorm/minimal_energy 10.0 MeV
 /npm/thunderstorm/stacking/electron false
 /npm/thunderstorm/stacking/positron false
