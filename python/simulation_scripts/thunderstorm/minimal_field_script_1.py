@@ -40,13 +40,13 @@ def input_generator_critical_energy():
     gdml_template = os.path.join(ROOT_PATH, "template", "critical_energy.gdml")
     macros_template = Template(INPUT_TEMPLATE)
     count = 0
-    ratio = 0.03
+    ratio = 0.10
     cep = CriticalEnergyProvider()
     gdml_index = 0
     for height in np.arange(0.0, 16000.0, 1000.0):
         min_field = get_minimal_field(height)
 
-        for field in np.arange(min_field, min_field*1.5, min_field*ratio):
+        for field in np.arange(min_field*1.25, min_field*2, min_field*ratio):
             values_gdml = {
                 'height': height,
                 'field': field*1e-4,

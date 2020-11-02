@@ -74,7 +74,7 @@ def plot_minimal_field_production(path, output="plot"):
             plt.xlabel("Height, meters")
             plt.ylabel("Cumulative number of electron")
             plt.legend()
-            plt.yscale("log")
+            # plt.yscale("log")
             plt.tight_layout()
             plt.savefig(path, format="png", transparent=True, dpi = 600)
     return 0
