@@ -42,6 +42,7 @@ def input_generator_critical_energy():
     count = 0
     ratio = 0.03
     cep = CriticalEnergyProvider()
+    gdml_index = 0
     for height in np.arange(0.0, 16000.0, 1000.0):
         min_field = get_minimal_field(height)
 
@@ -51,7 +52,8 @@ def input_generator_critical_energy():
                 'field': field*1e-4,
             }
             critical_energy = cep.get_critical_energy(height, field*1e-4)
-            paths, _ = create_gdml(gdml_template, values_gdml)
+            paths, _ = create_gdml(gdml_template, values_gdml, gdml_index)
+            gdml_index += 1
             gdml_path = paths[0]
             values = {
                 "path": [os.path.join("..",gdml_path)],
@@ -87,7 +89,7 @@ def main():
     readers = [
         ProtoSetReader("stacking_simple.bin", CylinderProtoSet)
     ]
-    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=True))
+    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=True), n_cpu_cores=12)
     return 0
 
 

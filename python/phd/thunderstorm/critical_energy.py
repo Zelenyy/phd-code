@@ -315,5 +315,11 @@ class CriticalEnergyProvider:
         indx = np.logical_and(self.data["height"] == height, self.data["field"] == field)
         rate_cut = 1/length
         data = self.data[indx]
-        indx = (data["k"] > rate_cut).argmax()
+        indx = np.argsort(data["energy"])
+        data = data[indx]
+        indx = data["k"] > rate_cut
+        if np.any(indx):
+            indx = indx.argmax()
+        else:
+            indx = -1
         return data["energy"][indx]
