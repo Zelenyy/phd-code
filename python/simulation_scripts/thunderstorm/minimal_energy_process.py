@@ -35,7 +35,7 @@ def create_parser():
 
 def main():
     args = create_parser().parse_args()
-    if args.production_plot is not None:
+    if args.production_plot:
         plot_seconadry(args)
     return 0
 
