@@ -150,6 +150,11 @@ void ThunderstormMessenger::initStackingSettings() {
     enableElectron->SetParameterName("flag", false);
     enablePositron = new G4UIcmdWithABool(stacking_positron_path.c_str(), this);
     enablePositron->SetParameterName("flag", false);
+
+    enableNeutron = new G4UIcmdWithABool(stacking_neutron_path.c_str(), this);
+    enableNeutron->SetParameterName("flag", false);
+
+
     stacking_type = new G4UIcmdWithAString(stacking_type_path.c_str(), this);
     stacking_type->SetGuidance("Set using stacking action.");
     stacking_type->SetParameterName("stacking_type", true);
@@ -178,6 +183,8 @@ bool ThunderstormMessenger::setStackingSettings(G4UIcommand *command, G4String n
         stackingSettings->enablePositron = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else if (command == enableElectron) {
         stackingSettings->enableElectron = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    } else if (command == enableNeutron) {
+        stackingSettings->enableNeutron = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else if (command == saveGamma) {
         stackingSettings->saveGamma = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else if (command == saveElectron) {
@@ -226,6 +233,9 @@ void ThunderstormMessenger::initTrackingSettings() {
     trackingSaveElectron->SetParameterName("flag", false);
     trackingSavePositron = new G4UIcmdWithABool(tracking_positron_save_path.c_str(), this);
     trackingSavePositron->SetParameterName("flag", false);
+
+    trackingSaveNeutron = new G4UIcmdWithABool(tracking_neutron_save_path.c_str(), this);
+    trackingSaveNeutron->SetParameterName("flag", false);
 }
 
 bool ThunderstormMessenger::setTrackingSettings(G4UIcommand *command, G4String newValue) {
@@ -236,6 +246,8 @@ bool ThunderstormMessenger::setTrackingSettings(G4UIcommand *command, G4String n
         trackingSettings->saveElectron = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else if (command == trackingSavePositron) {
         trackingSettings->savePositron = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    } else if (command == trackingSaveNeutron) {
+        trackingSettings->saveNeutron = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else {
         return false;
     }

@@ -36,6 +36,7 @@ private:
     void PostGamma(const G4Track *track);
     void PostElectron(const G4Track *track);
     void PostPositron(const G4Track *track);
+    void PostNeutron(const G4Track *track);
 
 };
 

@@ -61,6 +61,7 @@ struct TrackingSettings{
     bool saveGamma = false;
     bool saveElectron = false;
     bool savePositron = false;
+    bool saveNeutron = false;
 
 };
 
@@ -74,6 +75,7 @@ struct StackingSettings{
     bool enableGamma = false;
     bool enablePositron = false;
     bool enableMuon = false;
+    bool enableNeutron = false;
 
     bool saveGamma = false;
     bool saveElectron = false;

@@ -99,12 +99,14 @@ private:
     G4UIcmdWithABool* enablePositron;
     G4UIcmdWithABool* enableElectron;
     G4UIcmdWithABool* enableMuon;
+    G4UIcmdWithABool* enableNeutron;
     string stacking_path = thunderstorm_path + "stacking/";
     string stacking_type_path = stacking_path  + "type";
     string stacking_gamma_path = stacking_path  + "gamma";
     string stacking_electron_path = stacking_path  + "electron";
     string stacking_positron_path = stacking_path  + "positron";
     string stacking_muon_path = stacking_path  + "muon";
+    string stacking_neutron_path = stacking_path  + "neutron";
 
     G4UIcmdWithABool* saveGamma;
     G4UIcmdWithABool* saveElectron;
@@ -122,11 +124,12 @@ private:
     G4UIcmdWithABool* trackingSaveGamma;
     G4UIcmdWithABool* trackingSaveElectron;
     G4UIcmdWithABool* trackingSavePositron;
+    G4UIcmdWithABool* trackingSaveNeutron;
     string tracking_path = thunderstorm_path + "tracking/";
     string tracking_gamma_save_path = tracking_path  + "save_gamma";
     string tracking_electron_save_path = tracking_path  + "save_electron";
     string tracking_positron_save_path = tracking_path  + "save_positron";
-
+    string tracking_neutron_save_path = tracking_path  + "save_neutron";
 };
 
 

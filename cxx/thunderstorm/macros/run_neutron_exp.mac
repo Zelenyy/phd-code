@@ -1,0 +1,24 @@
+/npm/geometry/type gdml
+#/npm/geometry/gdml ../gdml/NeutronFullAtmosphere.gdml
+/npm/geometry/gdml ../gdml/SpaceCraftFullAtmosphere.gdml
+#/npm/visualization true
+/npm/thunderstorm/physics FTFP_BERT_opt4
+/npm/thunderstorm/minimal_energy 1.0 MeV
+/npm/thunderstorm/stacking/electron false
+/npm/thunderstorm/stacking/positron false
+/npm/thunderstorm/stacking/gamma true
+/npm/thunderstorm/stacking/save_gamma false
+/npm/thunderstorm/stacking/save_electron false
+/npm/thunderstorm/stacking/save_neutron true
+/npm/thunderstorm/tracking/save_gamma false
+/npm/thunderstorm/tracking/save_electron false
+
+/gps/particle gamma
+/gps/position 0.0 0.0 15000.0 meter
+/gps/direction 0 0 1
+/gps/ene/type Exp
+/gps/ene/ezero 15
+/gps/ene/min 1 MeV
+/gps/ene/max 100 MeV
+/run/beamOn 1000000
+exit

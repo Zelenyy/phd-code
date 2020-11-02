@@ -114,6 +114,9 @@ G4ClassificationOfNewTrack StackingAction::ClassifyNeutron(const G4Track *pTrack
     if (pTrack->GetKineticEnergy() < cut){
         return fKill;
     }
+    if (stackingSettings->enableNeutron){
+        return fUrgent;
+    }
     return fKill;
 }
 
