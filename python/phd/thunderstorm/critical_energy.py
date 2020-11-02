@@ -290,7 +290,9 @@ def calculate_secondary_production_rate(path, rate_cut = 0.001, method="simple")
                     energy_cut = energy
 
                 y_fit = p[1]*x + p[0]
-                chi2 = ((y - y_fit)/y_fit)**2
+                indx = y_fit !=0
+                y_fit = y_fit[indx]
+                chi2 = np.sum(((y[indx] - y_fit)/y_fit)**2)
 
                 result.append((key.field, key.height, energy, p[1], p[0], chi2))
         return np.array(result, dtype=dtype)
