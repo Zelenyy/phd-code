@@ -25,8 +25,8 @@ def create_parser():
     parser = argparse.ArgumentParser(description='Process critical energy.')
     parser.add_argument('files', metavar='FILE', type=str, nargs='+',
                         help='an files for processing')
-    # parser.add_argument('--secondary-rate', action='store',
-    #                     help='calculate rate of secondary production for all parameters', default=None)
+    parser.add_argument('--find', action='store_true',
+                        help='find minimal field')
     parser.add_argument('--production-plot', action='store_true',
                         help='Plot secondary production for all parameters')
     parser.add_argument("--output", "-o", action="store", help="Output file name", default="minimal_field")
@@ -37,6 +37,8 @@ def main():
     args = create_parser().parse_args()
     if args.production_plot:
         plot_seconadry(args)
+    if args.find:
+        process_minimal_field(args)
     return 0
 
 if __name__ == '__main__':
