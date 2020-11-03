@@ -1,7 +1,7 @@
 
 import argparse
 import numpy as np
-from phd.thunderstorm.minimal_field import plot_minimal_field_production
+from phd.thunderstorm.minimal_field import plot_minimal_field_production, find_minimal_field
 
 
 def plot_seconadry(args):
@@ -9,17 +9,17 @@ def plot_seconadry(args):
         plot_minimal_field_production(file, output=args.output)
     return 0
 
-# def process_secondary_rate(args):
-#     result = []
-#     for file in args.files:
-#         data = calculate_secondary_production_rate(file, method=args.secondary_rate)
-#         result.append(data)
-#     if len(result) > 1:
-#         data = np.hstack(result)
-#     else:
-#         data = result[0]
-#     np.save(args.output, data)
-#     return 0
+def process_minimal_field(args):
+    result = []
+    for file in args.files:
+        data = find_minimal_field(file)
+        result.append(data)
+    if len(result) > 1:
+        data = np.hstack(result)
+    else:
+        data = result[0]
+    np.save(args.output, data)
+    return 0
 
 def create_parser():
     parser = argparse.ArgumentParser(description='Process critical energy.')

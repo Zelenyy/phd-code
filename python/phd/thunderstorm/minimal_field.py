@@ -3,6 +3,7 @@ import os
 import star
 import numpy as np
 import tables
+from numpy.linalg import lstsq
 from phd.thunderstorm import atmosphere
 import matplotlib.pyplot as plt
 
@@ -44,21 +45,9 @@ def plot_minimal_field_production(path, output="plot"):
 
     if not os.path.exists(output):
         os.mkdir(output)
-
     groups = get_group(path)
     bins = np.arange(-500.0, 501, 1)
     x = bins[:-1]
-    result = []
-    dtype = np.dtype(
-        [
-            ("field", "d"),
-            ("height", "d"),
-            ("energy", "d"),
-            ("k", "d"),
-            ("b", "d")
-        ]
-    )
-
     with tables.open_file(path) as h5file:
         for height, value in groups.items():
             plt.clf()
@@ -79,3 +68,43 @@ def plot_minimal_field_production(path, output="plot"):
             plt.savefig(path, format="png", transparent=True, dpi = 600)
     return 0
 
+
+def find_minimal_field(path):
+    groups = get_group(path)
+    bins = np.arange(-500.0, 501, 1)
+    x = bins[:-1]
+    M = x[:, np.newaxis] ** [0, 1]
+    result = []
+    dtype = np.dtype(
+        [
+            ("field", "d"),
+            ("height", "d"),
+            ("coverage", np.bool_)
+        ]
+    )
+
+    with tables.open_file(path) as h5file:
+        for height, value in groups.items():
+            res_height = []
+            for field, group_name in value:
+                table: tables.Table = h5file.get_node("/{}".format(group_name), "stacking_simple")
+                data = table.read()
+                number = table.attrs["values_macros_number"]
+                temp, _ = np.histogram(data["z"], bins=bins)
+                temp = np.cumsum(temp[::-1])
+                y = temp / number
+                res_height.append((field, y))
+
+            field, y = res_height[-1]
+            if y[-1] <= 2:
+                result.append((height, field, False))
+            else:
+                prev_field = res_height[-1][0]
+                for field, y in res_height[::-1]:
+                    p, res, rnk, s = lstsq(M, y)
+                    k = p[1]
+                    if k<0.001:
+                        field = (field + prev_field)/2
+                        result.append((height, field, True))
+                        break
+    return np.array(result, dtype=dtype)
