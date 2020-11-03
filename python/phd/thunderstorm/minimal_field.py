@@ -77,8 +77,9 @@ def find_minimal_field(path):
     result = []
     dtype = np.dtype(
         [
-            ("field", "d"),
             ("height", "d"),
+            ("field", "d"),
+            ("baseline", "d"),
             ("coverage", np.bool_)
         ]
     )
@@ -86,6 +87,7 @@ def find_minimal_field(path):
     with tables.open_file(path) as h5file:
         for height, value in groups.items():
             res_height = []
+            baseline = get_minimal_field(height)
             for field, group_name in value:
                 table: tables.Table = h5file.get_node("/{}".format(group_name), "stacking_simple")
                 data = table.read()
@@ -97,7 +99,7 @@ def find_minimal_field(path):
 
             field, y = res_height[-1]
             if y[-1] <= 2:
-                result.append((height, field, False))
+                result.append((height, field, baseline, False))
             else:
                 prev_field = res_height[-1][0]
                 for field, y in res_height[::-1]:
@@ -105,6 +107,6 @@ def find_minimal_field(path):
                     k = p[1]
                     if k<0.001:
                         field = (field + prev_field)/2
-                        result.append((height, field, True))
+                        result.append((height, field, baseline, True))
                         break
     return np.array(result, dtype=dtype)
