@@ -3,9 +3,9 @@ import os
 import numpy as np
 from phd.utils.hdf5_tools import ProtoSetConvertor, DtypeProtoSetConvertor
 from phd.utils.histogram_pb2 import Histogram2DList
-from tables import Int32Col, IsDescription
+from tables import Int32Col, IsDescription, File, Group
 
-from phd.thunderstorm.thunderstorm_pb2 import CylinderIdList, ParticleDetectorList
+from phd.thunderstorm.thunderstorm_pb2 import CylinderIdList, ParticleDetectorList, Cumulator1D, Cumulator2D
 from ..utils.hdf5_tools import txtDataReader, dtypeDataReader
 
 names_txt = ['Primary', 'Gamma', 'Electron', 'Positron']
@@ -143,6 +143,71 @@ class ParticleDetectorProtoSet(DtypeProtoSetConvertor):
         table = self.h5file.get_node(self.group, self.tableName)
         table.append(data)
         table.flush()
+
+class Cumulator1DProtoSet(ProtoSetConvertor):
+
+    eventID = 0
+
+    def __init__(self, h5file: File, group: Group, filename: str = None, settings=None):
+        ProtoSetConvertor.__init__(self, h5file, group, filename, settings)
+        self.init()
+
+    def init(self, proto_item=None):
+        self.groupName = self.filename
+        if ("e-" in self.groupName):
+            self.groupName = self.groupName.replace("e-", "electron")
+        if ("e+" in self.groupName):
+            self.groupName = self.groupName.replace("e+", "positron")
+        self.h5file.create_group(self.group, self.groupName)
+
+    def convert(self, data: bytes):
+        proto = Cumulator1D()
+        proto.ParseFromString(data)
+        data = np.array(proto.data)
+        data_group = self.h5file.get_node(self.group, self.groupName)
+        array = self.h5file.create_array(data_group, "event"+str(self.eventID).rjust(5, "0"), obj=data)
+        array.attrs["eventID"] = self.eventID
+        array.attrs["number"] =proto.number
+        array.attrs["left"] = proto.left
+        array.attrs['right'] = proto.right
+        array.flush()
+        self.eventID+=1
+
+class Cumulator2DProtoSet(ProtoSetConvertor):
+
+    eventID = 0
+
+    def __init__(self, h5file: File, group: Group, filename: str = None, settings=None):
+        ProtoSetConvertor.__init__(self, h5file, group, filename, settings)
+        self.init()
+
+    def init(self, proto_item=None):
+        self.groupName = self.filename
+        if ("e-" in self.groupName):
+            self.groupName = self.groupName.replace("e-", "electron")
+        if ("e+" in self.groupName):
+            self.groupName = self.groupName.replace("e+", "positron")
+        self.h5file.create_group(self.group, self.groupName)
+
+    def convert(self, data: bytes):
+        proto = Cumulator2D()
+        proto.ParseFromString(data)
+        data = np.array(proto.data)
+        data_group = self.h5file.get_node(self.group, self.groupName)
+        array = self.h5file.create_array(data_group, "event"+str(self.eventID).rjust(5, "0"), obj=data)
+        array.attrs["eventID"] = self.eventID
+
+
+        def fill_bins(bins, prefix):
+            array.attrs[prefix + "_number"] = bins.number
+            array.attrs[prefix + "_left"] = bins.left
+            array.attrs[prefix + "_right"] = bins.right
+
+        fill_bins(proto.x, "x")
+        fill_bins(proto.y, "y")
+
+        array.flush()
+        self.eventID+=1
 
 
 class HistogramProtoSet(ProtoSetConvertor):

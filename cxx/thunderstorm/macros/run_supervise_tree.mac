@@ -1,0 +1,23 @@
+/npm/geometry/type custom
+/npm/thunderstorm/geometry/type uniform_cylinder
+/npm/thunderstorm/geometry/length 500 m
+/npm/thunderstorm/geometry/height 0 m
+/npm/thunderstorm/geometry/field_z 400.0 kV/m
+#/npm/visualization true
+/npm/thunderstorm/physics standard
+/npm/thunderstorm/minimal_energy 0.050 MeV
+/npm/thunderstorm/supervise_tree true
+/npm/thunderstorm/stacking/electron true
+/npm/thunderstorm/stacking/positron false
+/npm/thunderstorm/stacking/gamma false
+/npm/thunderstorm/stacking/save_gamma false
+/npm/thunderstorm/stacking/save_electron false
+/npm/thunderstorm/tracking/save_gamma false
+/npm/thunderstorm/tracking/save_electron false
+
+/gps/particle e-
+/gps/position 0.0 0.0 0.0 meter
+/gps/direction 0 0 1
+/gps/ene/mono 1.2 MeV
+/run/beamOn 10
+exit

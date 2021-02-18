@@ -29,8 +29,10 @@ void ActionInitialization::Build() const {
 
 
     auto stackingSettings = settings->stackingSettings;
+    StackingAction *stackingAction;
     if (stackingSettings->type == StackingType::simple){
-        SetUserAction(new StackingAction(settings));
+        stackingAction = new StackingAction(settings);
+        SetUserAction(stackingAction);
         logger->print("Using stacking  action: default simple");
     }
 //     if (settings->stacking == "dwyer2003") {
@@ -42,15 +44,29 @@ void ActionInitialization::Build() const {
 //        logger->print("Using stacking  action: particle_cylinder");
 //    }
     auto steppingSettings = settings->steppingSettings;
-    if (steppingSettings->type == SteppingType::simple) {
-        SetUserAction(new SteppingAction(settings));
-        logger->print("Using stepping  action: default");
-    } else if (steppingSettings->type == SteppingType::critical_energy){
-        SetUserAction(new CriticalEnergySteppingAction(settings));
-        logger->print("Using stepping  action: critical_energy");
+    SteppingAction* steppingAction;
+//    if (steppingSettings->type == SteppingType::simple) {
+//        steppingAction = new SteppingAction(settings);
+//        logger->print("Using stepping  action: default");
+//    } else if (steppingSettings->type == SteppingType::critical_energy){
+//        steppingAction =new CriticalEnergySteppingAction(settings);
+//        logger->print("Using stepping  action: critical_energy");
+//    }
+    steppingAction = new SteppingAction(settings);
+    SetUserAction(steppingAction);
+
+
+    TrackingAction *trackingAction;
+    trackingAction = new TrackingAction(settings);
+    SetUserAction(trackingAction);
+
+
+    if (settings->superviseTree){
+        auto electronCounter = new ElectronsCounter(settings, "electron");
+        eventAction->electronCounter = electronCounter;
+        trackingAction->electronCounter = electronCounter;
+        steppingAction->electronsCounter = electronCounter;
+
     }
-
-    SetUserAction(new TrackingAction(settings));
-
 
 }

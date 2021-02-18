@@ -29,3 +29,14 @@ message Histogram4D{
     Bins tbins = 5;
     repeated MetaPair meta = 6;
 }
+
+message UniformBins{
+    int32 number = 1;
+    double left = 2;
+    double right = 3;
+}
+
+message UniformHistogram1D{
+    UniformBins bins = 1;
+    repeated int32 data = 2 [packed=true];
+}

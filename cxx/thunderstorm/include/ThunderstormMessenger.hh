@@ -34,23 +34,19 @@ private:
     G4UIcmdWithAString * stackingParticle;
     G4UIcmdWithAString * detectorParticle;
     G4UIcmdWithADoubleAndUnit * minimalEnergy;
+    G4UIcmdWithABool * superviseTree;
 private:
     string thunderstorm_path = root_path + "thunderstorm/";
     string physics_path = thunderstorm_path + "physics";
 
     string energy_cut_path = thunderstorm_path + "minimal_energy";
+    string supervise_tree_path = thunderstorm_path + "supervise_tree";
     string add_particle_stacking_path = thunderstorm_path + "addParticleInPCS";
     string add_particle_detector_path = thunderstorm_path + "addParticleInPD";
 
 private:
-    G4UIcmdWithAString* thunderstorm_gen_type;
-    string thunderstorm_gen_type_path = thunderstorm_path + "geo_type";
 
-    G4UIcmdWithADoubleAndUnit * geo_height;
-    string geo_height_path = thunderstorm_path + "height";
 
-    G4UIcmdWithADoubleAndUnit * field_z;
-    string field_z_path = thunderstorm_path + "field_z";
 
     G4UIdirectory * aragats;
     string aragats_path = thunderstorm_path + "aragats/";
@@ -83,6 +79,23 @@ private:
     string parma_position_path = parma_path + "position";
 
 private:
+    void initGeometrySettings();
+    bool setGeometrySettings(G4UIcommand *command, G4String newValue);
+    G4UIdirectory* geometry;
+    string geometry_path = thunderstorm_path + "geometry/";
+    G4UIcmdWithAString* thunderstorm_geo_type;
+    string thunderstorm_geo_type_path = geometry_path + "type";
+
+    G4UIcmdWithADoubleAndUnit * geo_height;
+    string geo_height_path =geometry_path + "height";
+
+    G4UIcmdWithADoubleAndUnit * field_z;
+    string field_z_path = geometry_path + "field_z";
+
+    G4UIcmdWithADoubleAndUnit * cloud_length;
+    string cloud_length_path =geometry_path + "length";
+
+private:
     void initSteppingSettings();
     bool setSteppingSettings(G4UIcommand *command, G4String newValue);
     G4UIdirectory * stepping;
@@ -110,10 +123,12 @@ private:
 
     G4UIcmdWithABool* saveGamma;
     G4UIcmdWithABool* saveElectron;
+    G4UIcmdWithABool* savePositron;
     G4UIcmdWithABool* saveNeutron;
     G4UIcmdWithADoubleAndUnit * saveElectronCut;
     string stacking_gamma_save_path = stacking_path  + "save_gamma";
     string stacking_electron_save_path = stacking_path  + "save_electron";
+    string stacking_positron_save_path = stacking_path  + "save_positron";
     string stacking_electron_save_cut__path = stacking_path  + "save_electron_cut";
     string stacking_neutron_save_path = stacking_path  + "save_neutron";
 

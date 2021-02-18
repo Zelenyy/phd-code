@@ -87,7 +87,7 @@ def find_minimal_field(path):
     with tables.open_file(path) as h5file:
         for height, value in groups.items():
             res_height = []
-            baseline = get_minimal_field(height)
+            baseline = get_minimal_field(height)*1e-4
             for field, group_name in value:
                 table: tables.Table = h5file.get_node("/{}".format(group_name), "stacking_simple")
                 data = table.read()

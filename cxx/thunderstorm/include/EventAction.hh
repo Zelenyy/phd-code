@@ -8,6 +8,7 @@
 
 #include <G4UserEventAction.hh>
 #include "Settings.hh"
+#include "DataThunderstorm.hh"
 #include <iostream>
 #include <DataFileManager.hh>
 
@@ -21,6 +22,9 @@ public:
 
     void EndOfEventAction(const G4Event *anEvent) override;
 
+
+public:
+    ElectronsCounter* electronCounter = nullptr;
 private:
     DataFileManager* dataFileManager;
     Settings* fSettings;

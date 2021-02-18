@@ -5,18 +5,11 @@
 #include "ThunderstormConstruction.hh"
 #include <G4SDManager.hh>
 #include <ParticleDetector.hh>
-#include <G4DormandPrince745.hh>
-#include <G4MagIntegratorDriver.hh>
-#include <G4ChordFinder.hh>
-#include "G4FieldManager.hh"
-#include <G4ElectricField.hh>
-#include <G4UniformElectricField.hh>
-#include <G4EqMagElectricField.hh>
+
 
 G4VPhysicalVolume *ThunderstormConstruction::constuctWorld() {
 
-    G4double world_radius = 4.5 * kilometer;
-    G4double world_sizeZ = 4.5 * kilometer;
+
 
     G4VSolid *solidWorld =
             getCylinder("World",

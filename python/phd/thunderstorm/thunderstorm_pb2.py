@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='thunderstorm',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x12thunderstorm.proto\x12\x0cthunderstorm\"O\n\x0e\x43ylinderIdList\x12\x0f\n\x07\x65ventId\x18\x01 \x01(\x05\x12,\n\ncylinderId\x18\x02 \x03(\x0b\x32\x18.thunderstorm.CylinderId\"\x85\x01\n\nCylinderId\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x11\n\tparent_id\x18\x02 \x01(\x05\x12\x10\n\x08particle\x18\x03 \x01(\x05\x12\x0e\n\x06\x65nergy\x18\x04 \x01(\x01\x12\r\n\x05theta\x18\x05 \x01(\x01\x12\x0e\n\x06radius\x18\x06 \x01(\x01\x12\t\n\x01z\x18\x07 \x01(\x01\x12\x0c\n\x04time\x18\x08 \x01(\x01\"Y\n\x14ParticleDetectorList\x12\x0f\n\x07\x65ventId\x18\x01 \x01(\x05\x12\x30\n\x04\x64\x61ta\x18\x02 \x03(\x0b\x32\".thunderstorm.ParticleDetectorData\"e\n\x14ParticleDetectorData\x12\x10\n\x08particle\x18\x01 \x01(\x05\x12\x0e\n\x06\x65nergy\x18\x02 \x01(\x01\x12\r\n\x05theta\x18\x03 \x01(\x01\x12\x0e\n\x06radius\x18\x04 \x01(\x01\x12\x0c\n\x04time\x18\x05 \x01(\x01\x62\x06proto3'
+  serialized_pb=b'\n\x12thunderstorm.proto\x12\x0cthunderstorm\"O\n\x0e\x43ylinderIdList\x12\x0f\n\x07\x65ventId\x18\x01 \x01(\x05\x12,\n\ncylinderId\x18\x02 \x03(\x0b\x32\x18.thunderstorm.CylinderId\"\x85\x01\n\nCylinderId\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x11\n\tparent_id\x18\x02 \x01(\x05\x12\x10\n\x08particle\x18\x03 \x01(\x05\x12\x0e\n\x06\x65nergy\x18\x04 \x01(\x01\x12\r\n\x05theta\x18\x05 \x01(\x01\x12\x0e\n\x06radius\x18\x06 \x01(\x01\x12\t\n\x01z\x18\x07 \x01(\x01\x12\x0c\n\x04time\x18\x08 \x01(\x01\"Y\n\x14ParticleDetectorList\x12\x0f\n\x07\x65ventId\x18\x01 \x01(\x05\x12\x30\n\x04\x64\x61ta\x18\x02 \x03(\x0b\x32\".thunderstorm.ParticleDetectorData\"e\n\x14ParticleDetectorData\x12\x10\n\x08particle\x18\x01 \x01(\x05\x12\x0e\n\x06\x65nergy\x18\x02 \x01(\x01\x12\r\n\x05theta\x18\x03 \x01(\x01\x12\x0e\n\x06radius\x18\x04 \x01(\x01\x12\x0c\n\x04time\x18\x05 \x01(\x01\"L\n\x0b\x43umulator1D\x12\x0e\n\x06number\x18\x01 \x01(\x05\x12\x0c\n\x04left\x18\x02 \x01(\x01\x12\r\n\x05right\x18\x03 \x01(\x01\x12\x10\n\x04\x64\x61ta\x18\x04 \x03(\x01\x42\x02\x10\x01\":\n\x0bUniformBins\x12\x0e\n\x06number\x18\x01 \x01(\x05\x12\x0c\n\x04left\x18\x02 \x01(\x01\x12\r\n\x05right\x18\x03 \x01(\x01\"k\n\x0b\x43umulator2D\x12$\n\x01x\x18\x01 \x01(\x0b\x32\x19.thunderstorm.UniformBins\x12$\n\x01y\x18\x02 \x01(\x0b\x32\x19.thunderstorm.UniformBins\x12\x10\n\x04\x64\x61ta\x18\x03 \x03(\x01\x42\x02\x10\x01\x62\x06proto3'
 )
 
 
@@ -238,12 +238,159 @@ _PARTICLEDETECTORDATA = _descriptor.Descriptor(
   serialized_end=445,
 )
 
+
+_CUMULATOR1D = _descriptor.Descriptor(
+  name='Cumulator1D',
+  full_name='thunderstorm.Cumulator1D',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='number', full_name='thunderstorm.Cumulator1D.number', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='left', full_name='thunderstorm.Cumulator1D.left', index=1,
+      number=2, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='right', full_name='thunderstorm.Cumulator1D.right', index=2,
+      number=3, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='data', full_name='thunderstorm.Cumulator1D.data', index=3,
+      number=4, type=1, cpp_type=5, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\020\001', file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=447,
+  serialized_end=523,
+)
+
+
+_UNIFORMBINS = _descriptor.Descriptor(
+  name='UniformBins',
+  full_name='thunderstorm.UniformBins',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='number', full_name='thunderstorm.UniformBins.number', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='left', full_name='thunderstorm.UniformBins.left', index=1,
+      number=2, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='right', full_name='thunderstorm.UniformBins.right', index=2,
+      number=3, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=525,
+  serialized_end=583,
+)
+
+
+_CUMULATOR2D = _descriptor.Descriptor(
+  name='Cumulator2D',
+  full_name='thunderstorm.Cumulator2D',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='x', full_name='thunderstorm.Cumulator2D.x', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='y', full_name='thunderstorm.Cumulator2D.y', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='data', full_name='thunderstorm.Cumulator2D.data', index=2,
+      number=3, type=1, cpp_type=5, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\020\001', file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=585,
+  serialized_end=692,
+)
+
 _CYLINDERIDLIST.fields_by_name['cylinderId'].message_type = _CYLINDERID
 _PARTICLEDETECTORLIST.fields_by_name['data'].message_type = _PARTICLEDETECTORDATA
+_CUMULATOR2D.fields_by_name['x'].message_type = _UNIFORMBINS
+_CUMULATOR2D.fields_by_name['y'].message_type = _UNIFORMBINS
 DESCRIPTOR.message_types_by_name['CylinderIdList'] = _CYLINDERIDLIST
 DESCRIPTOR.message_types_by_name['CylinderId'] = _CYLINDERID
 DESCRIPTOR.message_types_by_name['ParticleDetectorList'] = _PARTICLEDETECTORLIST
 DESCRIPTOR.message_types_by_name['ParticleDetectorData'] = _PARTICLEDETECTORDATA
+DESCRIPTOR.message_types_by_name['Cumulator1D'] = _CUMULATOR1D
+DESCRIPTOR.message_types_by_name['UniformBins'] = _UNIFORMBINS
+DESCRIPTOR.message_types_by_name['Cumulator2D'] = _CUMULATOR2D
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 CylinderIdList = _reflection.GeneratedProtocolMessageType('CylinderIdList', (_message.Message,), {
@@ -274,5 +421,28 @@ ParticleDetectorData = _reflection.GeneratedProtocolMessageType('ParticleDetecto
   })
 _sym_db.RegisterMessage(ParticleDetectorData)
 
+Cumulator1D = _reflection.GeneratedProtocolMessageType('Cumulator1D', (_message.Message,), {
+  'DESCRIPTOR' : _CUMULATOR1D,
+  '__module__' : 'thunderstorm_pb2'
+  # @@protoc_insertion_point(class_scope:thunderstorm.Cumulator1D)
+  })
+_sym_db.RegisterMessage(Cumulator1D)
 
+UniformBins = _reflection.GeneratedProtocolMessageType('UniformBins', (_message.Message,), {
+  'DESCRIPTOR' : _UNIFORMBINS,
+  '__module__' : 'thunderstorm_pb2'
+  # @@protoc_insertion_point(class_scope:thunderstorm.UniformBins)
+  })
+_sym_db.RegisterMessage(UniformBins)
+
+Cumulator2D = _reflection.GeneratedProtocolMessageType('Cumulator2D', (_message.Message,), {
+  'DESCRIPTOR' : _CUMULATOR2D,
+  '__module__' : 'thunderstorm_pb2'
+  # @@protoc_insertion_point(class_scope:thunderstorm.Cumulator2D)
+  })
+_sym_db.RegisterMessage(Cumulator2D)
+
+
+_CUMULATOR1D.fields_by_name['data']._options = None
+_CUMULATOR2D.fields_by_name['data']._options = None
 # @@protoc_insertion_point(module_scope)

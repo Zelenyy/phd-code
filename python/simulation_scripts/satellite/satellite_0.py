@@ -12,10 +12,11 @@ from phd.utils.run_tools import multirun_command, \
 
 ROOT_PATH = os.path.dirname(__file__)
 
-INPUT_TEMPLATE = """/df/project test
-/df/gdml ../../satellite_anthracene.gdml
-/satellite/output file
-/satellite/detector ${mode}
+INPUT_TEMPLATE = """/npm/geometry/type gdml
+/npm/geometry/gdml ../../build/satellite/gdml/satellite.gdml
+/npm/visualization false
+/npm/satellite/detector ${mode}
+/npm/satellite/output file
 
 /gps/particle ${particle}
 /gps/number 1
@@ -23,6 +24,7 @@ INPUT_TEMPLATE = """/df/project test
 /gps/ene/mono ${energy} MeV
 /gps/position ${posX} 0. ${posZ} m
 /run/beamOn ${number}
+exit
 """
 
 
@@ -32,20 +34,19 @@ INPUT_TEMPLATE = """/df/project test
 def main():
     logging.basicConfig(filename="run.log")
     logging.root.setLevel(logging.DEBUG)
-
+    OUTPUT_FILE = "result.hdf5"
     values_macros = {
-        "mode" : "single",
+        "mode" : "single", # or "sum"
         "radius" : 0.15,
         # "shift": [0.0, 0.005, 0.016],
         # "theta": [0.0, 10.0, 20., 30.0, 50.0, 70.0],
-        "shift" : 0,
-        "theta" : np.arange(0.0,31.0, 3),
-        # "theta" : [30], #[0.0],
+        "shift" : 0.0,
+        "theta" : 0.0,
         "theta_unit": "degree",
-        'energy': np.arange(0.5,15.1, 0.5),
-        'number': [10000],
-        'particle': 'e-'
-        # 'particle': 'proton'
+        'energy': np.arange(10.0,15.1, 1.0),
+        'number': [100],
+        # 'particle': 'e-'
+        'particle': 'proton'
     }
     meta = Meta(
         {
@@ -56,9 +57,7 @@ def main():
     input_data = input_generator_satellite(meta, INPUT_TEMPLATE, init_pos=[0.0,0.0, 0.1])
     command = "../../build/satellite/geant4-satellite.exe"
     readers = [ProtoReader("deposit.proto.bin", proto_convertor=convert_satellite_proto)]
-    # for data in input_data:
-    #     print(data.text)
-    multirun_command(input_data, command, post_processor=get_convertor(readers, "./mcmc_electron.hdf5", clear=True))
+    multirun_command(input_data, command, post_processor=get_convertor(readers, OUTPUT_FILE, clear=True))
     return 0
 
 

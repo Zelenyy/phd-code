@@ -24,14 +24,23 @@ public:
             data = new CylinderId;
             DataFileManager::instance()->registerDataContainer("tracking_post", data);
         }
+
+        if (fSettings->superviseTree){
+            superviseTree = SuperviseTree::instance();
+        }
     }
 
     void PostUserTrackingAction(const G4Track *track) override;
 
+public:
+    ElectronsCounter* electronCounter = nullptr;
 private:
     Settings* fSettings;
     TrackingSettings* fTrackingSettings;
     CylinderId *data;
+    SuperviseTree* superviseTree;
+
+
 
     void PostGamma(const G4Track *track);
     void PostElectron(const G4Track *track);

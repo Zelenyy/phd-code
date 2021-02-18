@@ -10,6 +10,7 @@
 #include <string>
 #include <math.h>
 #include <iostream>
+#include "histogram.pb.h"
 
 using namespace std;
 
@@ -53,6 +54,10 @@ public:
         return indx;
     }
 
+    double countValue(int indx){
+        return fLeft + fStep*indx;
+    }
+
     int size() override{
         return fNumber;
     }
@@ -79,6 +84,43 @@ public:
 
 };
 
+class UniformHistogram1D{
+private:
+    histogram::UniformHistogram1D* histogram1D;
+    histogram::UniformBins* uniformBins;
+public:
+    UniformBins* bins;
+    UniformHistogram1D(UniformBins* bins) : bins(bins){
+        histogram1D = new histogram::UniformHistogram1D();
+        uniformBins = new histogram::UniformBins();
+        uniformBins->set_left(bins->fLeft);
+        uniformBins->set_right(bins->fRigth);
+        uniformBins->set_number(bins->fNumber);
+        histogram1D->set_allocated_bins(uniformBins);
+        for (int i = 0; i < bins->fNumber;++i){
+            histogram1D->add_data(0);
+        }
+    }
+
+    void add(double value){
+        int indx = bins->countIndx(value);
+        if (indx != -1){
+            histogram1D->set_data(indx, histogram1D->data(indx) + 1);
+        }
+    }
+    void save(ostream* output){
+        long size = histogram1D->ByteSizeLong();
+        output->write(reinterpret_cast<char *>(&size), sizeof size);
+        histogram1D->SerializeToOstream(output);
+    }
+
+    void reset(){
+        for (int i = 0; i < bins->fNumber;++i){
+            histogram1D->set_data(i, 0);
+        }
+    }
+};
+
 
 class IHistrogramm{
 protected:
@@ -95,6 +137,51 @@ public:
 
     vector<int> getData(){
         return data;
+    }
+};
+
+template<class T>
+class Array2D{
+private:
+    int rows;
+    int columns;
+    vector<T> data;
+
+    inline int index(int i, int j){
+        return i*columns + j;
+    }
+    inline int size() {return rows*columns;}
+public:
+    int numberOfRows() {return rows;};
+    int numberOfColumns() {return columns;};
+
+    Array2D(int rows, int columns) : rows(rows), columns(columns){
+        int size = rows*columns;
+        data.reserve(size);
+        data.resize(size);
+        for (int i=0; i < size; ++i){
+            data[i] = 0;
+        }
+    };
+
+    void set(int i, int j, T value){
+        data[index(i,j)] = value;
+    }
+    T get(int i, int j){
+        return data[index(i,j)];
+    }
+
+    void increment(int i, int j){
+        data[index(i,j)]++;
+    }
+    void increment(int i, int j, T value){
+        data[index(i,j)]+=value;
+    }
+
+    void fill(T value = 0){
+        for (int i=0; i < size(); ++i){
+            data[i] = value;
+        }
     }
 };
 
@@ -137,6 +224,7 @@ public:
     }
 
     int get(int i, int j){
+        //TODO(check index)
         return data[i*fYbins->size() + j];
     }
 

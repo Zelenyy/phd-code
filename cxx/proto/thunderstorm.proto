@@ -29,3 +29,22 @@ message ParticleDetectorData{
     double radius= 4;
     double time = 5;
 }
+
+message Cumulator1D{
+    int32 number = 1;
+    double left = 2;
+    double right = 3;
+    repeated double data = 4 [packed=true];
+}
+
+message UniformBins{
+    int32 number = 1;
+    double left = 2;
+    double right = 3;
+}
+
+message Cumulator2D{
+    UniformBins x = 1;
+    UniformBins y = 2;
+    repeated double data = 3 [packed=true];
+}

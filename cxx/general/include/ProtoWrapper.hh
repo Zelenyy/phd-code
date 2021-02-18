@@ -9,26 +9,35 @@
 #include "iostream"
 #include "G4Track.hh"
 
-class DataContainer{
+class DataContainer {
 public:
-    virtual void initializeRun(std::ostream* out) = 0;
+    virtual void initializeRun(std::ostream *out) = 0;
+
     virtual void initializeEvent(int eventID) = 0;
-    virtual void addTrack(const G4Track* track) = 0;
+
+    virtual void addTrack(const G4Track *track) = 0;
+
+    virtual void preTrack(const G4Track *track) = 0;
+
+    virtual void postTrack(const G4Track *track) = 0;
+
     virtual void finishEvent() = 0;
+
     virtual void finishRun() = 0;
 };
 
-template <class T>
-class ProtoWrapper : public DataContainer{
+template<class T>
+class ProtoWrapper : public DataContainer {
 protected:
-    T* protoList = nullptr;
-    std::ostream* out;
+    T *protoList = nullptr;
+    std::ostream *out;
     int count = 0;
-    void write(){
-        if (protoList != nullptr){
+
+    void write() {
+        if (protoList != nullptr) {
             long size = protoList->ByteSizeLong();
-            if (size != 0){
-                out->write(reinterpret_cast<char*>(&size), sizeof size);
+            if (size != 0) {
+                out->write(reinterpret_cast<char *>(&size), sizeof size);
                 protoList->SerializeToOstream(out);
                 protoList->Clear();
                 count = 0;
@@ -39,32 +48,37 @@ protected:
 
 public:
 
-    explicit ProtoWrapper()= default;
+    explicit ProtoWrapper() = default;
 
-    void initializeRun(std::ostream* out) override{
+    void initializeRun(std::ostream *out) override {
         this->out = out;
-        if (protoList != nullptr){
+        if (protoList != nullptr) {
             delete protoList;
         }
         protoList = new T;
     }
 
-    void initializeEvent(int eventID) override{}
+    void initializeEvent(int eventID) override {}
 
-    void addTrack(const G4Track* track) override{
+    void addTrack(const G4Track *track) override {
         count++;
-        if (count > 100000){
+        if (count > 100000) {
             write();
         }
     };
 
-    void finishEvent() override{
+    void finishEvent() override {
         write();
     }
 
-    void finishRun() override{
+    void finishRun() override {
         write();
     }
+
+    void preTrack(const G4Track *track) override {};
+
+    void postTrack(const G4Track *track) override {};
+
 };
 
 #endif //PHD_CODE_PROTOWRAPPER_HH

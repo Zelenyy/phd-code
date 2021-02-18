@@ -7,7 +7,7 @@ PROJECT(phd-code)
 
 add_subdirectory(thunderstorm)
 add_subdirectory(satellite)
-add_subdirectory(tests)
+
 
 
 

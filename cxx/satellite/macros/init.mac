@@ -1,5 +1,6 @@
 /npm/geometry/type gdml
 /npm/geometry/gdml ../gdml/satellite.gdml
+/npm/visualization false
 /npm/satellite/detector single
 /npm/satellite/output file
 

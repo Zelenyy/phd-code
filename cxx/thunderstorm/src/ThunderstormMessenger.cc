@@ -25,20 +25,22 @@ void ThunderstormMessenger::SetNewValue(G4UIcommand *command, G4String newValue)
     if (setTrackingSettings(command, newValue)) {
         return;
     }
+    if (setGeometrySettings(command, newValue)){
+        return;
+    }
     if (command == physics) {
         settings->physics = newValue;
     } else if (command == tracking) {
         settings->tracking = newValue;
     } else if (command == minimalEnergy) {
         settings->minimal_energy = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
-    } else if (command == stackingParticle) {
+    } else if (command==superviseTree){
+        settings->superviseTree = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    }
+    else if (command == stackingParticle) {
         settings->particle_cylinder_stacking.push_back(newValue);
     } else if (command == detectorParticle) {
         settings->particle_detector.push_back(newValue);
-    } else if (command == geo_height) {
-        settings->geometrySettings->height = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
-    } else if (command == field_z) {
-        settings->geometrySettings->field_z = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
     } else if (command == aragats_geo_type) {
         if (newValue == "uniform") {
             settings->aragatsSettings->aragatsGeoType = AragatsGeoType::uniform;
@@ -70,6 +72,7 @@ ThunderstormMessenger::ThunderstormMessenger(Settings *pSettings) : ServerMessen
     initStackingSettings();
     initSteppingSettings();
     initTrackingSettings();
+    initGeometrySettings();
 
     physics = new G4UIcmdWithAString(physics_path.c_str(), this);
     physics->SetGuidance("Set using physics.");
@@ -89,16 +92,10 @@ ThunderstormMessenger::ThunderstormMessenger(Settings *pSettings) : ServerMessen
     minimalEnergy->SetParameterName("energy", true, false);
     minimalEnergy->SetDefaultUnit("MeV");
 
+    superviseTree = new G4UIcmdWithABool(supervise_tree_path.c_str(), this);
+    superviseTree->SetParameterName("flag", false);
 
-    geo_height = new G4UIcmdWithADoubleAndUnit(geo_height_path.c_str(), this);
-    geo_height->SetGuidance("Set height of cloud");
-    geo_height->SetParameterName("height", false);
-    geo_height->SetDefaultUnit("m");
 
-    field_z = new G4UIcmdWithADoubleAndUnit(field_z_path.c_str(), this);
-    field_z->SetGuidance("Set uniform Z-field in cloud");
-    field_z->SetParameterName("field", false);
-    field_z->SetDefaultUnit("kV/m");
 
     aragats = new G4UIdirectory(aragats_path.c_str());
     aragats->SetGuidance("This is helper");
@@ -163,6 +160,8 @@ void ThunderstormMessenger::initStackingSettings() {
     saveGamma->SetParameterName("flag", false);
     saveElectron = new G4UIcmdWithABool(stacking_electron_save_path.c_str(), this);
     saveElectron->SetParameterName("flag", false);
+    savePositron = new G4UIcmdWithABool(stacking_positron_save_path.c_str(), this);
+    savePositron->SetParameterName("flag", false);
 
     saveElectronCut = new G4UIcmdWithADoubleAndUnit(stacking_electron_save_cut__path.c_str(), this);
     saveElectronCut->SetParameterName("Minimal energy for save electron", false);
@@ -191,7 +190,9 @@ bool ThunderstormMessenger::setStackingSettings(G4UIcommand *command, G4String n
         stackingSettings->saveElectron = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else if (command == saveElectronCut) {
         stackingSettings->saveElectronCut = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
-    } else if (command == saveNeutron) {
+    } else if (command == savePositron){
+        stackingSettings->savePositron = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    }else if (command == saveNeutron) {
         stackingSettings->saveNeutron = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else if (command == stacking_type) {
         if (newValue == "simple") {
@@ -248,6 +249,52 @@ bool ThunderstormMessenger::setTrackingSettings(G4UIcommand *command, G4String n
         trackingSettings->savePositron = G4UIcmdWithABool::GetNewBoolValue(newValue);
     } else if (command == trackingSaveNeutron) {
         trackingSettings->saveNeutron = G4UIcmdWithABool::GetNewBoolValue(newValue);
+    } else {
+        return false;
+    }
+    return true;
+}
+
+void ThunderstormMessenger::initGeometrySettings() {
+
+    geometry = new G4UIdirectory(geometry_path.c_str());
+
+    geo_height = new G4UIcmdWithADoubleAndUnit(geo_height_path.c_str(), this);
+    geo_height->SetGuidance("Set height of cloud");
+    geo_height->SetParameterName("height", false);
+    geo_height->SetDefaultUnit("m");
+
+    field_z = new G4UIcmdWithADoubleAndUnit(field_z_path.c_str(), this);
+    field_z->SetGuidance("Set uniform Z-field in cloud");
+    field_z->SetParameterName("field", false);
+    field_z->SetDefaultUnit("kV/m");
+
+    cloud_length= new G4UIcmdWithADoubleAndUnit(cloud_length_path.c_str(), this);
+    cloud_length->SetGuidance("Set length of cloud");
+    cloud_length->SetParameterName("length", false);
+    cloud_length->SetDefaultUnit("m");
+
+    thunderstorm_geo_type = new G4UIcmdWithAString(thunderstorm_geo_type_path.c_str(), this);
+    thunderstorm_geo_type->SetParameterName("type", false);
+
+}
+
+bool ThunderstormMessenger::setGeometrySettings(G4UIcommand *command, G4String newValue) {
+    auto geoSettings = settings->geometrySettings;
+    if (command == thunderstorm_geo_type) {
+        if (newValue == "uniform_cylinder"){
+            geoSettings->geometryType = ThunderstormSubType::uniform_cylinder;
+        } else if (newValue == "aragats"){
+            geoSettings->geometryType = ThunderstormSubType::aragats;
+        }
+    } else if (command == cloud_length) {
+        geoSettings->cloud_length = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    } else if (command == field_z) {
+        geoSettings->field_z = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    }  else if (command == field_z) {
+        geoSettings->field_z =G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
+    }  else if (command == geo_height) {
+        geoSettings->height =G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(newValue);
     } else {
         return false;
     }

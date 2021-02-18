@@ -3,7 +3,10 @@
 //
 
 #include <G4UImanager.hh>
+#include "fstream"
 #include <FTFP_BERT.hh>
+
+using namespace std;
 
 int main(int argc, char **argv){
     fstream fin;

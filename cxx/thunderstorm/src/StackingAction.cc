@@ -15,9 +15,12 @@ StackingAction::StackingAction(Settings *settings) : fSettings(settings){
     stackingSettings = fSettings->stackingSettings;
     cut = settings->minimal_energy;
 
-    if (stackingSettings->saveGamma || stackingSettings->saveElectron || stackingSettings->saveNeutron){
+    if (stackingSettings->saveGamma || stackingSettings->saveElectron || stackingSettings->saveNeutron || stackingSettings->savePositron){
         data = new CylinderId;
         DataFileManager::instance()->registerDataContainer("stacking_simple", data);
+    }
+    if (fSettings->superviseTree){
+        superviseTree = SuperviseTree::instance();
     }
 }
 
@@ -81,6 +84,14 @@ G4ClassificationOfNewTrack StackingAction::ClassifyElectron(const G4Track * aTra
     if (!stackingSettings->enableElectron){
         return fKill;
     }
+
+    if (stackingSettings->enableGamma && fSettings->superviseTree){
+        double z = superviseTree->getParentZandDecrementSecondaries(aTrack);
+        if (z>=0 && z > aTrack->GetPosition().getZ()){
+
+        }
+    }
+
     if (aTrack->GetKineticEnergy() < 0.08 * MeV) {
         return fWaiting;
     }
@@ -88,6 +99,9 @@ G4ClassificationOfNewTrack StackingAction::ClassifyElectron(const G4Track * aTra
 }
 
 G4ClassificationOfNewTrack StackingAction::ClassifyPositron(const G4Track * aTrack) {
+    if (stackingSettings->savePositron){
+        data->addTrack(aTrack);
+    }
     if (aTrack->GetKineticEnergy() < cut){
         return fKill;
     }

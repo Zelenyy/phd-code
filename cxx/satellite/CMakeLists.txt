@@ -38,3 +38,17 @@ target_include_directories(geant4-satellite.exe
 TARGET_LINK_LIBRARIES(geant4-satellite.exe
         ${Geant4_LIBRARIES} ${Protobuf_LIBRARIES}
 )
+
+set(PROGRAM_SCRIPTS
+        init_vis.mac
+        gdml/satellite.gdml
+        gdml/satellite_anthracene.gdml
+        )
+
+foreach(_script ${PROGRAM_SCRIPTS})
+    configure_file(
+            ${PROJECT_SOURCE_DIR}/${_script}
+            ${PROJECT_BINARY_DIR}/${_script}
+            COPYONLY
+    )
+endforeach()

@@ -10,6 +10,13 @@
 #include <G4PVPlacement.hh>
 #include <G4NistManager.hh>
 #include "Settings.hh"
+#include <G4DormandPrince745.hh>
+#include <G4MagIntegratorDriver.hh>
+#include <G4ChordFinder.hh>
+#include "G4FieldManager.hh"
+#include <G4ElectricField.hh>
+#include <G4UniformElectricField.hh>
+#include <G4EqMagElectricField.hh>
 
 namespace ISA {
 
@@ -26,12 +33,16 @@ public:
     explicit ThunderstormConstruction(Settings *settings) : settings(settings) {
         InitializeMaterials();
         logger = Logger::instance();
+        geometrySettings = settings->geometrySettings;
     };
 
 protected:
     Settings *settings;
+    GeometrySettings* geometrySettings;
     Logger *logger;
 
+    G4double world_radius = 5 * kilometer;
+    G4double world_sizeZ = 10 * kilometer;
     G4VPhysicalVolume *constuctWorld();
 
     G4Material *vacuum;
@@ -57,6 +68,9 @@ public:
 
 };
 
+
+
+
 class AragatsConstruction : public ThunderstormConstruction {
 
 public:
@@ -79,6 +93,55 @@ private:
     G4LogicalVolume *CreateCORSIKA();
 
 };
+
+
+class UniformCylinderConstruction: public ThunderstormConstruction{
+private:
+    G4LogicalVolume *cloudLogic;
+public:
+    UniformCylinderConstruction(Settings* settings) : ThunderstormConstruction(settings) {};
+    G4VPhysicalVolume *Construct() override{
+        world_sizeZ = 2*geometrySettings->cloud_length;
+        auto world = constuctWorld();
+        auto logicWorld = world->GetLogicalVolume();
+        auto air = createAirForHeight(geometrySettings->height);
+        double length = geometrySettings->cloud_length;
+        auto cloudSolid = getCylinder("cloud", settings->geometrySettings->radius, length);
+
+        cloudLogic = new G4LogicalVolume(cloudSolid, air, "cloud");
+        auto cloudPhys = new G4PVPlacement(0, G4ThreeVector(0,0,length/2), cloudLogic, "cloud", logicWorld, false, 0, checkOverlaps);
+        return world;
+    }
+    void ConstructSDandField() override{
+        G4VUserDetectorConstruction::ConstructSDandField();
+//        auto sdman = G4SDManager::GetSDMpointer();
+//        if (detectorLogic != nullptr) {
+//            auto particleDetector = new ParticleDetector("detector", settings);
+//            sdman->AddNewDetector(particleDetector);
+//            detectorLogic->SetSensitiveDetector(particleDetector);
+//        }
+        logger->print("Set field Z: " + to_string(settings->geometrySettings->field_z / (kilovolt / meter)) + " kV/m");
+        G4ElectricField *fEMfield = new G4UniformElectricField(
+                G4ThreeVector(0.0, 0.0, -1*settings->geometrySettings->field_z));
+        auto *equation = new G4EqMagElectricField(fEMfield);
+        G4int nvar = 8;
+        auto fStepper = new G4DormandPrince745(equation, nvar);
+        auto *fieldManager = new G4FieldManager();
+        cloudLogic->SetFieldManager(fieldManager, true);
+        fieldManager->SetDetectorField(fEMfield);
+        G4double fMinStep;  // minimal step
+        fMinStep = 0.01 * mm; // minimal step
+        auto integrationDriver = new G4MagInt_Driver(
+                fMinStep,
+                fStepper,
+                fStepper->GetNumberOfVariables()
+        );
+        auto fChordFinder = new G4ChordFinder(integrationDriver);
+        fieldManager->SetChordFinder(fChordFinder);
+    };
+
+};
+
 
 //class CORSIKAUSSA {
 //

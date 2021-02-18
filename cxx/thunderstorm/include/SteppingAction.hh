@@ -9,13 +9,22 @@
 #include <G4UserSteppingAction.hh>
 #include "G4Step.hh"
 #include "Settings.hh"
+#include "DataThunderstorm.hh"
 
 class SteppingAction : public G4UserSteppingAction {
 public:
-    explicit SteppingAction(Settings* settings) : fSettings(settings){};
+    explicit SteppingAction(Settings* settings) : fSettings(settings){
+        if (fSettings->superviseTree){
+            superviseTree = SuperviseTree::instance();
+        }
+    };
     void UserSteppingAction(const G4Step *step) override;
+
+    ElectronsCounter* electronsCounter = nullptr;
 private:
     Settings* fSettings;
+    SuperviseTree* superviseTree;
+
 };
 
 class CriticalEnergySteppingAction : public G4UserSteppingAction {

@@ -7,8 +7,12 @@ include_directories(${Protobuf_INCLUDE_DIRS})
 
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ../proto/thunderstorm.proto ../proto/histogram.proto)
 
+# protobuf_generate_python(PY_SOURCES thunderstorm.proto)
+# add_custom_target(py_proto ALL DEPENDS ${PY_SOURCES})
 
 FIND_PACKAGE(Geant4 REQUIRED ui_all vis_all)
+
+
 
 IF(NOT Geant4_FOUND)
     MESSAGE(FATAL_ERROR "Geant4 not found!")

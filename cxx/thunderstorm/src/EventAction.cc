@@ -29,6 +29,10 @@ void EventAction::EndOfEventAction(const G4Event *anEvent) {
         delete list;
     }
 
+    if (fSettings->superviseTree){
+        electronCounter->endEvent();
+    }
+
     G4UserEventAction::EndOfEventAction(anEvent);
 }
 

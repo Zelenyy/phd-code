@@ -25,13 +25,6 @@ def main():
     logging.basicConfig(filename="run.log")
     logging.root.setLevel(logging.DEBUG)
 
-    meta = {
-        "command" : ["../build/satellite/geant4-satellite.exe"],
-        "gdml" : "../satellite.gdml",
-        "mode" : DetectorMode.SUM.value,
-        "port" : 8777
-    }
-
     max_theta_plus = 65.0
     max_theta_minus = 75.0
 

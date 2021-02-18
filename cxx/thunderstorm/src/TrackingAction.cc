@@ -11,6 +11,17 @@
 
 void TrackingAction::PreUserTrackingAction(const G4Track *track) {
     G4UserTrackingAction::PreUserTrackingAction(track);
+    auto def = track->GetDefinition();
+
+
+    if (fSettings->superviseTree){
+        if (def == G4Gamma::Definition()){
+            superviseTree->preTracking(track);
+        }
+        if (def==G4Electron::Definition()){
+            electronCounter->preTracking(track);
+        }
+    }
 
 }
 
@@ -47,6 +58,9 @@ void TrackingAction::PostGamma(const G4Track *track) {
 void TrackingAction::PostElectron(const G4Track *track) {
     if (fTrackingSettings->saveElectron){
         data->addTrack(track);
+    }
+    if (fSettings->superviseTree){
+        electronCounter->postTracking(track);
     }
 }
 

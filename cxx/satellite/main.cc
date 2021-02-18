@@ -50,9 +50,6 @@ int main(int argc, char **argv) {
     }
 
     // Run server
-
-
-
     g4Server->setup(*setup_in);
     if (g4Server->massWorld == nullptr) {
         cout<<"Not geometry"<<endl;

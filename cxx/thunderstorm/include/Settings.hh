@@ -16,6 +16,7 @@ using namespace std;
 
 
 enum class ThunderstormSubType {
+    uniform_cylinder,
     aragats
 };
 
@@ -23,6 +24,8 @@ struct GeometrySettings {
     double height = 0.0 * meter;
     double field_z = 0.0 * kilovolt / meter;
     double radius = 4 * kilometer;
+    double cloud_length = 1000*meter;
+    ThunderstormSubType geometryType = ThunderstormSubType::uniform_cylinder;
 };
 
 enum class AragatsGeoType {
@@ -80,6 +83,7 @@ struct StackingSettings{
     bool saveGamma = false;
     bool saveElectron = false;
     double saveElectronCut = 0.0;
+    bool savePositron = false;
     bool saveNeutron = false;
 };
 
@@ -90,6 +94,8 @@ enum class SteppingType{
 
 struct SteppingSettings{
     SteppingType type = SteppingType::simple;
+
+
 };
 
 class Settings : public ServerSettings {
@@ -97,7 +103,7 @@ public:
     double minimal_energy = 0.05 * MeV;
 
     ThunderstomPGSubType pgSubType = ThunderstomPGSubType::parma;
-    ThunderstormSubType geoSubType = ThunderstormSubType::aragats;
+
     string physics = "default";
     string tracking = "default";
 
@@ -112,6 +118,9 @@ public:
     StackingSettings* stackingSettings = new StackingSettings;
     SteppingSettings* steppingSettings = new SteppingSettings;
     TrackingSettings* trackingSettings = new TrackingSettings;
+
+    bool superviseTree = false;
+
     // Aragats
     AragatsSettings *aragatsSettings = new AragatsSettings;
 };

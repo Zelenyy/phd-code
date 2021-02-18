@@ -42,5 +42,6 @@ def main():
         plot_seconadry(args)
     return 0
 
+
 if __name__ == '__main__':
     main()

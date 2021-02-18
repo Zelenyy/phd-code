@@ -22,6 +22,7 @@ public:
 private:
     Settings* fSettings;
     StackingSettings * stackingSettings;
+    SuperviseTree* superviseTree;
     double cut = 0.05*MeV;
 
     CylinderId* data = nullptr;

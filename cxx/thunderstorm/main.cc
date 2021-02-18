@@ -58,10 +58,12 @@ int main(int argc, char **argv) {
     g4Server->setup(*setup_in);
     if (g4Server->massWorld == nullptr) {
         ThunderstormConstruction *construction;
-        if (settings->geoSubType == ThunderstormSubType::aragats){
+        if (settings->geometrySettings->geometryType == ThunderstormSubType::aragats){
             construction = new AragatsConstruction(settings);
         }
-
+        else if (settings->geometrySettings->geometryType == ThunderstormSubType::uniform_cylinder){
+            construction = new UniformCylinderConstruction(settings);
+        }
 //        g4Server->massWorld = thunderstormDC;
         g4Server->runManager->SetUserInitialization(construction);
     } else {
@@ -81,22 +83,6 @@ int main(int argc, char **argv) {
     }
     return 0;
 }
-
-//
-//    if (argc > 1) {
-
-//        else if (strcmp(argv[1], "vis") == 0){
-
-//            G4UIExecutive* ui =  new G4UIExecutive(1, argv);
-//            G4VisManager* visManager = new G4VisExecutive;
-//            visManager->Initialize();
-//            G4UImanager* UImanager = G4UImanager::GetUIpointer();
-//            UImanager->ApplyCommand("/control/execute init_vis.mac");
-//            ui->SessionStart();
-//            delete ui;
-//            dfClient->stop();
-//            fin.close();
-//        }
 
 
 
