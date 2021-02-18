@@ -36,17 +36,17 @@ def main():
     logging.root.setLevel(logging.DEBUG)
     OUTPUT_FILE = "result.hdf5"
     values_macros = {
-        "mode" : "single", # or "sum"
+        "mode" : "single", # or "sum" Сожранение или всех симуляций или среднего значения.
         "radius" : 0.15,
         # "shift": [0.0, 0.005, 0.016],
         # "theta": [0.0, 10.0, 20., 30.0, 50.0, 70.0],
-        "shift" : 0.0,
-        "theta" : 0.0,
+        "shift" : 0.0, # Сдвиг относительно центральной оси, может быть списком
+        "theta" : 0.0, # Отклонение от центральной оси, может быть списком
         "theta_unit": "degree",
-        'energy': np.arange(10.0,15.1, 1.0),
-        'number': [100],
+        'energy': np.arange(10.0,15.1, 1.0), # Набор энергий для симуляции
+        'number': [100], # Число событий в одной симуляции
         # 'particle': 'e-'
-        'particle': 'proton'
+        'particle': 'proton' # Запускаемая частица
     }
     meta = Meta(
         {
