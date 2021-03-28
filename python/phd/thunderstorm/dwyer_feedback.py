@@ -11,6 +11,20 @@ from scipy.optimize import curve_fit
 from tables import File, Group, pickle
 
 
+
+def min_or_zero(x):
+    if x.size !=0:
+        return x["energy"].min()
+    else:
+        return 0
+
+def max_or_zero(x):
+    if x.size !=0:
+        return x["energy"].max()
+    else:
+        return 0
+
+
 def load_reversed_data(path, field=8e-4, height=0):
     paths = find_by_meta(path,target_node="particle_detector_number", values_gdml_fieldValueZ=field, values_gdml_height = height)
     probability = []
