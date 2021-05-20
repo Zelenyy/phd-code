@@ -1,4 +1,7 @@
 import logging
+import os
+
+import numpy as np
 
 from phd.satellite.satellite_pb2 import MeanRun
 from tables import File, Group, IsDescription, Float32Col, Int32Col
@@ -25,9 +28,12 @@ def convert_satellite_proto(path, h5file: File, group: Group, settings):
     with open(path, "rb") as fin:
         run.ParseFromString(fin.read())
 
+    n = len(run.event[0].deposit)
+    name = os.path.split(path)[1].split(".")[0]
+
     table = h5file.create_table(group,
-                                name="deposit",
-                                description=DepositDescription,
+                                name=name,
+                                description=np.dtype([("event", "d",(n,))]),
                                 title="Deposit in detector cell", **settings)
     deposit = table.row
     for event in run.event:

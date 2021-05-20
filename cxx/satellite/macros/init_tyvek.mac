@@ -1,5 +1,5 @@
-/npm/geometry/type gdml
-/npm/geometry/gdml ../gdml/satellite.gdml
+/npm/geometry/type custom
+/npm/satellite/geometry/type tyvek
 /npm/visualization true
 /npm/satellite/detector single
 /npm/satellite/output file
@@ -7,7 +7,7 @@
 /gps/particle proton
 /gps/number 1
 /gps/direction 0 0 -1
-/gps/ene/mono 100 MeV
+/gps/ene/mono 75 MeV
 /gps/position 0. 0. 0.15 m
-/run/beamOn 5
+#/run/beamOn 5
 exit

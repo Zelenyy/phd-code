@@ -1,7 +1,9 @@
+from dataclasses import dataclass
 from typing import List
 
 import numpy as np
-from phd.satellite.mean_table import Normilizer
+from phd.satellite.mean_table import Normilizer, MeanItem
+from phd.satellite.single_processing import NormilizerContainer, DataMeshLoader, calculate_interpolators
 from scipy.interpolate import RegularGridInterpolator
 from scipy.stats import multivariate_normal
 
@@ -11,22 +13,20 @@ class Likelihood:
                  interpolators_mean: List[RegularGridInterpolator],
                  interpolators_std: List[RegularGridInterpolator],
                  event: np.ndarray,
-                 energy_normilizer: Normilizer = None,
-                 theta_normilizer: Normilizer = None,
-                 shift_normilizer: Normilizer = None,
+                 normilazers: NormilizerContainer = None,
                  splitting = None,
                  radius=0.015  # meter
                  ):
         self.mean_list = interpolators_mean
         self.std_list = interpolators_std
-        self.energy_normilizer = energy_normilizer
-        self.theta_normilizer = theta_normilizer
-        self.shift_normilizer = shift_normilizer
+        self.energy_normilizer = normilazers.energy_normilizer
+        self.theta_normilizer = normilazers.theta_normilizer
+        self.shift_normilizer = normilazers.shift_normilizer
         self.splitting = splitting
         self.radius = radius
         self.event = event
         self.full_energy = self._full_energy(event)
-        self.min_range = self._full_range(event)/1000.0 #meter
+        self.min_range = self._full_range(event)/1000.0 # meter
         self.max_theta = self._max_theta(radius, self.min_range)
 
         # print("Max theta: {}".format(self.max_theta))
@@ -137,3 +137,51 @@ class Likelihood:
 
         result[indx] = 1 / sum_
         return result
+
+
+@dataclass
+class LikelihoodFactory:
+    interpolators_mean: List[RegularGridInterpolator]
+    interpolators_std: List[RegularGridInterpolator]
+    normilazers: NormilizerContainer = None
+    splitting: List[int] = None
+
+    def build(self, event: np.ndarray):
+        treshhold = 10
+        indx = event > (event.mean()/treshhold)
+        new_event = np.zeros(event.size)
+        new_event[indx] = event[indx]
+        i = np.argmin(new_event > 0)
+        return Likelihood(self.interpolators_mean[:i], self.interpolators_std[:i], event[:i],
+                          self.normilazers, splitting = self.splitting)
+
+def load_splitting_likelihood_factory(path, particle="proton", splitting=None):
+    data_mesh_loader = DataMeshLoader.load(path, particle=particle)
+    if splitting is None:
+        split_mean_mesh = data_mesh_loader.mean
+        split_var_mesh = data_mesh_loader.var
+    else:
+        n = len(splitting)
+        split_mean_mesh = np.zeros((n,) + data_mesh_loader.mean.shape[1:])
+        split_var_mesh = np.zeros((n,) + data_mesh_loader.var.shape[1:])
+        i = 0
+        for indx, split in enumerate(splitting):
+            temp = []
+            for mean, var in zip(data_mesh_loader.mean[i:i + split], data_mesh_loader.var[i:i + split]):
+                # FIXME for simulation with diff `number`
+                temp.append(MeanItem(mean, var, number=1))
+            temp = MeanItem.sum_item(*temp)
+            split_mean_mesh[indx] = temp.mean  # /split
+            split_var_mesh[indx] = temp.variance  # /(split**2)
+            i += split
+
+    normalizers = data_mesh_loader.normalizers
+    inter_list, inter_std_list = calculate_interpolators(
+        data_mesh_loader.energy,
+        data_mesh_loader.theta,
+        data_mesh_loader.shift,
+        split_mean_mesh,
+        split_var_mesh)
+
+    return LikelihoodFactory(inter_list, inter_std_list,
+                             data_mesh_loader.normalizers, splitting)

@@ -48,13 +48,8 @@ int main(int argc, char **argv) {
             setup_in = fin;
             mainloop_in = fin;
         }
-
     }
-
     // Run server
-
-
-
     g4Server->setup(*setup_in);
     if (g4Server->massWorld == nullptr) {
         ThunderstormConstruction *construction;

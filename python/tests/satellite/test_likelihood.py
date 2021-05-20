@@ -37,7 +37,7 @@ class Likelihood(TestCase):
         path_recon= "/home/zelenyy/npm/phd/phd-code/python/simulation_scripts/satellite/recon_3.hdf5"
         with tables.open_file(path_recon) as h5file:
             data_recon = h5file.get_node("/", "proton_mean_test").read()
-        norm_cont = NormilizerContainer(path_mesh, particle="proton")
+        norm_cont = NormilizerContainer.load(path_mesh, particle="proton")
         data_recon["reconstructed"][:, 0] = norm_cont.energy_normilizer.unnormalize(data_recon["reconstructed"][:, 0])
         data_recon["reconstructed"][:, 1] = norm_cont.theta_normilizer.unnormalize(data_recon["reconstructed"][:, 1])
         data_recon["reconstructed"][:, 2]= norm_cont.shift_normilizer.unnormalize(data_recon["reconstructed"][:, 2])

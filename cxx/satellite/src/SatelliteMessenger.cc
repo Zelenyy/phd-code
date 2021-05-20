@@ -9,6 +9,10 @@ G4String SatelliteMessenger::GetCurrentValue(G4UIcommand *command) {
 }
 
 void SatelliteMessenger::SetNewValue(G4UIcommand *command, G4String newValue) {
+    if (setGeometrySettings(command, newValue)){
+        return;
+    }
+
     if (command == detector) {
         if (newValue == "sum") {
             settings->scoredDetectorMode = ScoredDetectorMode::sum;
@@ -32,6 +36,8 @@ SatelliteMessenger::SatelliteMessenger(Settings *pSettings) : ServerMessenger(pS
     satellite = new G4UIdirectory(satellite_directory.c_str());
     satellite->SetGuidance("This is helper");
 
+    initGeometrySettings();
+
     detector = new G4UIcmdWithAString(detector_mode.c_str(), this);
     detector->SetGuidance("Set detector mode");
     detector->SetParameterName("mode", true);
@@ -47,4 +53,22 @@ SatelliteMessenger::SatelliteMessenger(Settings *pSettings) : ServerMessenger(pS
     port = new G4UIcmdWithAnInteger(port_path.c_str(), this);
     output->SetParameterName("port", false);
 
+}
+
+void SatelliteMessenger::initGeometrySettings() {
+    geometry = new G4UIdirectory(geometry_path.c_str());
+    satellite_geo_type = new G4UIcmdWithAString(satellite_geo_type_path.c_str(), this);
+    satellite_geo_type->SetParameterName("type", false);
+}
+
+bool SatelliteMessenger::setGeometrySettings(G4UIcommand *command, G4String newValue) {
+    auto geoSettings = settings->geometrySettings;
+    if (command == satellite_geo_type) {
+        if (newValue == "tyvek"){
+            geoSettings->geometryType = SatelliteSubType::tyvek;
+        }
+    } else{
+        return false;
+    }
+    return true;
 }

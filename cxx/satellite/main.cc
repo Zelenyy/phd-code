@@ -1,12 +1,13 @@
 #include <SatelliteMessenger.hh>
 #include <G4UImanager.hh>
 #include <G4UIExecutive.hh>
-#include <QGSP_BERT.hh>
 #include <G4Server.hh>
 #include "Settings.hh"
 #include "ServerSettings.hh"
+#include "SatelliteConstruction.hh"
 //Mandatory user option
 #include "ActionInitialization.hh"
+#include "PhysList.hh"
 //Factory
 #include "SensitiveDetectorFactory.hh"
 #include "IFieldFactory.hh"
@@ -46,20 +47,18 @@ int main(int argc, char **argv) {
             setup_in = fin;
             mainloop_in = fin;
         }
-
     }
-
     // Run server
     g4Server->setup(*setup_in);
     if (g4Server->massWorld == nullptr) {
-        cout<<"Not geometry"<<endl;
-        return 0;
+        SatelliteConstruction* construction = new SatelliteConstruction(settings);
+        g4Server->runManager->SetUserInitialization(construction);
     } else {
         g4Server->massWorld->setDetectorFactory(new SensitiveDetectorFactory(settings));
         g4Server->massWorld->setFieldFactory(new IFieldFactory);
     }
 
-    auto physList = new QGSP_BERT(-1);
+    auto physList = new PhysList();
     g4Server->runManager->SetUserInitialization(physList);
     auto actionInit = new ActionInitialization(settings);
     g4Server->runManager->SetUserInitialization(actionInit);

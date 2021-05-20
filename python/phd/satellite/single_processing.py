@@ -1,58 +1,10 @@
+from dataclasses import dataclass
+
 import tables
-from phd.satellite.processing.likelihood_factory import LikelihoodFactory
 from scipy.interpolate import RegularGridInterpolator
 import numpy as np
-from phd.satellite.mean_table import MeanItem, Normilizer
+from phd.satellite.mean_table import MeanItem, NormilizerContainer
 
-
-#
-# def create_linear_interpolator(points, mean_item : MeanItem):
-#     interpolator = LinearNDInterpolator(points, mean_item.mean)
-#     interpolator_std = LinearNDInterpolator(points, np.sqrt(mean_item.variance))
-#     return interpolator, interpolator_std
-#
-# @dataclass
-# class InterpolatorContainer:
-#     n_layers : int
-#     name :str
-#     interpolator_mean : LinearNDInterpolator
-#     interpolator_std : LinearNDInterpolator
-#
-#
-# def create_interpolator_from_layers(parameters):
-#     points, mean_items, name = parameters
-#     n_layers = len(mean_items)
-#     if n_layers == 1:
-#         mean_item = mean_items[0]
-#     else:
-#         mean_item = MeanItem.join_item(*mean_items)
-#     interpolator, interpolator_std = create_linear_interpolator(points, mean_item)
-#     return InterpolatorContainer(n_layers, name, interpolator, interpolator_std)
-#
-# def save_interpolator(file : File, container: InterpolatorContainer):
-#     filters = Filters(complevel=3, fletcher32=True)
-#     data = pickle.dumps(container)
-#     array = file.create_array(file.root, container.name, obj=data, filters=filters)
-#     array.flush()
-#     return 0
-
-# def parameters_generator(points, mean_items: List[MeanItem], n = 1, particle="proton"):
-#     n_layrers = len(mean_items)
-#     for i in range(n_layrers - (n-1)):
-#         name = particle + "_".join(map(str,range(i, i + n)))
-#         temp = mean_items[i:i + n]
-#         yield (points, temp, name)
-
-# def save_interpolators(file, mean_items: List[MeanItem], points, n = 1, particle="proton", n_cpu_cores = None):
-#     with open_file(file, "a") as h5file:
-#         with Pool(n_cpu_cores) as p:
-#             n_layers = len(mean_items)
-#             with tqdm(total = (n_layers - (n-1))) as pbar:
-#                 generator = parameters_generator(points, mean_items, n=n, particle=particle)
-#                 for result in p.imap_unordered(create_interpolator_from_layers, generator):
-#                     save_interpolator(h5file, result)
-#                     pbar.update(1)
-#     return 0
 
 def convert_data_to_mean_points(data):
     points = np.zeros(shape=(data.size, 3))
@@ -82,47 +34,60 @@ def calculate_interpolators(energy, theta, shift, mean, var):
         inter_std_list.append(grid_inter_std)
     return inter_list, inter_std_list
 
-class NormilizerContainer:
-    def __init__(self, path, particle="proton"):
-        with tables.open_file(path) as h5file:
-            group = tables.Group(h5file.root, particle)
-            energy_node = h5file.get_node(group, "energy")
-            self.energy_normilizer = Normilizer.load_normilizer(energy_node)
-            theta_node = h5file.get_node(group, "theta")
-            self.theta_normilizer = Normilizer.load_normilizer(theta_node)
-            shift_node =  h5file.get_node(group, "shift")
-            self.shift_normilizer = Normilizer.load_normilizer(shift_node)
 
+
+@dataclass
 class DataMeshLoader:
-    def __init__(self, path, particle="proton"):
+    mean: np.ndarray
+    var: np.ndarray
+    energy: np.ndarray
+    theta: np.ndarray
+    shift: np.ndarray
+    normalizers: NormilizerContainer
+
+    @staticmethod
+    def load(path, particle="proton"):
         with tables.open_file(path) as h5file:
             group = tables.Group(h5file.root, particle)
-            self.mean = h5file.get_node(group, "mean").read()
-            self.var = h5file.get_node(group, "variance").read()
             energy_node = h5file.get_node(group, "energy")
-            self.energy = energy_node.read()
-            self.energy_normilizer = Normilizer.load_normilizer(energy_node)
+            energy = energy_node.read()
             theta_node = h5file.get_node(group, "theta")
-            self.theta_normilizer = Normilizer.load_normilizer(theta_node)
-            self.theta = theta_node.read()
-            shift_node =  h5file.get_node(group, "shift")
-            self.shift_normilizer = Normilizer.load_normilizer(shift_node)
-            self.shift = shift_node.read()
+            theta = theta_node.read()
+            shift_node = h5file.get_node(group, "shift")
+            shift = shift_node.read()
+            return DataMeshLoader(
+                h5file.get_node(group, "mean").read(),
+                h5file.get_node(group, "variance").read(),
+                energy, theta, shift,
+                NormilizerContainer(h5file, group)
+            )
 
+    def get_normed_axis(self):
+        m, n, k = self.energy.size, self.theta.size, self.shift.size
+        return np.tile(self.energy, n * k), np.tile(np.repeat(self.theta, m), k), np.repeat(self.shift, m * n)
 
-def load_likelihood_factory(path, particle="proton"):
-    data_mesh_loader = DataMeshLoader(path, particle=particle)
-    inter_list, inter_std_list = calculate_interpolators(
-        data_mesh_loader.energy,
-        data_mesh_loader.theta,
-        data_mesh_loader.shift,
-        data_mesh_loader.mean,
-        data_mesh_loader.var)
-    return LikelihoodFactory(inter_list, inter_std_list,
-                             data_mesh_loader.energy_normilizer,
-                             data_mesh_loader.theta_normilizer,
-                             data_mesh_loader.shift_normilizer)
+    def get_normed_points(self):
+        energy, theta, shift = self.get_normed_axis()
+        points = np.zeros((energy.size, 3), dtype="d")
+        points[:, 0] = energy
+        points[:, 1] = theta
+        points[:, 2] = shift
+        return points
 
+    def get_real_axis(self):
+        m, n, k = self.energy.size, self.theta.size, self.shift.size
+        enery = self.normalizers.energy_normilizer.unnormalize(self.energy)
+        theta = self.normalizers.theta_normilizer.unnormalize(self.theta)
+        shift = self.normalizers.shift_normilizer.unnormalize(self.shift)
+        return np.tile(enery, n * k), np.tile(np.repeat(theta, m), k), np.repeat(shift, m * n)
+
+    def get_real_points(self):
+        energy, theta, shift = self.get_axis()
+        points = np.zeros((energy.size, 3), dtype="d")
+        points[:, 0] = energy
+        points[:, 1] = theta
+        points[:, 2] = shift
+        return points
 
 def join_event(data, splitting):
     mean = data["mean"]
@@ -142,36 +107,3 @@ def join_event(data, splitting):
         i += split
     return split_mean, split_var
 
-def load_splitting_likelihood_factory(path, particle="proton", splitting=None):
-    if splitting is None:
-        return load_likelihood_factory(path, particle)
-    data_mesh_loader = DataMeshLoader(path, particle=particle)
-
-    n = len(splitting)
-
-    split_mean_mesh = np.zeros((n,) + data_mesh_loader.mean.shape[1:])
-    split_var_mesh = np.zeros((n,) + data_mesh_loader.var.shape[1:])
-
-    i = 0
-    for indx, split in enumerate(splitting):
-        temp = []
-        for mean, var in zip(data_mesh_loader.mean[i:i + split], data_mesh_loader.var[i:i + split]):
-            # FIXME for simulation with diff `number`
-            temp.append(MeanItem(mean, var, number=1))
-        temp = MeanItem.sum_item(*temp)
-        split_mean_mesh[indx] = temp.mean  # /split
-        split_var_mesh[indx] = temp.variance  # /(split**2)
-        i += split
-    inter_list, inter_std_list = calculate_interpolators(
-        data_mesh_loader.energy,
-        data_mesh_loader.theta,
-        data_mesh_loader.shift,
-        split_mean_mesh,
-        split_var_mesh)
-
-    lh_fact = LikelihoodFactory(inter_list, inter_std_list,
-                                data_mesh_loader.energy_normilizer,
-                                data_mesh_loader.theta_normilizer,
-                                data_mesh_loader.shift_normilizer,
-                                splitting)
-    return lh_fact

@@ -150,6 +150,9 @@ class Normilizer:
         self.init = init
         self.step = step
 
+    def __call__(self, data):
+        return self.normalize(data)
+
     def normalize(self, data):
         return (data - self.init) / self.norm
 
@@ -172,6 +175,23 @@ class Normilizer:
     def load_normilizer(node):
         return Normilizer(node.attrs["init"], step=node.attrs["step"],
                           norm=node.attrs["norm"])
+
+
+class NormilizerContainer:
+    def __init__(self, h5file, group):
+        energy_node = h5file.get_node(group, "energy")
+        self.energy_normilizer = Normilizer.load_normilizer(energy_node)
+        theta_node = h5file.get_node(group, "theta")
+        self.theta_normilizer = Normilizer.load_normilizer(theta_node)
+        shift_node =  h5file.get_node(group, "shift")
+        self.shift_normilizer = Normilizer.load_normilizer(shift_node)
+
+    @staticmethod
+    def load(path, particle="proton"):
+        with tables.open_file(path) as h5file:
+            group = tables.Group(h5file.root, particle)
+            return NormilizerContainer(h5file, group)
+
 
 def convert_to_mesh(input_file : str, output: str, particle="proton"):
     with tables.open_file(input_file) as h5file:

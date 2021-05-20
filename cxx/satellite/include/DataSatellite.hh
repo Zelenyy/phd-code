@@ -13,6 +13,8 @@ public:
     satellite::Run* run = nullptr;
     satellite::MeanRun* meanRun = nullptr;
 
+    satellite::Run* wrapperRun = nullptr;
+
     void initialize(Settings* settings){
         if (settings->scoredDetectorMode == ScoredDetectorMode::single){
             run = new satellite::Run();

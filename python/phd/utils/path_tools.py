@@ -5,7 +5,7 @@ from typing import Optional
 import numpy as np
 from dataforge import Meta
 from tables import File, open_file, Group
-
+import math
 
 def get_attrs_values(filename: str, attrs_name: str):
     result  = set()
@@ -39,7 +39,10 @@ def find_by_meta(filename: str, target_node = None, meta: Optional[Meta] = None,
 
     def check(node, meta):
         for key, value in meta.items():
-            if (node.attrs[key] != value):
+            if isinstance(value, float):
+                if not math.isclose(node.attrs[key], value):
+                    return False
+            elif (node.attrs[key] != value):
                 return False
         return True
 

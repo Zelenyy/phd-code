@@ -49,6 +49,15 @@ void RunAction::EndOfRunAction(const G4Run *aRun) {
      fout.open("deposit.proto.bin");
      if (fSettings->scoredDetectorMode == ScoredDetectorMode::single) {
          dataSatellite->run->SerializeToOstream(&fout);
+         if (fSettings->geometry == GeometryType::custom){
+             if (fSettings->geometrySettings->geometryType == SatelliteSubType::tyvek){
+                 ofstream fout_wrapper;
+                 fout_wrapper.open("wrapper_deposit.proto.bin");
+                 dataSatellite->wrapperRun->SerializeToOstream(&fout_wrapper);
+                 fout_wrapper.flush();
+                 fout_wrapper.close();
+             }
+         }
      }
      else if (fSettings->scoredDetectorMode == ScoredDetectorMode::sum) {
          dataSatellite->meanRun->SerializeToOstream(&fout);

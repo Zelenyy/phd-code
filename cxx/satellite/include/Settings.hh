@@ -11,6 +11,19 @@
 
 using namespace std;
 
+
+enum class SatelliteSubType {
+    tyvek
+};
+
+struct GeometrySettings {
+//    double height = 0.0 * meter;
+//    double field_z = 0.0 * kilovolt / meter;
+//    double radius = 4 * kilometer;
+//    double cloud_length = 1000*meter;
+    SatelliteSubType geometryType = SatelliteSubType::tyvek;
+};
+
 enum class ScoredDetectorMode{
     sum,
     single
@@ -27,6 +40,7 @@ public:
     ScoredDetectorMode scoredDetectorMode = ScoredDetectorMode::sum;
     OutputMode outputMode =OutputMode::file;
     int port = 8777;
+    GeometrySettings *geometrySettings = new GeometrySettings;
 };
 
 #endif //PHD_CODE_SETTINGS_HH
