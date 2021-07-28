@@ -79,7 +79,7 @@ def convert_hdf5_to_json(input_file, output_file, zip=False):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Convert HDF5 file to json.\n Requires: `pip install pytables`\n Using in-memory json dumper, use for small files')
+    parser = argparse.ArgumentParser(description='Convert HDF5 file to json.\n Requires: `pip install pytables`\n Using in-memory json dumper, use for small nodes')
     parser.add_argument("-i", '--input',
                         help='path to input hdf5 file',
                         default="input.hdf5",

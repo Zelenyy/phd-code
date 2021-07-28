@@ -16,14 +16,14 @@ inline string checkFileName(string filename, int i = 0, string postfix =".bin") 
         if (fin) {
             return checkFileName(filename, i + 1, postfix);
         } else {
-            return filename;
+            return filename + postfix;
         }
     } else
         fin.open(filename + to_string(i) + postfix);
     if (fin) {
         return checkFileName(filename, i + 1, postfix);
     } else {
-        return filename + to_string(i);
+        return filename + to_string(i) + postfix;
     }
 
 }

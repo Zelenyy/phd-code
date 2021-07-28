@@ -1,11 +1,10 @@
 import logging
 import os
-from string import Template
 
 from dataforge import Meta
 from phd.thunderstorm.convert_to_hdf5 import READERS_TXT, READERS_CYLINDER_DATA
 from phd.utils.hdf5_tools import get_convertor
-from phd.utils.run_tools import InputData, multirun_command, dir_name_generator, values_from_dict, create_gdml
+from phd.utils.run_tools import multirun_command, general_input_generator
 
 ROOT_PATH = os.path.dirname(__file__)
 
@@ -22,46 +21,37 @@ INPUT_TEMPLATE = """/df/project test
 /run/beamOn ${number}
 """
 
-def input_generator():
-    gdml_template = os.path.join(ROOT_PATH, "template", "diff_models_0.gdml")
+def main():
+    logging.basicConfig(filename = "run.log")
+    logging.root.setLevel(logging.DEBUG)
+
+    gdml_template = os.path.join(ROOT_PATH, "template", "cylinder.gdml")
+
     values_gdml = {
     'height' : [0],
     'cellHeight' : [600],
     'fieldValueZ' : [0, 3e-4, 10e-4],
     }
-    paths = list(map(lambda x: os.path.join("..", x),
-                     create_gdml(gdml_template, values_gdml)))
-    values_gps = {
+
+    values_macros = {
     "physics" : ["standard","standard_opt_1","standard_opt_2","standard_opt_3",  "standard_opt_4", "penelopa", "livermore", "emlowepphysics"],
-    "path" : paths,
-    'number' : [int(5)],
+    'number' : [int(1000)],
     'energy' : [10],
-    'posZ' : [399.9],
+    'posZ' : [299.9],
     'direction' : ['0 0 -1'],
     'particle' : 'e-'
                   }
+    meta = Meta(
+        {
+            "macros": values_macros,
+            "gdml": values_gdml
+        }
+    )
 
-    template = Template(INPUT_TEMPLATE)
-    for path, values in zip(
-            dir_name_generator(".", "sim"),
-            values_from_dict(values_gps)
-    ):
-        text = template.substitute(values)
-        data = InputData(
-            text=text,
-            path=path,
-            values=Meta(values)
-        )
-        yield data
-
-
-def main():
-    logging.basicConfig(filename = "run.log")
-    logging.root.setLevel(logging.DEBUG)
-
+    input_data = general_input_generator(meta, gdml_template, INPUT_TEMPLATE)
     command = "../build/thunderstorm/geant4-thunderstorm.exe"
     readers = READERS_CYLINDER_DATA + READERS_TXT
-    multirun_command(input_generator(), command, post_processor=get_convertor(readers, "./result.hdf5"))
+    multirun_command(input_data, command, post_processor=get_convertor(readers, "./result.hdf5", clear=False))
     return 0
 
 if __name__ == '__main__':

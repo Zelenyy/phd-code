@@ -1,0 +1,9 @@
+/df/project test
+/df/gdml gdml/diff_models_0.gdml
+/thunderstorm/physics standard
+/thunderstorm/stacking one_generation
+
+/gps/particle e-
+/gps/direction 0 0 -1
+/gps/position 0. 0. 499.9 m
+/gps/ene/mono 10 MeV

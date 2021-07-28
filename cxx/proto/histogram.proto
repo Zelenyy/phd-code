@@ -1,0 +1,42 @@
+syntax = "proto3";
+package histogram;
+
+message Histogram2DList{
+    repeated Histogram2D histogram = 1;
+}
+
+message Histogram2D{
+    repeated int32 data = 1 [packed=true];
+    Bins xbins = 2;
+    Bins ybins = 3;
+    repeated MetaPair meta = 4;
+}
+
+message Bins{
+    repeated double bins = 1 [packed=true];
+}
+
+message MetaPair{
+    string key = 1;
+    string value =2;
+}
+
+message Histogram4D{
+    repeated int32 data = 1 [packed=true];
+    Bins xbins = 2;
+    Bins ybins = 3;
+    Bins zbins = 4;
+    Bins tbins = 5;
+    repeated MetaPair meta = 6;
+}
+
+message UniformBins{
+    int32 number = 1;
+    double left = 2;
+    double right = 3;
+}
+
+message UniformHistogram1D{
+    UniformBins bins = 1;
+    repeated int32 data = 2 [packed=true];
+}

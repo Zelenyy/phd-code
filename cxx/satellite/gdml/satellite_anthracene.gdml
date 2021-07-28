@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="../../schema/gdml.xsd">
+    <define>
+        <quantity value="0.25" name="worldRadius" unit="m"/>
+        <quantity value="1" name="worldHeight" unit="m"/>
+        <quantity value="1" name="cellThickness" unit="mm"/>
+        <quantity value="1.5" name="cellRadius" unit="cm"/>
+        <position name="centerPos"/>
+        <variable value="0" name="x"/>
+        <constant value="100" name="numberCell"/>
+    </define>
+    <solids>
+        <tube name="world" rmax="worldRadius" z="worldHeight" deltaphi="360" aunit="degree"/>
+        <tube name="cell" rmax="cellRadius" z="cellThickness" deltaphi="360" aunit="degree"/>
+    </solids>
+    <structure>
+        <volume name="Cell">
+        <materialref ref="G4_ANTHRACENE"/>
+        <solidref ref="cell"/>
+        <auxiliary auxtype="SensDet" auxvalue="SensitiveScoredDetector"/>
+        </volume>
+        <volume name="World">
+            <materialref ref="G4_Galactic"/>
+            <solidref ref="world"/>
+            <loop for="x" from="1" to="numberCell" step="1">
+                <physvol>
+                    <volumeref ref="Cell"/>
+                    <position name="cellPos" x="0" y="0.0" z="(numberCell - x)*cellThickness"/>
+                </physvol>
+            </loop>
+        </volume>
+    </structure>
+    <setup name="test" version="1.0">
+        <world ref="World"/>
+    </setup>
+</gdml>

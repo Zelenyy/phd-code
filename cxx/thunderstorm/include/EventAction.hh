@@ -7,21 +7,27 @@
 
 
 #include <G4UserEventAction.hh>
-#include "Data.hh"
-#include "DataManager.hh"
+#include "Settings.hh"
+#include "DataThunderstorm.hh"
+#include <iostream>
+#include <DataFileManager.hh>
 
 class EventAction : public G4UserEventAction {
 public:
-    EventAction(){
-        dataManager = DataManager::instance();
+    explicit EventAction(Settings* settings): G4UserEventAction(), fSettings(settings){
+        dataFileManager = DataFileManager::instance();
     };
 
     void BeginOfEventAction(const G4Event *anEvent) override;
 
     void EndOfEventAction(const G4Event *anEvent) override;
 
+
+public:
+    ElectronsCounter* electronCounter = nullptr;
 private:
-    DataManager * dataManager;
+    DataFileManager* dataFileManager;
+    Settings* fSettings;
 };
 
 

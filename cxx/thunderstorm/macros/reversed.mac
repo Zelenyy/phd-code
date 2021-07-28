@@ -1,0 +1,11 @@
+/df/project test
+/df/gdml ../gdml/reversed.gdml
+/thunderstorm/physics standard_opt_4
+/thunderstorm/stacking particle_cylinder
+/thunderstorm/addParticleInPCS gamma
+/thunderstorm/addParticleInPD e-
+
+/gps/particle e-
+/gps/direction 0 0 1
+/gps/position 0. 0. 0.0 m
+/gps/ene/mono 1 MeV

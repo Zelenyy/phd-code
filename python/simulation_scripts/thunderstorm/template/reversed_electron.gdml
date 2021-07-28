@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="../../../../cxx/schema/gdml.xsd">
+    <define>
+        <constant value="${height}" name="height"/>
+        <constant value="288.15" name="normalTemperature"/>
+        <constant value="-0.0065*kelvin / m" name="temperatureGrad"/>
+        <constant value="101325" name="normalPressure"/>
+        <constant value="9.80665" name="gravityAccelerate"/>
+        <constant value="0.0289644" name="M"/>
+        <constant value="8.31447" name="R"/>
+        <constant value="normalTemperature + temperatureGrad*height" name="temperature"/>
+        <constant value="normalPressure*exp(-1*M*gravityAccelerate*height/(R*temperature))" name="pressure"/>
+        <constant value="pressure*M/(R*temperature)*1e-3" name="density"/>
+        <quantity value="100" name="worldWidth" unit="m"/>
+        <quantity value="200" name="worldHeight" unit="m"/>
+        <quantity value="21" name="cellHeight" unit="m"/>
+        <quantity value="90" name="cellWidth" unit="m"/>
+        <quantity value="0.1" name="detectorThickness" unit="m"/>
+        <position name="centerPos"/>
+        <position name="cellPos" z="9.5" unit="m"/>
+        <position name="detectorPos" z="-1 - (0.1/2)" unit="m"/>
+    </define>
+    <materials>
+        <material name="airHeigth">
+            <D value="density"/>
+            <!--suppress XmlInvalidId -->
+            <fraction n="1.0" ref="G4_AIR"/>
+        </material>
+    </materials>
+    <solids>
+        <tube name="world" rmax="worldWidth" z="worldHeight" deltaphi="360" aunit="degree"/>
+        <tube name="cell" rmax="cellWidth/2" z="cellHeight" deltaphi="360" aunit="degree"/>
+        <tube name="detector" rmax="cellWidth/2" z="detectorThickness" deltaphi="360" aunit="degree"/>
+    </solids>
+    <structure>
+        <volume name="Cell">
+            <materialref ref="airHeigth"/>
+            <solidref ref="cell"/>
+            <auxiliary auxtype="ElectricField" auxvalue="Uniform">
+                <auxiliary auxtype="Ex" auxvalue="0"/>
+                <auxiliary auxtype="Ey" auxvalue="0"/>
+                <auxiliary auxtype="Ez" auxvalue="${fieldValueZ}"/>
+            </auxiliary>
+        </volume>
+        <volume name="Detector">
+            <materialref ref="airHeigth"/>
+            <solidref ref="detector"/>
+            <auxiliary auxtype="SensDet" auxvalue="particle"/>
+        </volume>
+        <volume name="World">
+            <materialref ref="airHeigth"/>
+            <solidref ref="world"/>
+            <physvol>
+                <volumeref ref="Cell"/>
+                <positionref ref="cellPos"/>
+            </physvol>
+            <physvol>
+                <volumeref ref="Detector"/>
+                <positionref ref="detectorPos"/>
+            </physvol>
+
+        </volume>
+    </structure>
+    <setup name="test" version="1.0">
+        <world ref="World"/>
+    </setup>
+</gdml>

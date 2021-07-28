@@ -1,0 +1,14 @@
+/npm/geometry/type custom
+/npm/visualization true
+/npm/thunderstorm/height 3750 m
+/npm/thunderstorm/field_z 220 kV/m
+/npm/thunderstorm/aragats/geo_type pie
+/npm/thunderstorm/physics standard
+/npm/thunderstorm/energy/cut 0.01
+
+/gps/particle e-
+/gps/position 0.0 0.0 499.5 meter
+/gps/direction 0 0 -1
+/gps/ene/mono 1 MeV
+/run/beamOn 1
+exit

@@ -1,0 +1,16 @@
+syntax = "proto3";
+package satellite;
+
+message Event{
+    repeated double deposit = 1 [packed = true];
+}
+
+message Run{
+    repeated Event event = 1;
+}
+
+message MeanRun{
+    repeated double mean = 1 [packed = true];
+    repeated double variance = 2 [packed = true];
+    int32 number = 3;
+}

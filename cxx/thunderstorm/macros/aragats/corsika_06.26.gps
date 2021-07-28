@@ -1,0 +1,18 @@
+/npm/geometry/type custom
+/npm/visualization true
+/npm/thunderstorm/height 3750 m
+/npm/thunderstorm/field_z 0 kV/m
+/npm/thunderstorm/aragats/geo_type pie
+/npm/thunderstorm/physics FTFP_BERT_opt4
+/npm/thunderstorm/energy/cut 0.01
+/npm/thunderstorm/aragats/only_muon true
+/npm/thunderstorm/aragats/pie/low 3325 m
+/npm/thunderstorm/aragats/pie/high 80000 m
+
+/gps/particle proton
+/gps/position 0.0 0.0 79499.5 meter
+/gps/direction 0 0 -1
+/gps/ene/type Pow
+/gps/ene/alpha -2.7
+/run/beamOn 1
+exit

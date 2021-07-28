@@ -11,9 +11,11 @@
 using namespace std;
 class SensitiveDetectorFactory: public IDetectorFactory {
 public:
+    explicit SensitiveDetectorFactory(Settings* settings);
     G4VSensitiveDetector *getSensitiveDetector(G4GDMLAuxListType::const_iterator vit) override;
 
-
+private:
+    Settings* settings;
 };
 
 

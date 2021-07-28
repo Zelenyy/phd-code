@@ -1,0 +1,50 @@
+syntax = "proto3";
+package thunderstorm;
+
+message CylinderIdList{
+    int32 eventId = 1;
+    repeated CylinderId cylinderId = 2;
+}
+
+message CylinderId{
+    int32 id = 1;
+    int32 parent_id = 2;
+    int32 particle = 3;
+    double energy = 4;
+    double theta = 5;
+    double radius= 6;
+    double z = 7;
+    double time = 8;
+}
+
+message ParticleDetectorList{
+    int32 eventId = 1;
+    repeated ParticleDetectorData data = 2;
+}
+
+message ParticleDetectorData{
+    int32 particle = 1;
+    double energy = 2;
+    double theta = 3;
+    double radius= 4;
+    double time = 5;
+}
+
+message Cumulator1D{
+    int32 number = 1;
+    double left = 2;
+    double right = 3;
+    repeated double data = 4 [packed=true];
+}
+
+message UniformBins{
+    int32 number = 1;
+    double left = 2;
+    double right = 3;
+}
+
+message Cumulator2D{
+    UniformBins x = 1;
+    UniformBins y = 2;
+    repeated double data = 3 [packed=true];
+}

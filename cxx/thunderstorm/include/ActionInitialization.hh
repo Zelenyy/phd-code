@@ -7,6 +7,7 @@
 
 #include "G4VUserActionInitialization.hh"
 #include "Settings.hh"
+#include "PARMAPrimaryGenerator.hh"
 
 class ActionInitialization : public G4VUserActionInitialization {
 public:

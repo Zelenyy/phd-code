@@ -1,46 +1,68 @@
 import json
 import os
+from typing import Optional
 
 import numpy as np
+from dataforge import Meta
+from tables import File, open_file, Group
+import math
+
+def get_attrs_values(filename: str, attrs_name: str):
+    result  = set()
+    with open_file(filename) as h5file:
+        for node in h5file.walk_nodes():
+            if isinstance(node, Group):
+                continue
+            try:
+                result.add(node.attrs[attrs_name])
+            except (AttributeError, KeyError):
+                continue
+    return result
+
+def find_group_by_meta(filename, **kwargs):
+    result = []
+    with open_file(filename) as h5file:
+        for group in h5file.root:
+            meta = h5file.get_node(group, "meta")
+            meta = Meta(meta)
+            flag = True
+            for key, value in kwargs:
+                if meta[key] != value:
+                    flag = False
+                    break
+            if flag:
+                result.append(group._v_pathname)
+    return result
 
 
-def read_meta(path_dir):
-    with open(os.path.join(path_dir, 'meta.json')) as fin:
-        return json.load(fin)
+def find_by_meta(filename: str, target_node = None, meta: Optional[Meta] = None, **kwargs):
 
+    def check(node, meta):
+        for key, value in meta.items():
+            if isinstance(value, float):
+                if not math.isclose(node.attrs[key], value):
+                    return False
+            elif (node.attrs[key] != value):
+                return False
+        return True
 
-def find_meta_path(root_path):
-    paths = []
-    for pathDir, dirList, fileList in os.walk(root_path):
-        if 'meta.json' in fileList:
-            paths.append(pathDir)
-    return paths
-
-
-def select_meta_path(paths, **kwargs):
-    newPaths = []
-    keys = set(kwargs.keys())
-    for path in paths:
-        meta = read_meta(path)
-        temp = False
-        mkeys = set(meta.keys())
-        for key in keys:
-            if not (key in mkeys):
-                break
-        else:
-            temp = True
-        if not temp:
-            continue
-        for key in keys:
-            if type(kwargs[key]) == list:
-                if not meta[key] in kwargs[key]:
-                    temp = False
-            elif meta[key] != kwargs[key]:
-                temp = False
-        if temp:
-            newPaths.append(path)
-    return newPaths
-
+    results = []
+    with open_file(filename) as h5file:
+        for group in h5file.root:
+            if target_node is None:
+                for node in h5file.list_nodes(group):
+                    if check(node, kwargs):
+                         results.append(node._v_pathname)
+            elif isinstance(target_node, str):
+                node_item = h5file.get_node(group, target_node)
+                if check(node_item, kwargs):
+                    results.append(node_item._v_pathname)
+            elif isinstance(target_node, list):
+                for node_item in node:
+                    node_item = h5file.get_node(group, node_item)
+                    if check(node_item, kwargs):
+                         results.append(node_item._v_pathname)
+    return results
 
 class LogTime:
     """
